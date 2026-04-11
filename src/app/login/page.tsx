@@ -1,31 +1,67 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import AuthCard from "@/components/layout/AuthCard";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PageShell from "@/components/layout/PageShell";
+import { signIn } from "@/lib/auth/actions";
 
-export const metadata: Metadata = {
-  title: "Log In",
-  description: "Log in to your Loopawear account.",
-  robots: { index: false },
+type LoginPageProps = {
+  searchParams?: Promise<{
+    error?: string;
+  }>;
 };
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+  const error = params?.error;
+
   return (
     <PageShell>
       <AuthCard title="Log in" description="Welcome back to Loopawear">
-        <div className="mt-8 flex flex-col gap-4">
+        <form action={signIn} className="mt-8 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-xs font-medium text-zinc-400">Email</label>
-            <Input id="email" type="email" name="email" autoComplete="email" placeholder="you@example.com" />
+            <label
+              htmlFor="email"
+              className="text-xs font-medium text-zinc-400"
+            >
+              Email
+            </label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              required
+            />
           </div>
+
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-xs font-medium text-zinc-400">Password</label>
-            <Input id="password" type="password" name="password" autoComplete="current-password" placeholder="••••••••" />
+            <label
+              htmlFor="password"
+              className="text-xs font-medium text-zinc-400"
+            >
+              Password
+            </label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="current-password"
+              required
+            />
           </div>
-          <Button type="submit" fullWidth>Log in</Button>
-        </div>
+
+          {error ? (
+            <p className="text-sm text-red-400">{error}</p>
+          ) : null}
+
+          <Button type="submit" fullWidth>
+            Log in
+          </Button>
+        </form>
+
         <p className="mt-6 text-center text-sm text-zinc-500">
           Don&apos;t have an account?{" "}
           <Link
