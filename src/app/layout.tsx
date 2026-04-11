@@ -15,8 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Loopawear",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  title: {
+    template: "%s | Loopawear",
+    default: "Loopawear",
+  },
   description: "AI-powered apparel marketplace. Generate designs, create products, and sell to the world.",
+  openGraph: {
+    type: "website",
+    siteName: "Loopawear",
+    title: "Loopawear",
+    description: "AI-powered apparel marketplace. Generate designs, create products, and sell to the world.",
+  },
+  twitter: {
+    card: "summary",
+    title: "Loopawear",
+    description: "AI-powered apparel marketplace. Generate designs, create products, and sell to the world.",
+  },
 };
 
 export default function RootLayout({

@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Button from "@/components/ui/Button";
 import PageShell from "@/components/layout/PageShell";
+
+export const metadata: Metadata = {
+  title: { absolute: "Loopawear" },
+  description: "Generate AI clothing designs, place them on products, and sell to the world.",
+};
 
 export default function Home() {
   return (

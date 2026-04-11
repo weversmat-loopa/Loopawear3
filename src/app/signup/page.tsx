@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import AuthCard from "@/components/layout/AuthCard";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PageShell from "@/components/layout/PageShell";
+
+export const metadata: Metadata = {
+  title: "Sign Up",
+  description: "Create a Loopawear account and start designing.",
+  robots: { index: false },
+};
 
 export default function SignupPage() {
   return (

@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
 import PageIntro from "@/components/layout/PageIntro";
+
+export const metadata: Metadata = {
+  title: "Design Studio",
+  description: "Design unique apparel with AI. Describe your vision and let AI bring it to life.",
+};
 
 export default function GeneratePage() {
   return (

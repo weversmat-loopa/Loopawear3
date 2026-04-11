@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import PageShell from "@/components/layout/PageShell";
 import PageIntro from "@/components/layout/PageIntro";
+
+export const metadata: Metadata = {
+  title: "Marketplace",
+  description: "Discover and shop original AI-generated apparel from independent creators on Loopawear.",
+};
 
 export default function MarketplacePage() {
   return (
