@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Button from "@/components/ui/Button";
 import PageShell from "@/components/layout/PageShell";
 
 export default function LoginPage() {
@@ -22,9 +23,7 @@ export default function LoginPage() {
             placeholder="Password"
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
           />
-          <button className="w-full rounded-full bg-white py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75">
-            Log in
-          </button>
+          <Button type="submit" fullWidth>Log in</Button>
         </div>
         <p className="mt-6 text-center text-sm text-zinc-500">
           Don&apos;t have an account?{" "}

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Button from "@/components/ui/Button";
 import PageShell from "@/components/layout/PageShell";
 
 export default function Home() {
@@ -14,18 +14,8 @@ export default function Home() {
         Generate AI clothing designs, place them on products, and sell to the world.
       </p>
       <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Link
-          href="/generate"
-          className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75"
-        >
-          Get started
-        </Link>
-        <Link
-          href="/marketplace"
-          className="rounded-full border border-zinc-700 px-8 py-3 text-sm font-semibold text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
-        >
-          Browse marketplace
-        </Link>
+        <Button href="/generate" variant="primary">Get started</Button>
+        <Button href="/marketplace" variant="ghost">Browse marketplace</Button>
       </div>
     </PageShell>
   );
