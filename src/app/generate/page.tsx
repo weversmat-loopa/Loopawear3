@@ -1,18 +1,15 @@
 import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
+import PageIntro from "@/components/layout/PageIntro";
 
 export default function GeneratePage() {
   return (
     <PageShell>
-      <span className="mb-6 rounded-full border border-zinc-800 px-4 py-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
-        Design studio
-      </span>
-      <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl">
-        Create your design
-      </h1>
-      <p className="mt-5 max-w-sm text-base leading-relaxed text-zinc-400">
-        The AI design studio is being built. This is where you will generate and customize your clothing designs.
-      </p>
+      <PageIntro
+        eyebrow="Design studio"
+        heading="Create your design"
+        description="Turn a prompt into a wearable design. Describe your vision and let AI bring it to life."
+      />
       <Link
         href="/"
         className="mt-10 text-sm font-medium text-zinc-500 transition-colors hover:text-white"
