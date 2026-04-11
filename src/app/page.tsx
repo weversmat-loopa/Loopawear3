@@ -1,6 +1,8 @@
+import PageShell from "@/components/layout/PageShell";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center bg-black px-6 text-center">
+    <PageShell>
       <span className="mb-6 rounded-full border border-zinc-800 px-4 py-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
         AI-powered apparel
       </span>
@@ -16,6 +18,6 @@ export default function Home() {
       >
         Get started
       </a>
-    </main>
+    </PageShell>
   );
 }

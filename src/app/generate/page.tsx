@@ -1,8 +1,9 @@
 import Link from "next/link";
+import PageShell from "@/components/layout/PageShell";
 
 export default function GeneratePage() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center bg-black px-6 text-center">
+    <PageShell>
       <span className="mb-6 rounded-full border border-zinc-800 px-4 py-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
         Design studio
       </span>
@@ -18,6 +19,6 @@ export default function GeneratePage() {
       >
         ← Back to home
       </Link>
-    </main>
+    </PageShell>
   );
 }
