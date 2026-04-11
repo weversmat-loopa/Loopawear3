@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import PageShell from "@/components/layout/PageShell";
-import PageIntro from "@/components/layout/PageIntro";
+import GenerateStudio from "./GenerateStudio";
 
 export const metadata: Metadata = {
   title: "Design Studio",
@@ -8,13 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function GeneratePage() {
-  return (
-    <PageShell>
-      <PageIntro
-        eyebrow="Design studio"
-        heading="Create your design"
-        description="Turn a prompt into a wearable design. Describe your vision and let AI bring it to life."
-      />
-    </PageShell>
-  );
+  return <GenerateStudio />;
 }
