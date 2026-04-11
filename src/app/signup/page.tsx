@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AuthCard from "@/components/layout/AuthCard";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PageShell from "@/components/layout/PageShell";
@@ -6,16 +7,19 @@ import PageShell from "@/components/layout/PageShell";
 export default function SignupPage() {
   return (
     <PageShell>
-      <div className="w-full max-w-sm text-left">
-        <h1 className="text-2xl font-bold tracking-tight text-white">
-          Create an account
-        </h1>
-        <p className="mt-2 text-sm text-zinc-400">
-          Join Loopawear and start creating
-        </p>
-        <div className="mt-8 flex flex-col gap-3">
-          <Input type="email" placeholder="Email" />
-          <Input type="password" placeholder="Password" />
+      <AuthCard
+        title="Create an account"
+        description="Join Loopawear and start creating"
+      >
+        <div className="mt-8 flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="email" className="text-xs font-medium text-zinc-400">Email</label>
+            <Input id="email" type="email" name="email" autoComplete="email" placeholder="you@example.com" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="password" className="text-xs font-medium text-zinc-400">Password</label>
+            <Input id="password" type="password" name="password" autoComplete="new-password" placeholder="••••••••" />
+          </div>
           <Button type="submit" fullWidth>Create account</Button>
         </div>
         <p className="mt-6 text-center text-sm text-zinc-500">
@@ -27,7 +31,7 @@ export default function SignupPage() {
             Log in
           </Link>
         </p>
-      </div>
+      </AuthCard>
     </PageShell>
   );
 }
