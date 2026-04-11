@@ -1,3 +1,4 @@
+import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
 
 export default function Home() {
@@ -12,12 +13,20 @@ export default function Home() {
       <p className="mt-5 max-w-sm text-base leading-relaxed text-zinc-400">
         Generate AI clothing designs, place them on products, and sell to the world.
       </p>
-      <a
-        href="/generate"
-        className="mt-10 inline-block rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75"
-      >
-        Get started
-      </a>
+      <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <Link
+          href="/generate"
+          className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+        >
+          Get started
+        </Link>
+        <Link
+          href="/marketplace"
+          className="rounded-full border border-zinc-700 px-8 py-3 text-sm font-semibold text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+        >
+          Browse marketplace
+        </Link>
+      </div>
     </PageShell>
   );
 }
