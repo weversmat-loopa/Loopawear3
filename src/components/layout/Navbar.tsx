@@ -16,23 +16,39 @@ export default function Navbar() {
     <header className="flex h-14 w-full items-center justify-between border-b border-zinc-800 bg-black px-6">
       <Link
         href="/"
-        className="text-sm font-bold tracking-tight text-white hover:opacity-80 transition-opacity"
+        className="text-sm font-bold tracking-tight text-white transition-opacity hover:opacity-80"
       >
         Loopawear
       </Link>
-      <nav className="flex items-center gap-6">
-        {links.map(({ label, href }) => (
+      <div className="flex items-center gap-6">
+        <nav className="flex items-center gap-6">
+          {links.map(({ label, href }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`text-sm font-medium transition-colors hover:text-white ${
+                pathname === href ? "text-white" : "text-zinc-400"
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
+        <div className="flex items-center gap-3">
           <Link
-            key={href}
-            href={href}
-            className={`text-sm font-medium transition-colors hover:text-white ${
-              pathname === href ? "text-white" : "text-zinc-400"
-            }`}
+            href="/login"
+            className="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
           >
-            {label}
+            Log in
           </Link>
-        ))}
-      </nav>
+          <Link
+            href="/signup"
+            className="rounded-full border border-zinc-700 px-4 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+          >
+            Sign up
+          </Link>
+        </div>
+      </div>
     </header>
   );
 }
