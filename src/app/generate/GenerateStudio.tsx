@@ -2,12 +2,21 @@
 
 import { useState } from "react";
 
+const PRODUCT_TYPES = ["T-shirt", "Hoodie", "Sweatshirt", "Tote bag"] as const;
+const STYLE_MOODS = ["Minimal", "Bold", "Vintage", "Abstract", "Graphic"] as const;
+
+type ProductType = (typeof PRODUCT_TYPES)[number] | null;
+type StyleMood = (typeof STYLE_MOODS)[number] | null;
+
 export default function GenerateStudio() {
   const [prompt, setPrompt] = useState("");
+  const [productType, setProductType] = useState<ProductType>(null);
+  const [styleMood, setStyleMood] = useState<StyleMood>(null);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     // AI generation will be wired in here
+    // available inputs: prompt, productType, styleMood
   }
 
   return (
@@ -20,23 +29,74 @@ export default function GenerateStudio() {
           Describe your design and let AI bring it to life.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-8">
-          <label
-            htmlFor="prompt"
-            className="text-xs font-medium uppercase tracking-wider text-zinc-500"
-          >
-            Prompt
-          </label>
-          <textarea
-            id="prompt"
-            name="prompt"
-            rows={4}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder="Describe the design you want to create — style, colors, motifs, mood..."
-            className="mt-2 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
-          />
-          <div className="mt-4 flex justify-end">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Product
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {PRODUCT_TYPES.map((type) => (
+                <button
+                  key={type}
+                  type="button"
+                  onClick={() =>
+                    setProductType(productType === type ? null : type)
+                  }
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                    productType === type
+                      ? "border-white bg-white text-black"
+                      : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                  }`}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Style
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {STYLE_MOODS.map((style) => (
+                <button
+                  key={style}
+                  type="button"
+                  onClick={() =>
+                    setStyleMood(styleMood === style ? null : style)
+                  }
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                    styleMood === style
+                      ? "border-white bg-white text-black"
+                      : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                  }`}
+                >
+                  {style}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="prompt"
+              className="text-xs font-medium uppercase tracking-wider text-zinc-500"
+            >
+              Prompt
+            </label>
+            <textarea
+              id="prompt"
+              name="prompt"
+              rows={4}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder="Describe the design you want to create — style, colors, motifs, mood..."
+              className="mt-2 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
+            />
+          </div>
+
+          <div className="flex justify-end">
             <button
               type="submit"
               disabled={!prompt.trim()}
