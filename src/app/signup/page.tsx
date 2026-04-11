@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
 import PageShell from "@/components/layout/PageShell";
 
 export default function SignupPage() {
@@ -13,16 +14,8 @@ export default function SignupPage() {
           Join Loopawear and start creating
         </p>
         <div className="mt-8 flex flex-col gap-3">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
-          />
+          <Input type="email" placeholder="Email" />
+          <Input type="password" placeholder="Password" />
           <Button type="submit" fullWidth>Create account</Button>
         </div>
         <p className="mt-6 text-center text-sm text-zinc-500">
