@@ -107,8 +107,34 @@ export default function GenerateStudio() {
           </div>
         </form>
 
-        <div className="mt-10 flex min-h-[320px] items-center justify-center rounded-xl border border-dashed border-zinc-800">
-          <p className="text-sm text-zinc-600">Your design will appear here</p>
+        <div className="mt-10 min-h-[320px] rounded-xl border border-dashed border-zinc-800">
+          {prompt.trim() ? (
+            <div className="p-6">
+              {(productType || styleMood) && (
+                <div className="mb-4 flex flex-wrap gap-2">
+                  {productType && (
+                    <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
+                      {productType}
+                    </span>
+                  )}
+                  {styleMood && (
+                    <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
+                      {styleMood}
+                    </span>
+                  )}
+                </div>
+              )}
+              <p className="line-clamp-4 text-sm leading-relaxed text-zinc-300">
+                &ldquo;{prompt.trim()}&rdquo;
+              </p>
+              <p className="mt-6 text-xs text-zinc-700">Ready to generate</p>
+            </div>
+          ) : (
+            <div className="flex min-h-[320px] flex-col items-center justify-center gap-1">
+              <p className="text-sm text-zinc-600">Your design will appear here</p>
+              <p className="text-xs text-zinc-700">Fill in the form above and hit Generate</p>
+            </div>
+          )}
         </div>
       </div>
     </main>
