@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { label: "Home", href: "/" },
   { label: "Marketplace", href: "/marketplace" },
   { label: "Generate", href: "/generate" },
   { label: "Account", href: "/account" },
@@ -35,7 +34,7 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 border-l border-zinc-800 pl-6">
           <Link
             href="/login"
             className="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
