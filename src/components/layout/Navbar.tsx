@@ -7,6 +7,7 @@ const links = [
   { label: "Home", href: "/" },
   { label: "Marketplace", href: "/marketplace" },
   { label: "Generate", href: "/generate" },
+  { label: "Account", href: "/account" },
 ];
 
 export default function Navbar() {
