@@ -45,6 +45,7 @@ This file defines how Claude should behave while working on this project.
 - Avoid touching files that are unrelated to the task.
 - Respect the existing project structure and naming conventions.
 - If a task may break existing behavior, say so first.
+- At the end of each completed task or code change, provide a short, clear summary of exactly what was done.
 
 ---
 
