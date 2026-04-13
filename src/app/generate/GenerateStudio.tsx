@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
+import { saveDraft } from "./actions";
 
 const PRODUCT_TYPES = ["T-shirt", "Hoodie", "Sweatshirt", "Tote bag"] as const;
 const STYLE_MOODS = ["Minimal", "Bold", "Vintage", "Abstract", "Graphic"] as const;
@@ -8,15 +10,36 @@ const STYLE_MOODS = ["Minimal", "Bold", "Vintage", "Abstract", "Graphic"] as con
 type ProductType = (typeof PRODUCT_TYPES)[number] | null;
 type StyleMood = (typeof STYLE_MOODS)[number] | null;
 
+type SaveState =
+  | { status: "idle" }
+  | { status: "saving" }
+  | { status: "success" }
+  | { status: "auth_required" }
+  | { status: "save_failed" };
+
 export default function GenerateStudio() {
   const [prompt, setPrompt] = useState("");
   const [productType, setProductType] = useState<ProductType>(null);
   const [styleMood, setStyleMood] = useState<StyleMood>(null);
+  const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
 
-  function handleSubmit(e: React.FormEvent) {
+  function resetSaveState() {
+    if (saveState.status !== "idle") setSaveState({ status: "idle" });
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // AI generation will be wired in here
-    // available inputs: prompt, productType, styleMood
+    setSaveState({ status: "saving" });
+
+    const result = await saveDraft({ prompt, productType, styleMood });
+
+    if (result.error === "auth_required") {
+      setSaveState({ status: "auth_required" });
+    } else if (result.error === "save_failed") {
+      setSaveState({ status: "save_failed" });
+    } else {
+      setSaveState({ status: "success" });
+    }
   }
 
   return (
@@ -39,9 +62,10 @@ export default function GenerateStudio() {
                 <button
                   key={type}
                   type="button"
-                  onClick={() =>
-                    setProductType(productType === type ? null : type)
-                  }
+                  onClick={() => {
+                    setProductType(productType === type ? null : type);
+                    resetSaveState();
+                  }}
                   className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                     productType === type
                       ? "border-white bg-white text-black"
@@ -63,9 +87,10 @@ export default function GenerateStudio() {
                 <button
                   key={style}
                   type="button"
-                  onClick={() =>
-                    setStyleMood(styleMood === style ? null : style)
-                  }
+                  onClick={() => {
+                    setStyleMood(styleMood === style ? null : style);
+                    resetSaveState();
+                  }}
                   className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                     styleMood === style
                       ? "border-white bg-white text-black"
@@ -90,7 +115,10 @@ export default function GenerateStudio() {
               name="prompt"
               rows={4}
               value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
+              onChange={(e) => {
+                setPrompt(e.target.value);
+                resetSaveState();
+              }}
               placeholder="Describe the design you want to create — style, colors, motifs, mood..."
               className="mt-2 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
             />
@@ -99,16 +127,55 @@ export default function GenerateStudio() {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={!prompt.trim()}
+              disabled={!prompt.trim() || saveState.status === "saving"}
               className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Generate
+              {saveState.status === "saving" ? "Saving…" : "Generate"}
             </button>
           </div>
         </form>
 
         <div className="mt-10 min-h-[320px] rounded-xl border border-dashed border-zinc-800">
-          {prompt.trim() ? (
+          {saveState.status === "success" ? (
+            <div className="flex min-h-[320px] flex-col items-center justify-center gap-1 p-6 text-center">
+              <p className="text-sm font-medium text-zinc-400">Draft saved</p>
+              <p className="mt-1 text-xs text-zinc-700">
+                Your design has been saved. Edit your inputs to start a new
+                draft.
+              </p>
+            </div>
+          ) : saveState.status === "auth_required" ? (
+            <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
+              <p className="text-sm font-medium text-zinc-400">
+                Sign in to save your design
+              </p>
+              <p className="text-sm text-zinc-600">
+                <Link
+                  href="/login"
+                  className="text-zinc-400 underline underline-offset-2 hover:text-white"
+                >
+                  Log in
+                </Link>{" "}
+                or{" "}
+                <Link
+                  href="/signup"
+                  className="text-zinc-400 underline underline-offset-2 hover:text-white"
+                >
+                  Sign up
+                </Link>{" "}
+                — your inputs will still be here.
+              </p>
+            </div>
+          ) : saveState.status === "save_failed" ? (
+            <div className="flex min-h-[320px] flex-col items-center justify-center gap-1 p-6 text-center">
+              <p className="text-sm font-medium text-zinc-500">
+                Something went wrong
+              </p>
+              <p className="mt-1 text-xs text-zinc-700">
+                Your design could not be saved. Please try again.
+              </p>
+            </div>
+          ) : prompt.trim() ? (
             <div className="p-6">
               {(productType || styleMood) && (
                 <div className="mb-4 flex flex-wrap gap-2">
@@ -131,8 +198,12 @@ export default function GenerateStudio() {
             </div>
           ) : (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-1">
-              <p className="text-sm text-zinc-600">Your design will appear here</p>
-              <p className="text-xs text-zinc-700">Fill in the form above and hit Generate</p>
+              <p className="text-sm text-zinc-600">
+                Your design will appear here
+              </p>
+              <p className="text-xs text-zinc-700">
+                Fill in the form above and hit Generate
+              </p>
             </div>
           )}
         </div>

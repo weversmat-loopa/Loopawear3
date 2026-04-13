@@ -3,7 +3,15 @@ import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
-import { updateDisplayName } from "./actions";
+import { updateDisplayName, publishDraft } from "./actions";
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 export const metadata: Metadata = {
   title: "Account",
@@ -33,6 +41,14 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     .select("display_name, role")
     .eq("id", user.id)
     .maybeSingle();
+
+  const { data: designs } = await supabase
+    .from("designs")
+    .select("id, prompt, product_type, style, created_at")
+    .eq("creator_id", user.id)
+    .eq("status", "draft")
+    .order("created_at", { ascending: false })
+    .limit(50);
 
   const params = await searchParams;
   const success = params?.success;
@@ -96,6 +112,67 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             </p>
           </div>
         </div>
+
+        <section className="mt-10 pb-16">
+          <h2 className="text-lg font-semibold tracking-tight text-white">
+            Drafts
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Your saved design drafts.
+          </p>
+
+          {designs && designs.length > 0 ? (
+            <ul className="mt-4 space-y-3">
+              {designs.map((design) => (
+                <li
+                  key={design.id}
+                  className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
+                >
+                  <p className="line-clamp-2 text-sm leading-relaxed text-zinc-300">
+                    {design.prompt}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    {design.product_type && (
+                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                        {design.product_type}
+                      </span>
+                    )}
+                    {design.style && (
+                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                        {design.style}
+                      </span>
+                    )}
+                    <div className="ml-auto flex items-center gap-4">
+                      <span className="text-xs text-zinc-600">
+                        {formatDate(design.created_at)}
+                      </span>
+                      <form action={publishDraft}>
+                        <input
+                          type="hidden"
+                          name="designId"
+                          value={design.id}
+                        />
+                        <button
+                          type="submit"
+                          className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                        >
+                          Publish
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="mt-4 rounded-xl border border-dashed border-zinc-800 px-6 py-10 text-center">
+              <p className="text-sm text-zinc-500">No drafts yet</p>
+              <p className="mt-1 text-xs text-zinc-700">
+                Go to Generate to create your first design.
+              </p>
+            </div>
+          )}
+        </section>
       </div>
     </PageShell>
   );
