@@ -26,13 +26,14 @@ export default function Navbar({ user }: NavbarProps) {
       >
         Loopawear
       </Link>
+
       <div className="flex items-center gap-6">
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center">
           {links.map(({ label, href }) => (
             <Link
               key={href}
               href={href}
-              className={`text-sm font-medium transition-colors hover:text-white ${
+              className={`flex h-14 items-center px-3 text-sm font-medium transition-colors hover:text-white ${
                 pathname === href ? "text-white" : "text-zinc-400"
               }`}
             >
@@ -40,6 +41,7 @@ export default function Navbar({ user }: NavbarProps) {
             </Link>
           ))}
         </nav>
+
         <div className="flex items-center gap-3 border-l border-zinc-800 pl-6">
           {user ? (
             <>
