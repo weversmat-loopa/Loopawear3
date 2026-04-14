@@ -27,6 +27,13 @@ export default function GenerateStudio() {
     if (saveState.status !== "idle") setSaveState({ status: "idle" });
   }
 
+  function resetForm() {
+    setPrompt("");
+    setProductType(null);
+    setStyleMood(null);
+    setSaveState({ status: "idle" });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaveState({ status: "saving" });
@@ -130,24 +137,54 @@ export default function GenerateStudio() {
               disabled={!prompt.trim() || saveState.status === "saving"}
               className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {saveState.status === "saving" ? "Saving…" : "Generate"}
+              {saveState.status === "saving" ? "Saving…" : "Save design"}
             </button>
           </div>
         </form>
 
         <div className="mt-10 min-h-[320px] rounded-xl border border-dashed border-zinc-800">
           {saveState.status === "success" ? (
-            <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
-              <p className="text-sm font-medium text-white">Draft saved</p>
-              <p className="text-xs text-zinc-500">
-                Your design is ready. Go to your draft to generate an image.
+            <div className="flex min-h-[320px] flex-col justify-center gap-5 p-6">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
+                  Design saved
+                </p>
+                {(productType || styleMood) && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {productType && (
+                      <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
+                        {productType}
+                      </span>
+                    )}
+                    {styleMood && (
+                      <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
+                        {styleMood}
+                      </span>
+                    )}
+                  </div>
+                )}
+                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-zinc-300">
+                  &ldquo;{prompt.trim()}&rdquo;
+                </p>
+              </div>
+              <p className="text-xs text-zinc-600">
+                Open your design workspace to generate an image.
               </p>
-              <Link
-                href={`/account/designs/${saveState.id}`}
-                className="mt-3 rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
-              >
-                View draft →
-              </Link>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={`/account/designs/${saveState.id}`}
+                  className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                >
+                  Open workspace →
+                </Link>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+                >
+                  New design
+                </button>
+              </div>
             </div>
           ) : saveState.status === "auth_required" ? (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
@@ -199,7 +236,6 @@ export default function GenerateStudio() {
               <p className="line-clamp-4 text-sm leading-relaxed text-zinc-300">
                 &ldquo;{prompt.trim()}&rdquo;
               </p>
-              <p className="mt-6 text-xs text-zinc-700">Ready to generate</p>
             </div>
           ) : (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-1">
