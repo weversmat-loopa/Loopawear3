@@ -146,6 +146,58 @@ export async function startImageGeneration(formData: FormData) {
   redirect(`/account/designs/${designId}`);
 }
 
+// DEV ONLY — remove when real image generation is wired up
+export async function devMarkGenerationReady(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  await supabase
+    .from("designs")
+    .update({ image_status: "ready" })
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .eq("image_status", "generating");
+
+  redirect(`/account/designs/${designId}`);
+}
+
+// DEV ONLY — remove when real image generation is wired up
+export async function devMarkGenerationFailed(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  await supabase
+    .from("designs")
+    .update({ image_status: "failed" })
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .eq("image_status", "generating");
+
+  redirect(`/account/designs/${designId}`);
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {

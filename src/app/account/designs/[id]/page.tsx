@@ -3,7 +3,11 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import DesignEditForm from "./DesignEditForm";
-import { startImageGeneration } from "@/app/account/actions";
+import {
+  startImageGeneration,
+  devMarkGenerationReady,
+  devMarkGenerationFailed,
+} from "@/app/account/actions";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -172,6 +176,34 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               )}
             </div>
           </div>
+
+          {design.image_status === "generating" && (
+            <div className="mt-5 rounded-xl border border-dashed border-zinc-800 px-4 py-3">
+              <p className="text-xs text-zinc-700">
+                Dev — simulate generation result
+              </p>
+              <div className="mt-2.5 flex gap-2">
+                <form action={devMarkGenerationReady}>
+                  <input type="hidden" name="designId" value={design.id} />
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                  >
+                    Mark ready
+                  </button>
+                </form>
+                <form action={devMarkGenerationFailed}>
+                  <input type="hidden" name="designId" value={design.id} />
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                  >
+                    Mark failed
+                  </button>
+                </form>
+              </div>
+            </div>
+          )}
 
           {success && (
             <p className="mt-6 text-sm text-green-400">{success}</p>
