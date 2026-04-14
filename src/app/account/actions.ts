@@ -38,6 +38,41 @@ export async function publishDraft(formData: FormData) {
   );
 }
 
+export async function unpublishDesign(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(
+      `/account?error=${encodeURIComponent("Invalid design.")}`
+    );
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ status: "draft" })
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .eq("status", "published");
+
+  if (error) {
+    redirect(
+      `/account?error=${encodeURIComponent("Could not unpublish design. Please try again.")}`
+    );
+  }
+
+  redirect(
+    `/account?success=${encodeURIComponent("Design moved back to drafts.")}`
+  );
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {

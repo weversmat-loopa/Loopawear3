@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
-import { updateDisplayName, publishDraft } from "./actions";
+import { updateDisplayName, publishDraft, unpublishDesign } from "./actions";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -222,6 +222,19 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                       >
                         View ↗
                       </Link>
+                      <form action={unpublishDesign}>
+                        <input
+                          type="hidden"
+                          name="designId"
+                          value={design.id}
+                        />
+                        <button
+                          type="submit"
+                          className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                        >
+                          Unpublish
+                        </button>
+                      </form>
                     </div>
                   </div>
                 </li>
