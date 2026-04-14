@@ -137,9 +137,12 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                   key={design.id}
                   className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
                 >
-                  <p className="line-clamp-2 text-sm leading-relaxed text-zinc-300">
+                  <Link
+                    href={`/account/designs/${design.id}`}
+                    className="block line-clamp-2 text-sm leading-relaxed text-zinc-300 transition-colors hover:text-white"
+                  >
                     {design.prompt}
-                  </p>
+                  </Link>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     {design.product_type && (
                       <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
@@ -198,9 +201,12 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                   key={design.id}
                   className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
                 >
-                  <p className="line-clamp-2 text-sm leading-relaxed text-zinc-300">
+                  <Link
+                    href={`/account/designs/${design.id}`}
+                    className="block line-clamp-2 text-sm leading-relaxed text-zinc-300 transition-colors hover:text-white"
+                  >
                     {design.prompt}
-                  </p>
+                  </Link>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     {design.product_type && (
                       <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
