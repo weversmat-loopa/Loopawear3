@@ -98,11 +98,22 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             Edit design
           </h1>
 
-          <div className="mt-8 flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
-            <div className="text-center">
-              <p className="text-sm font-medium text-zinc-500">No image yet</p>
-              <p className="mt-1 text-xs text-zinc-700">
-                Image generation will be available here soon.
+          <div className="mt-8">
+            <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
+              <p className="text-sm text-zinc-600">No image generated yet</p>
+            </div>
+
+            <div className="mt-4 flex flex-wrap items-center gap-4">
+              <button
+                type="button"
+                disabled
+                className="cursor-not-allowed rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black opacity-40"
+              >
+                Generate image
+              </button>
+              <p className="text-xs text-zinc-600">
+                Generates a unique AI image for this design based on your
+                prompt, product type, and style.
               </p>
             </div>
           </div>
