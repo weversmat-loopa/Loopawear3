@@ -45,7 +45,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: drafts } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, created_at")
+    .select("id, prompt, product_type, style, image_url, created_at")
     .eq("creator_id", user.id)
     .eq("status", "draft")
     .order("created_at", { ascending: false })
@@ -53,7 +53,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: publishedDesigns } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, created_at")
+    .select("id, prompt, product_type, style, image_url, created_at")
     .eq("creator_id", user.id)
     .eq("status", "published")
     .order("created_at", { ascending: false })
@@ -135,42 +135,60 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {drafts.map((design) => (
                 <li
                   key={design.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
+                  className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950"
                 >
-                  <Link
-                    href={`/account/designs/${design.id}`}
-                    className="block line-clamp-2 text-sm leading-relaxed text-zinc-300 transition-colors hover:text-white"
-                  >
-                    {design.prompt}
-                  </Link>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    {design.product_type && (
-                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                        {design.product_type}
-                      </span>
-                    )}
-                    {design.style && (
-                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                        {design.style}
-                      </span>
-                    )}
-                    <div className="ml-auto flex items-center gap-4">
-                      <span className="text-xs text-zinc-600">
-                        {formatDate(design.created_at)}
-                      </span>
-                      <form action={publishDraft}>
-                        <input
-                          type="hidden"
-                          name="designId"
-                          value={design.id}
+                  <div className="flex">
+                    {design.image_url ? (
+                      <div className="w-16 shrink-0 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+                        <img
+                          src={design.image_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
-                        <button
-                          type="submit"
-                          className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
-                        >
-                          Publish
-                        </button>
-                      </form>
+                      </div>
+                    ) : (
+                      <div className="w-16 shrink-0 bg-zinc-900" />
+                    )}
+                    <div className="flex flex-1 flex-col p-4">
+                      <Link
+                        href={`/account/designs/${design.id}`}
+                        className="line-clamp-2 text-sm leading-relaxed text-zinc-300 transition-colors hover:text-white"
+                      >
+                        {design.prompt}
+                      </Link>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {design.product_type && (
+                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                            {design.product_type}
+                          </span>
+                        )}
+                        {design.style && (
+                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                            {design.style}
+                          </span>
+                        )}
+                        <div className="ml-auto flex items-center gap-4">
+                          <span className="text-xs text-zinc-600">
+                            {formatDate(design.created_at)}
+                          </span>
+                          <form action={publishDraft}>
+                            <input
+                              type="hidden"
+                              name="designId"
+                              value={design.id}
+                            />
+                            <button
+                              type="submit"
+                              className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                            >
+                              Publish
+                            </button>
+                          </form>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -199,48 +217,66 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {publishedDesigns.map((design) => (
                 <li
                   key={design.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
+                  className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950"
                 >
-                  <Link
-                    href={`/account/designs/${design.id}`}
-                    className="block line-clamp-2 text-sm leading-relaxed text-zinc-300 transition-colors hover:text-white"
-                  >
-                    {design.prompt}
-                  </Link>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    {design.product_type && (
-                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                        {design.product_type}
-                      </span>
-                    )}
-                    {design.style && (
-                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                        {design.style}
-                      </span>
-                    )}
-                    <div className="ml-auto flex items-center gap-4">
-                      <span className="text-xs text-zinc-600">
-                        {formatDate(design.created_at)}
-                      </span>
-                      <Link
-                        href={`/marketplace/${design.id}`}
-                        className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
-                      >
-                        View ↗
-                      </Link>
-                      <form action={unpublishDesign}>
-                        <input
-                          type="hidden"
-                          name="designId"
-                          value={design.id}
+                  <div className="flex">
+                    {design.image_url ? (
+                      <div className="w-16 shrink-0 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+                        <img
+                          src={design.image_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
-                        <button
-                          type="submit"
-                          className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
-                        >
-                          Unpublish
-                        </button>
-                      </form>
+                      </div>
+                    ) : (
+                      <div className="w-16 shrink-0 bg-zinc-900" />
+                    )}
+                    <div className="flex flex-1 flex-col p-4">
+                      <Link
+                        href={`/account/designs/${design.id}`}
+                        className="line-clamp-2 text-sm leading-relaxed text-zinc-300 transition-colors hover:text-white"
+                      >
+                        {design.prompt}
+                      </Link>
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        {design.product_type && (
+                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                            {design.product_type}
+                          </span>
+                        )}
+                        {design.style && (
+                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                            {design.style}
+                          </span>
+                        )}
+                        <div className="ml-auto flex items-center gap-4">
+                          <span className="text-xs text-zinc-600">
+                            {formatDate(design.created_at)}
+                          </span>
+                          <Link
+                            href={`/marketplace/${design.id}`}
+                            className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                          >
+                            View ↗
+                          </Link>
+                          <form action={unpublishDesign}>
+                            <input
+                              type="hidden"
+                              name="designId"
+                              value={design.id}
+                            />
+                            <button
+                              type="submit"
+                              className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                            >
+                              Unpublish
+                            </button>
+                          </form>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </li>
