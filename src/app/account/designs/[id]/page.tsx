@@ -2,9 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import DesignEditForm from "./DesignEditForm";
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ success?: string; error?: string }>;
 };
 
 function formatDate(iso: string) {
@@ -40,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function OwnerDesignPage({ params }: Props) {
+export default async function OwnerDesignPage({ params, searchParams }: Props) {
   const { id } = await params;
   const supabase = await createClient();
 
@@ -62,6 +64,10 @@ export default async function OwnerDesignPage({ params }: Props) {
   if (!design) {
     notFound();
   }
+
+  const sp = await searchParams;
+  const success = sp?.success;
+  const error = sp?.error;
 
   const isPublished = design.status === "published";
 
@@ -86,25 +92,25 @@ export default async function OwnerDesignPage({ params }: Props) {
             >
               {isPublished ? "Published" : "Draft"}
             </span>
-            {design.product_type && (
-              <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                {design.product_type}
-              </span>
-            )}
-            {design.style && (
-              <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                {design.style}
-              </span>
-            )}
           </div>
 
           <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
-            {design.product_type ? `${design.product_type} Design` : "Design"}
+            Edit design
           </h1>
 
-          <p className="mt-6 text-base leading-relaxed text-zinc-300">
-            &ldquo;{design.prompt}&rdquo;
-          </p>
+          {success && (
+            <p className="mt-4 text-sm text-green-400">{success}</p>
+          )}
+          {error && (
+            <p className="mt-4 text-sm text-red-400">{error}</p>
+          )}
+
+          <DesignEditForm
+            designId={design.id}
+            initialPrompt={design.prompt}
+            initialProductType={design.product_type}
+            initialStyle={design.style}
+          />
 
           <p className="mt-10 border-t border-zinc-900 pt-6 text-xs text-zinc-600">
             Created {formatDate(design.created_at)}

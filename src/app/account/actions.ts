@@ -73,6 +73,48 @@ export async function unpublishDesign(formData: FormData) {
   );
 }
 
+export async function updateDesign(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  const prompt = String(formData.get("prompt") ?? "").trim();
+  const productType = String(formData.get("product_type") ?? "").trim() || null;
+  const style = String(formData.get("style") ?? "").trim() || null;
+
+  if (!prompt) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent("Prompt cannot be empty.")}`
+    );
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ prompt, product_type: productType, style })
+    .eq("id", designId)
+    .eq("creator_id", user.id);
+
+  if (error) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent("Could not save changes. Please try again.")}`
+    );
+  }
+
+  redirect(
+    `/account/designs/${designId}?success=${encodeURIComponent("Changes saved.")}`
+  );
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {
