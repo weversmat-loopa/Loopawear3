@@ -14,7 +14,7 @@ export default async function MarketplacePage() {
 
   const { data } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, created_at")
+    .select("id, prompt, product_type, style, image_url, created_at")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(100);

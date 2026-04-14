@@ -13,6 +13,7 @@ export type MarketplaceDesign = {
   prompt: string;
   product_type: string | null;
   style: string | null;
+  image_url: string | null;
   created_at: string;
 };
 
@@ -94,25 +95,45 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
               <li key={design.id}>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="flex h-full flex-col gap-3 rounded-xl border border-zinc-800 bg-zinc-950 p-5 transition-colors hover:border-zinc-700"
+                  className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700"
                 >
-                  {(design.product_type || design.style) && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {design.product_type && (
-                        <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                          {design.product_type}
-                        </span>
-                      )}
-                      {design.style && (
-                        <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                          {design.style}
-                        </span>
-                      )}
+                  {design.image_url ? (
+                    <div className="aspect-square w-full overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+                      <img
+                        src={design.image_url}
+                        alt={
+                          design.product_type
+                            ? `${design.product_type} design`
+                            : "Design"
+                        }
+                        className="block h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
+                  ) : (
+                    <div className="aspect-square w-full bg-zinc-900" />
                   )}
-                  <p className="line-clamp-4 text-sm leading-relaxed text-zinc-300">
-                    &ldquo;{design.prompt}&rdquo;
-                  </p>
+                  <div className="flex flex-col gap-2 p-4">
+                    {(design.product_type || design.style) && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {design.product_type && (
+                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                            {design.product_type}
+                          </span>
+                        )}
+                        {design.style && (
+                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                            {design.style}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <p className="line-clamp-2 text-sm leading-relaxed text-zinc-300">
+                      &ldquo;{design.prompt}&rdquo;
+                    </p>
+                  </div>
                 </Link>
               </li>
             ))}
