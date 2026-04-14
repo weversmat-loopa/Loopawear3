@@ -106,7 +106,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           </div>
 
           <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
-            Edit design
+            {design.product_type ? `${design.product_type} Design` : "Design"}
           </h1>
 
           <div className="mt-8">
@@ -245,19 +245,25 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          {success && (
-            <p className="mt-6 text-sm text-green-400">{success}</p>
-          )}
-          {error && (
-            <p className="mt-6 text-sm text-red-400">{error}</p>
-          )}
+          <div className="mt-12 border-t border-zinc-900 pt-8">
+            <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Design details
+            </h2>
 
-          <DesignEditForm
-            designId={design.id}
-            initialPrompt={design.prompt}
-            initialProductType={design.product_type}
-            initialStyle={design.style}
-          />
+            {success && (
+              <p className="mt-4 text-sm text-green-400">{success}</p>
+            )}
+            {error && (
+              <p className="mt-4 text-sm text-red-400">{error}</p>
+            )}
+
+            <DesignEditForm
+              designId={design.id}
+              initialPrompt={design.prompt}
+              initialProductType={design.product_type}
+              initialStyle={design.style}
+            />
+          </div>
 
           <p className="mt-10 border-t border-zinc-900 pt-6 text-xs text-zinc-600">
             Created {formatDate(design.created_at)}
