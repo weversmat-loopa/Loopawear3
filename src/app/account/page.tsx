@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import PageShell from "@/components/layout/PageShell";
 import Input from "@/components/ui/Input";
@@ -42,11 +43,19 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
     .eq("id", user.id)
     .maybeSingle();
 
-  const { data: designs } = await supabase
+  const { data: drafts } = await supabase
     .from("designs")
     .select("id, prompt, product_type, style, created_at")
     .eq("creator_id", user.id)
     .eq("status", "draft")
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  const { data: publishedDesigns } = await supabase
+    .from("designs")
+    .select("id, prompt, product_type, style, created_at")
+    .eq("creator_id", user.id)
+    .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -113,7 +122,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
           </div>
         </div>
 
-        <section className="mt-10 pb-16">
+        <section className="mt-10">
           <h2 className="text-lg font-semibold tracking-tight text-white">
             Drafts
           </h2>
@@ -121,9 +130,9 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             Your saved design drafts.
           </p>
 
-          {designs && designs.length > 0 ? (
+          {drafts && drafts.length > 0 ? (
             <ul className="mt-4 space-y-3">
-              {designs.map((design) => (
+              {drafts.map((design) => (
                 <li
                   key={design.id}
                   className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
@@ -169,6 +178,60 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               <p className="text-sm text-zinc-500">No drafts yet</p>
               <p className="mt-1 text-xs text-zinc-700">
                 Go to Generate to create your first design.
+              </p>
+            </div>
+          )}
+        </section>
+
+        <section className="mt-10 pb-16">
+          <h2 className="text-lg font-semibold tracking-tight text-white">
+            Published
+          </h2>
+          <p className="mt-1 text-sm text-zinc-500">
+            Your designs visible in the marketplace.
+          </p>
+
+          {publishedDesigns && publishedDesigns.length > 0 ? (
+            <ul className="mt-4 space-y-3">
+              {publishedDesigns.map((design) => (
+                <li
+                  key={design.id}
+                  className="rounded-xl border border-zinc-800 bg-zinc-950 px-5 py-4"
+                >
+                  <p className="line-clamp-2 text-sm leading-relaxed text-zinc-300">
+                    {design.prompt}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    {design.product_type && (
+                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                        {design.product_type}
+                      </span>
+                    )}
+                    {design.style && (
+                      <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                        {design.style}
+                      </span>
+                    )}
+                    <div className="ml-auto flex items-center gap-4">
+                      <span className="text-xs text-zinc-600">
+                        {formatDate(design.created_at)}
+                      </span>
+                      <Link
+                        href={`/marketplace/${design.id}`}
+                        className="text-xs font-medium text-zinc-400 transition-colors hover:text-white"
+                      >
+                        View ↗
+                      </Link>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="mt-4 rounded-xl border border-dashed border-zinc-800 px-6 py-10 text-center">
+              <p className="text-sm text-zinc-500">No published designs yet</p>
+              <p className="mt-1 text-xs text-zinc-700">
+                Publish a draft to see it here.
               </p>
             </div>
           )}
