@@ -98,11 +98,20 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             Edit design
           </h1>
 
+          <div className="mt-8 flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
+            <div className="text-center">
+              <p className="text-sm font-medium text-zinc-500">No image yet</p>
+              <p className="mt-1 text-xs text-zinc-700">
+                Image generation will be available here soon.
+              </p>
+            </div>
+          </div>
+
           {success && (
-            <p className="mt-4 text-sm text-green-400">{success}</p>
+            <p className="mt-6 text-sm text-green-400">{success}</p>
           )}
           {error && (
-            <p className="mt-4 text-sm text-red-400">{error}</p>
+            <p className="mt-6 text-sm text-red-400">{error}</p>
           )}
 
           <DesignEditForm

@@ -13,7 +13,7 @@ type StyleMood = (typeof STYLE_MOODS)[number] | null;
 type SaveState =
   | { status: "idle" }
   | { status: "saving" }
-  | { status: "success" }
+  | { status: "success"; id: string }
   | { status: "auth_required" }
   | { status: "save_failed" };
 
@@ -38,7 +38,7 @@ export default function GenerateStudio() {
     } else if (result.error === "save_failed") {
       setSaveState({ status: "save_failed" });
     } else {
-      setSaveState({ status: "success" });
+      setSaveState({ status: "success", id: result.id });
     }
   }
 
@@ -137,12 +137,17 @@ export default function GenerateStudio() {
 
         <div className="mt-10 min-h-[320px] rounded-xl border border-dashed border-zinc-800">
           {saveState.status === "success" ? (
-            <div className="flex min-h-[320px] flex-col items-center justify-center gap-1 p-6 text-center">
-              <p className="text-sm font-medium text-zinc-400">Draft saved</p>
-              <p className="mt-1 text-xs text-zinc-700">
-                Your design has been saved. Edit your inputs to start a new
-                draft.
+            <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
+              <p className="text-sm font-medium text-white">Draft saved</p>
+              <p className="text-xs text-zinc-500">
+                Your design is ready. Go to your draft to generate an image.
               </p>
+              <Link
+                href={`/account/designs/${saveState.id}`}
+                className="mt-3 rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white"
+              >
+                View draft →
+              </Link>
             </div>
           ) : saveState.status === "auth_required" ? (
             <div className="flex min-h-[320px] flex-col items-center justify-center gap-2 p-6 text-center">
