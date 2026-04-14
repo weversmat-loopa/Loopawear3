@@ -46,7 +46,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, created_at")
+    .select("id, prompt, product_type, style, image_url, created_at")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -66,8 +66,25 @@ export default async function DesignPage({ params }: Props) {
         </Link>
 
         <div className="mt-10">
+          {design.image_url && (
+            <div className="overflow-hidden rounded-xl border border-zinc-800">
+              {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+              <img
+                src={design.image_url}
+                alt={
+                  design.product_type
+                    ? `${design.product_type} design`
+                    : "Design"
+                }
+                className="block h-auto w-full"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          )}
+
           {(design.product_type || design.style) && (
-            <div className="flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap gap-2">
               {design.product_type && (
                 <span className="rounded-full border border-zinc-800 px-3 py-1 text-xs text-zinc-500">
                   {design.product_type}

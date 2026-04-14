@@ -7,6 +7,8 @@ import {
   startImageGeneration,
   devMarkGenerationReady,
   devMarkGenerationFailed,
+  devSetTestImageUrl,
+  devClearImageUrl,
 } from "@/app/account/actions";
 
 type Props = {
@@ -110,11 +112,17 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           <div className="mt-8">
             {design.image_status === "ready" && design.image_url ? (
               <div className="overflow-hidden rounded-xl border border-zinc-800">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
                 <img
                   src={design.image_url}
-                  alt="Generated design"
-                  className="w-full"
+                  alt={
+                    design.product_type
+                      ? `${design.product_type} design`
+                      : "Generated design"
+                  }
+                  className="block h-auto w-full"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             ) : design.image_status === "generating" ? (
@@ -202,6 +210,38 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   </button>
                 </form>
               </div>
+            </div>
+          )}
+
+          {design.image_status !== "generating" && (
+            <div className="mt-5 rounded-xl border border-dashed border-zinc-800 px-4 py-3">
+              <p className="text-xs text-zinc-700">Dev — test image URL</p>
+              <form action={devSetTestImageUrl} className="mt-2.5 flex gap-2">
+                <input type="hidden" name="designId" value={design.id} />
+                <input
+                  name="image_url"
+                  type="url"
+                  placeholder="https://..."
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-transparent px-3 py-1.5 text-xs text-zinc-400 outline-none placeholder:text-zinc-700 focus:border-zinc-600"
+                />
+                <button
+                  type="submit"
+                  className="shrink-0 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                >
+                  Set
+                </button>
+              </form>
+              {design.image_url && (
+                <form action={devClearImageUrl} className="mt-2">
+                  <input type="hidden" name="designId" value={design.id} />
+                  <button
+                    type="submit"
+                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                  >
+                    Clear image URL
+                  </button>
+                </form>
+              )}
             </div>
           )}
 

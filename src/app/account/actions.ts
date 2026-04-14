@@ -198,6 +198,75 @@ export async function devMarkGenerationFailed(formData: FormData) {
   redirect(`/account/designs/${designId}`);
 }
 
+// DEV ONLY — remove when real image generation is wired up
+export async function devSetTestImageUrl(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+  if (!imageUrl) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent("Image URL cannot be empty.")}`
+    );
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ image_url: imageUrl, image_status: "ready" })
+    .eq("id", designId)
+    .eq("creator_id", user.id);
+
+  if (error) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent("Could not set image URL. Please try again.")}`
+    );
+  }
+
+  redirect(`/account/designs/${designId}`);
+}
+
+// DEV ONLY — remove when real image generation is wired up
+export async function devClearImageUrl(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ image_url: null, image_status: "none" })
+    .eq("id", designId)
+    .eq("creator_id", user.id);
+
+  if (error) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent("Could not clear image URL. Please try again.")}`
+    );
+  }
+
+  redirect(`/account/designs/${designId}`);
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {
