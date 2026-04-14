@@ -13,7 +13,7 @@ type StyleMood = (typeof STYLE_MOODS)[number] | null;
 type SaveState =
   | { status: "idle" }
   | { status: "saving" }
-  | { status: "success"; id: string }
+  | { status: "success"; id: string; wasUpdate: boolean }
   | { status: "auth_required" }
   | { status: "save_failed" };
 
@@ -21,12 +21,14 @@ interface GenerateStudioProps {
   initialPrompt?: string;
   initialProductType?: string | null;
   initialStyle?: string | null;
+  initialDesignId?: string | null;
 }
 
 export default function GenerateStudio({
   initialPrompt = "",
   initialProductType = null,
   initialStyle = null,
+  initialDesignId = null,
 }: GenerateStudioProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [productType, setProductType] = useState<ProductType>(
@@ -39,6 +41,7 @@ export default function GenerateStudio({
       ? (initialStyle as StyleMood)
       : null
   );
+  const [designId, setDesignId] = useState<string | null>(initialDesignId);
   const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
 
   function resetSaveState() {
@@ -49,6 +52,7 @@ export default function GenerateStudio({
     setPrompt("");
     setProductType(null);
     setStyleMood(null);
+    setDesignId(null);
     setSaveState({ status: "idle" });
   }
 
@@ -56,14 +60,16 @@ export default function GenerateStudio({
     e.preventDefault();
     setSaveState({ status: "saving" });
 
-    const result = await saveDraft({ prompt, productType, styleMood });
+    const wasUpdate = designId !== null;
+    const result = await saveDraft({ prompt, productType, styleMood, designId });
 
     if (result.error === "auth_required") {
       setSaveState({ status: "auth_required" });
     } else if (result.error === "save_failed") {
       setSaveState({ status: "save_failed" });
     } else {
-      setSaveState({ status: "success", id: result.id });
+      setDesignId(result.id);
+      setSaveState({ status: "success", id: result.id, wasUpdate });
     }
   }
 
@@ -165,7 +171,7 @@ export default function GenerateStudio({
             <div className="flex min-h-[320px] flex-col justify-center gap-5 p-6">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
-                  Design saved
+                  {saveState.wasUpdate ? "Design updated" : "Design saved"}
                 </p>
                 {(productType || styleMood) && (
                   <div className="mt-3 flex flex-wrap gap-2">

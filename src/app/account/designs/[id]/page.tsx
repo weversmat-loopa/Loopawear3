@@ -78,7 +78,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
 
   const isPublished = design.status === "published";
 
-  const refineParams = new URLSearchParams({ prompt: design.prompt });
+  const refineParams = new URLSearchParams({ prompt: design.prompt, design_id: design.id });
   if (design.product_type) refineParams.set("product_type", design.product_type);
   if (design.style) refineParams.set("style", design.style);
   const refineHref = `/generate?${refineParams.toString()}`;
