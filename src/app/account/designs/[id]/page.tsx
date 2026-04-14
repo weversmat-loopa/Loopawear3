@@ -56,7 +56,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, status, created_at")
+    .select("id, prompt, product_type, style, status, image_status, image_url, created_at")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -99,9 +99,46 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           </h1>
 
           <div className="mt-8">
-            <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
-              <p className="text-sm text-zinc-600">No image generated yet</p>
-            </div>
+            {design.image_status === "ready" && design.image_url ? (
+              <div className="overflow-hidden rounded-xl border border-zinc-800">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={design.image_url}
+                  alt="Generated design"
+                  className="w-full"
+                />
+              </div>
+            ) : design.image_status === "generating" ? (
+              <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
+                <div className="text-center">
+                  <p className="text-sm font-medium text-zinc-400">
+                    Generating image…
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-600">
+                    This may take a moment.
+                  </p>
+                </div>
+              </div>
+            ) : design.image_status === "failed" ? (
+              <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
+                <div className="text-center">
+                  <p className="text-sm font-medium text-zinc-500">
+                    Generation failed
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-700">
+                    Something went wrong. You can try again below.
+                  </p>
+                </div>
+              </div>
+            ) : design.image_status === "ready" && !design.image_url ? (
+              <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
+                <p className="text-sm text-zinc-600">Image unavailable</p>
+              </div>
+            ) : (
+              <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
+                <p className="text-sm text-zinc-600">No image generated yet</p>
+              </div>
+            )}
 
             <div className="mt-4 flex flex-wrap items-center gap-4">
               <button
@@ -109,12 +146,19 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                 disabled
                 className="cursor-not-allowed rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black opacity-40"
               >
-                Generate image
+                {design.image_status === "failed"
+                  ? "Retry generation"
+                  : design.image_status === "generating"
+                    ? "Generating…"
+                    : "Generate image"}
               </button>
-              <p className="text-xs text-zinc-600">
-                Generates a unique AI image for this design based on your
-                prompt, product type, and style.
-              </p>
+              {design.image_status === "none" ||
+              design.image_status === null ? (
+                <p className="text-xs text-zinc-600">
+                  Generates a unique AI image for this design based on your
+                  prompt, product type, and style.
+                </p>
+              ) : null}
             </div>
           </div>
 
