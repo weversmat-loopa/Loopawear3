@@ -115,6 +115,37 @@ export async function updateDesign(formData: FormData) {
   );
 }
 
+export async function startImageGeneration(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ image_status: "generating" })
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .in("image_status", ["none", "failed"]);
+
+  if (error) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent("Could not start generation. Please try again.")}`
+    );
+  }
+
+  redirect(`/account/designs/${designId}`);
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {
