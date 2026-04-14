@@ -17,10 +17,28 @@ type SaveState =
   | { status: "auth_required" }
   | { status: "save_failed" };
 
-export default function GenerateStudio() {
-  const [prompt, setPrompt] = useState("");
-  const [productType, setProductType] = useState<ProductType>(null);
-  const [styleMood, setStyleMood] = useState<StyleMood>(null);
+interface GenerateStudioProps {
+  initialPrompt?: string;
+  initialProductType?: string | null;
+  initialStyle?: string | null;
+}
+
+export default function GenerateStudio({
+  initialPrompt = "",
+  initialProductType = null,
+  initialStyle = null,
+}: GenerateStudioProps) {
+  const [prompt, setPrompt] = useState(initialPrompt);
+  const [productType, setProductType] = useState<ProductType>(
+    PRODUCT_TYPES.includes(initialProductType as ProductType)
+      ? (initialProductType as ProductType)
+      : null
+  );
+  const [styleMood, setStyleMood] = useState<StyleMood>(
+    STYLE_MOODS.includes(initialStyle as StyleMood)
+      ? (initialStyle as StyleMood)
+      : null
+  );
   const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
 
   function resetSaveState() {

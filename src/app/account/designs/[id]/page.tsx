@@ -77,6 +77,12 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
   const error = sp?.error;
 
   const isPublished = design.status === "published";
+
+  const refineParams = new URLSearchParams({ prompt: design.prompt });
+  if (design.product_type) refineParams.set("product_type", design.product_type);
+  if (design.style) refineParams.set("style", design.style);
+  const refineHref = `/generate?${refineParams.toString()}`;
+
   const canGenerate =
     design.image_status === "none" ||
     design.image_status === null ||
@@ -265,9 +271,17 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             />
           </div>
 
-          <p className="mt-10 border-t border-zinc-900 pt-6 text-xs text-zinc-600">
-            Created {formatDate(design.created_at)}
-          </p>
+          <div className="mt-10 flex items-center justify-between border-t border-zinc-900 pt-6">
+            <p className="text-xs text-zinc-600">
+              Created {formatDate(design.created_at)}
+            </p>
+            <Link
+              href={refineHref}
+              className="text-xs text-zinc-500 transition-colors hover:text-white"
+            >
+              Refine in studio →
+            </Link>
+          </div>
         </div>
       </div>
     </main>

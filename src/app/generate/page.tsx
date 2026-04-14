@@ -6,6 +6,21 @@ export const metadata: Metadata = {
   description: "Design unique apparel with AI. Describe your vision and let AI bring it to life.",
 };
 
-export default function GeneratePage() {
-  return <GenerateStudio />;
+type GeneratePageProps = {
+  searchParams?: Promise<{
+    prompt?: string;
+    product_type?: string;
+    style?: string;
+  }>;
+};
+
+export default async function GeneratePage({ searchParams }: GeneratePageProps) {
+  const sp = await searchParams;
+  return (
+    <GenerateStudio
+      initialPrompt={sp?.prompt ?? ""}
+      initialProductType={sp?.product_type ?? null}
+      initialStyle={sp?.style ?? null}
+    />
+  );
 }
