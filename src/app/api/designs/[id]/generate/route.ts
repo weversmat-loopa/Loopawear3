@@ -4,6 +4,36 @@ import { createClient } from "@/utils/supabase/server";
 
 fal.config({ credentials: process.env.FAL_KEY });
 
+const STYLE_KEYWORDS: Record<string, string> = {
+  Minimal: "clean minimal lines, flat design, limited color palette",
+  Bold: "bold shapes, high contrast, strong graphic composition",
+  Vintage: "retro vintage aesthetic, worn texture, faded palette",
+  Abstract: "abstract geometric shapes, non-representational, artistic",
+  Graphic: "graphic illustration, sharp lines, vector-art style",
+};
+
+function buildGenerationPrompt(
+  userPrompt: string,
+  productType: string | null,
+  style: string | null
+): string {
+  const parts: string[] = [
+    "Flat graphic design artwork suitable for apparel screen printing.",
+  ];
+
+  if (style && STYLE_KEYWORDS[style]) {
+    parts.push(STYLE_KEYWORDS[style] + ".");
+  }
+
+  parts.push(userPrompt.trim() + ".");
+
+  parts.push(
+    "No background. No model wearing clothes. No photorealism. Isolated graphic on white."
+  );
+
+  return parts.join(" ");
+}
+
 type Params = { id: string };
 
 export async function POST(
@@ -46,9 +76,11 @@ export async function POST(
     .eq("id", id)
     .eq("creator_id", user.id);
 
-  let prompt = design.prompt.trim();
-  if (design.product_type) prompt = `${design.product_type} design: ${prompt}`;
-  if (design.style) prompt = `${prompt}, ${design.style.toLowerCase()} style`;
+  const prompt = buildGenerationPrompt(
+    design.prompt,
+    design.product_type,
+    design.style
+  );
 
   try {
     const result = await fal.run("fal-ai/flux/dev", {
