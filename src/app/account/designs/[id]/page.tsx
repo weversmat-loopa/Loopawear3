@@ -4,12 +4,12 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import DesignEditForm from "./DesignEditForm";
 import {
-  startImageGeneration,
   devMarkGenerationReady,
   devMarkGenerationFailed,
   devSetTestImageUrl,
   devClearImageUrl,
 } from "@/app/account/actions";
+import GenerateImageButton from "./GenerateImageButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -83,10 +83,6 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
   if (design.style) refineParams.set("style", design.style);
   const refineHref = `/generate?${refineParams.toString()}`;
 
-  const canGenerate =
-    design.image_status === "none" ||
-    design.image_status === null ||
-    design.image_status === "failed";
 
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-12">
@@ -163,31 +159,11 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               </div>
             )}
 
-            <div className="mt-4 flex flex-wrap items-center gap-4">
-              <form action={startImageGeneration}>
-                <input type="hidden" name="designId" value={design.id} />
-                <button
-                  type="submit"
-                  disabled={!canGenerate}
-                  className={`rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity ${
-                    canGenerate
-                      ? "hover:opacity-75"
-                      : "cursor-not-allowed opacity-40"
-                  }`}
-                >
-                  {design.image_status === "failed"
-                    ? "Retry generation"
-                    : design.image_status === "generating"
-                      ? "Generating…"
-                      : "Generate image"}
-                </button>
-              </form>
-              {canGenerate && (
-                <p className="text-xs text-zinc-600">
-                  Generates a unique AI image for this design based on your
-                  prompt, product type, and style.
-                </p>
-              )}
+            <div className="mt-4">
+              <GenerateImageButton
+                designId={design.id}
+                imageStatus={design.image_status}
+              />
             </div>
           </div>
 

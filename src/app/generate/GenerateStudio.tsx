@@ -32,12 +32,12 @@ export default function GenerateStudio({
 }: GenerateStudioProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [productType, setProductType] = useState<ProductType>(
-    PRODUCT_TYPES.includes(initialProductType as ProductType)
+    PRODUCT_TYPES.includes(initialProductType as (typeof PRODUCT_TYPES)[number])
       ? (initialProductType as ProductType)
       : null
   );
   const [styleMood, setStyleMood] = useState<StyleMood>(
-    STYLE_MOODS.includes(initialStyle as StyleMood)
+    STYLE_MOODS.includes(initialStyle as (typeof STYLE_MOODS)[number])
       ? (initialStyle as StyleMood)
       : null
   );
@@ -67,7 +67,7 @@ export default function GenerateStudio({
       setSaveState({ status: "auth_required" });
     } else if (result.error === "save_failed") {
       setSaveState({ status: "save_failed" });
-    } else {
+    } else if (result.id) {
       setDesignId(result.id);
       setSaveState({ status: "success", id: result.id, wasUpdate });
     }
