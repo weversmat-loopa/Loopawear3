@@ -85,7 +85,6 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
   if (colorPalette) refineParams.set("color_palette", colorPalette);
   const refineHref = `/generate?${refineParams.toString()}`;
 
-
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-12">
       <div className="mx-auto w-full max-w-2xl">
@@ -162,11 +161,36 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             )}
 
             <div className="mt-4">
-              <GenerateImageButton
-                designId={design.id}
-                imageStatus={design.image_status}
-                colorPalette={colorPalette}
-              />
+              {design.image_status === "ready" ? (
+                <div className="flex flex-wrap items-center gap-4">
+                  <Link
+                    href={refineHref}
+                    className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                  >
+                    Refine in studio →
+                  </Link>
+                  <p className="text-xs text-zinc-600">
+                    Adjust your prompt, style, or colors to generate a new image.
+                  </p>
+                </div>
+              ) : design.image_status !== "generating" ? (
+                <div className="space-y-3">
+                  <GenerateImageButton
+                    designId={design.id}
+                    imageStatus={design.image_status}
+                    colorPalette={colorPalette}
+                  />
+                  <p className="text-xs text-zinc-700">
+                    Want to change the prompt first?{" "}
+                    <Link
+                      href={refineHref}
+                      className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-white"
+                    >
+                      Refine in studio →
+                    </Link>
+                  </p>
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -250,16 +274,10 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             />
           </div>
 
-          <div className="mt-10 flex items-center justify-between border-t border-zinc-900 pt-6">
+          <div className="mt-10 border-t border-zinc-900 pt-6">
             <p className="text-xs text-zinc-600">
               Created {formatDate(design.created_at)}
             </p>
-            <Link
-              href={refineHref}
-              className="text-xs text-zinc-500 transition-colors hover:text-white"
-            >
-              Refine in studio →
-            </Link>
           </div>
         </div>
       </div>
