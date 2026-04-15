@@ -76,11 +76,7 @@ export async function POST(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  if (
-    design.image_status !== "none" &&
-    design.image_status !== null &&
-    design.image_status !== "failed"
-  ) {
+  if (design.image_status === "generating") {
     return NextResponse.json({ error: "already_generating" }, { status: 409 });
   }
 

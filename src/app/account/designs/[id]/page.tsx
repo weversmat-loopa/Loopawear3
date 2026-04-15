@@ -169,9 +169,12 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   >
                     Refine in studio →
                   </Link>
-                  <p className="text-xs text-zinc-600">
-                    Adjust your prompt, style, or colors to generate a new image.
-                  </p>
+                  <GenerateImageButton
+                    designId={design.id}
+                    imageStatus={design.image_status}
+                    colorPalette={colorPalette}
+                    secondary
+                  />
                 </div>
               ) : design.image_status !== "generating" ? (
                 <div className="space-y-3">
