@@ -6,9 +6,11 @@ import { saveDraft } from "./actions";
 
 const PRODUCT_TYPES = ["T-shirt", "Hoodie", "Sweatshirt", "Tote bag"] as const;
 const STYLE_MOODS = ["Minimal", "Bold", "Vintage", "Abstract", "Graphic"] as const;
+const COLOR_PALETTES = ["Monochrome", "Two-tone", "Full color"] as const;
 
 type ProductType = (typeof PRODUCT_TYPES)[number] | null;
 type StyleMood = (typeof STYLE_MOODS)[number] | null;
+type ColorPalette = (typeof COLOR_PALETTES)[number] | null;
 
 type SaveState =
   | { status: "idle" }
@@ -21,6 +23,7 @@ interface GenerateStudioProps {
   initialPrompt?: string;
   initialProductType?: string | null;
   initialStyle?: string | null;
+  initialColorPalette?: string | null;
   initialDesignId?: string | null;
 }
 
@@ -28,6 +31,7 @@ export default function GenerateStudio({
   initialPrompt = "",
   initialProductType = null,
   initialStyle = null,
+  initialColorPalette = null,
   initialDesignId = null,
 }: GenerateStudioProps) {
   const [prompt, setPrompt] = useState(initialPrompt);
@@ -41,6 +45,11 @@ export default function GenerateStudio({
       ? (initialStyle as StyleMood)
       : null
   );
+  const [colorPalette, setColorPalette] = useState<ColorPalette>(
+    COLOR_PALETTES.includes(initialColorPalette as (typeof COLOR_PALETTES)[number])
+      ? (initialColorPalette as ColorPalette)
+      : null
+  );
   const [designId, setDesignId] = useState<string | null>(initialDesignId);
   const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
 
@@ -52,6 +61,7 @@ export default function GenerateStudio({
     setPrompt("");
     setProductType(null);
     setStyleMood(null);
+    setColorPalette(null);
     setDesignId(null);
     setSaveState({ status: "idle" });
   }
@@ -135,6 +145,31 @@ export default function GenerateStudio({
           </div>
 
           <div>
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Colors
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {COLOR_PALETTES.map((palette) => (
+                <button
+                  key={palette}
+                  type="button"
+                  onClick={() => {
+                    setColorPalette(colorPalette === palette ? null : palette);
+                    resetSaveState();
+                  }}
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                    colorPalette === palette
+                      ? "border-white bg-white text-black"
+                      : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                  }`}
+                >
+                  {palette}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <label
               htmlFor="prompt"
               className="text-xs font-medium uppercase tracking-wider text-zinc-500"
@@ -173,7 +208,7 @@ export default function GenerateStudio({
                 <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
                   {saveState.wasUpdate ? "Design updated" : "Design saved"}
                 </p>
-                {(productType || styleMood) && (
+                {(productType || styleMood || colorPalette) && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {productType && (
                       <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
@@ -183,6 +218,11 @@ export default function GenerateStudio({
                     {styleMood && (
                       <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
                         {styleMood}
+                      </span>
+                    )}
+                    {colorPalette && (
+                      <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
+                        {colorPalette}
                       </span>
                     )}
                   </div>
@@ -196,7 +236,7 @@ export default function GenerateStudio({
               </p>
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href={`/account/designs/${saveState.id}`}
+                  href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
                   className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
                 >
                   Open workspace →
@@ -243,7 +283,7 @@ export default function GenerateStudio({
             </div>
           ) : prompt.trim() ? (
             <div className="p-6">
-              {(productType || styleMood) && (
+              {(productType || styleMood || colorPalette) && (
                 <div className="mb-4 flex flex-wrap gap-2">
                   {productType && (
                     <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
@@ -253,6 +293,11 @@ export default function GenerateStudio({
                   {styleMood && (
                     <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
                       {styleMood}
+                    </span>
+                  )}
+                  {colorPalette && (
+                    <span className="rounded-full border border-zinc-700 px-3 py-1 text-xs text-zinc-400">
+                      {colorPalette}
                     </span>
                   )}
                 </div>

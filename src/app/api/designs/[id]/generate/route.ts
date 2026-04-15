@@ -12,10 +12,17 @@ const STYLE_KEYWORDS: Record<string, string> = {
   Graphic: "graphic illustration, sharp lines, vector-art style",
 };
 
+const COLOR_PALETTE_KEYWORDS: Record<string, string> = {
+  Monochrome: "strictly monochrome, single ink color, black and white only",
+  "Two-tone": "exactly two colors, two-tone color scheme, duotone",
+  "Full color": "full color illustration, rich vibrant color palette",
+};
+
 function buildGenerationPrompt(
   userPrompt: string,
   productType: string | null,
-  style: string | null
+  style: string | null,
+  colorPalette: string | null
 ): string {
   const parts: string[] = [
     "Flat graphic design artwork suitable for apparel screen printing.",
@@ -23,6 +30,10 @@ function buildGenerationPrompt(
 
   if (style && STYLE_KEYWORDS[style]) {
     parts.push(STYLE_KEYWORDS[style] + ".");
+  }
+
+  if (colorPalette && COLOR_PALETTE_KEYWORDS[colorPalette]) {
+    parts.push(COLOR_PALETTE_KEYWORDS[colorPalette] + ".");
   }
 
   parts.push(userPrompt.trim() + ".");
@@ -37,10 +48,13 @@ function buildGenerationPrompt(
 type Params = { id: string };
 
 export async function POST(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<Params> }
 ) {
   const { id } = await params;
+  const body = await req.json().catch(() => ({})) as { colorPalette?: string };
+  const colorPalette = typeof body.colorPalette === "string" ? body.colorPalette : null;
+
   const supabase = await createClient();
 
   const {
@@ -79,7 +93,8 @@ export async function POST(
   const prompt = buildGenerationPrompt(
     design.prompt,
     design.product_type,
-    design.style
+    design.style,
+    colorPalette
   );
 
   try {

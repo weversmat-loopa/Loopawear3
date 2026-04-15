@@ -13,7 +13,7 @@ import GenerateImageButton from "./GenerateImageButton";
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ success?: string; error?: string }>;
+  searchParams?: Promise<{ success?: string; error?: string; color_palette?: string }>;
 };
 
 function formatDate(iso: string) {
@@ -75,12 +75,14 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
   const sp = await searchParams;
   const success = sp?.success;
   const error = sp?.error;
+  const colorPalette = sp?.color_palette ?? null;
 
   const isPublished = design.status === "published";
 
   const refineParams = new URLSearchParams({ prompt: design.prompt, design_id: design.id });
   if (design.product_type) refineParams.set("product_type", design.product_type);
   if (design.style) refineParams.set("style", design.style);
+  if (colorPalette) refineParams.set("color_palette", colorPalette);
   const refineHref = `/generate?${refineParams.toString()}`;
 
 
@@ -163,6 +165,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               <GenerateImageButton
                 designId={design.id}
                 imageStatus={design.image_status}
+                colorPalette={colorPalette}
               />
             </div>
           </div>

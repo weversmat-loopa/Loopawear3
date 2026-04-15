@@ -6,11 +6,13 @@ import { useRouter } from "next/navigation";
 interface GenerateImageButtonProps {
   designId: string;
   imageStatus: string | null;
+  colorPalette?: string | null;
 }
 
 export default function GenerateImageButton({
   designId,
   imageStatus,
+  colorPalette = null,
 }: GenerateImageButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +31,8 @@ export default function GenerateImageButton({
     try {
       const res = await fetch(`/api/designs/${designId}/generate`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ colorPalette }),
       });
 
       if (!res.ok) {

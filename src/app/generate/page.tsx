@@ -11,6 +11,7 @@ type GeneratePageProps = {
     prompt?: string;
     product_type?: string;
     style?: string;
+    color_palette?: string;
     design_id?: string;
   }>;
 };
@@ -22,6 +23,7 @@ export default async function GeneratePage({ searchParams }: GeneratePageProps) 
       initialPrompt={sp?.prompt ?? ""}
       initialProductType={sp?.product_type ?? null}
       initialStyle={sp?.style ?? null}
+      initialColorPalette={sp?.color_palette ?? null}
       initialDesignId={sp?.design_id ?? null}
     />
   );
