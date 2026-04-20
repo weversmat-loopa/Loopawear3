@@ -24,10 +24,35 @@ interface MarketplaceBrowseProps {
 
 export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
   const [activeFilter, setActiveFilter] = useState<ProductFilter>(null);
+  const [query, setQuery] = useState("");
 
-  const filtered = activeFilter
-    ? designs.filter((d) => d.product_type === activeFilter)
-    : designs;
+  const trimmedQuery = query.trim().toLowerCase();
+
+  const results = designs
+    .filter((d) => !activeFilter || d.product_type === activeFilter)
+    .filter((d) => {
+      if (!trimmedQuery) return true;
+      return (
+        d.prompt.toLowerCase().includes(trimmedQuery) ||
+        (d.creator_name?.toLowerCase().includes(trimmedQuery) ?? false) ||
+        (d.style?.toLowerCase().includes(trimmedQuery) ?? false) ||
+        (d.product_type?.toLowerCase().includes(trimmedQuery) ?? false)
+      );
+    });
+
+  const isFiltering = activeFilter !== null || trimmedQuery !== "";
+
+  function emptyHeading() {
+    if (designs.length === 0) return "No designs published yet";
+    return "No designs match";
+  }
+
+  function emptySubtext() {
+    if (designs.length === 0) return "Creators are just getting started — check back soon.";
+    if (trimmedQuery && activeFilter) return "Try a different search term or product filter.";
+    if (trimmedQuery) return "Try a different search term.";
+    return "Try selecting a different product type.";
+  }
 
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-10">
@@ -43,7 +68,29 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
           Every piece starts with a prompt.
         </p>
 
-        <div className="mt-8 flex flex-wrap gap-2">
+        {/* Search */}
+        <div className="relative mt-8">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by keyword, style, or creator…"
+            className="w-full rounded-full border border-zinc-800 bg-transparent px-5 py-2.5 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-zinc-600"
+          />
+          {trimmedQuery && (
+            <button
+              type="button"
+              onClick={() => setQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
+        {/* Product type filters */}
+        <div className="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
             onClick={() => setActiveFilter(null)}
@@ -73,9 +120,16 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
           ))}
         </div>
 
-        {filtered.length > 0 ? (
+        {/* Result count — only shown when actively filtering */}
+        {isFiltering && results.length > 0 && (
+          <p className="mt-4 text-xs text-zinc-600">
+            {results.length} {results.length === 1 ? "design" : "designs"} found
+          </p>
+        )}
+
+        {results.length > 0 ? (
           <ul className="mt-6 grid grid-cols-1 gap-4 border-t border-zinc-900 pt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {filtered.map((design) => (
+            {results.map((design) => (
               <li key={design.id}>
                 <Link
                   href={`/marketplace/${design.id}`}
@@ -120,16 +174,17 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
           </ul>
         ) : (
           <div className="mt-6 flex flex-col items-center justify-center border-t border-zinc-900 py-24 text-center">
-            <p className="text-sm font-medium text-zinc-500">
-              {designs.length === 0
-                ? "No designs published yet"
-                : "No designs match this filter"}
-            </p>
-            <p className="mt-2 text-sm text-zinc-700">
-              {designs.length === 0
-                ? "Creators are just getting started — check back soon."
-                : "Try selecting a different product type."}
-            </p>
+            <p className="text-sm font-medium text-zinc-500">{emptyHeading()}</p>
+            <p className="mt-2 text-sm text-zinc-700">{emptySubtext()}</p>
+            {isFiltering && (
+              <button
+                type="button"
+                onClick={() => { setQuery(""); setActiveFilter(null); }}
+                className="mt-4 text-xs text-zinc-500 underline underline-offset-2 transition-colors hover:text-zinc-300"
+              >
+                Clear all filters
+              </button>
+            )}
           </div>
         )}
       </div>
