@@ -101,6 +101,24 @@ export default function GenerateStudio({
     }
   }
 
+  async function handleDownload() {
+    if (saveState.status !== "generated") return;
+    try {
+      const res = await fetch(saveState.imageUrl);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "design.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      window.open(saveState.imageUrl, "_blank");
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSaveState({ status: "saving" });
@@ -150,12 +168,29 @@ export default function GenerateStudio({
           decoding="async"
         />
         <div className="flex items-center justify-between border-t border-zinc-900 px-4 py-3">
-          <Link
-            href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-            className="text-sm text-zinc-400 transition-colors hover:text-white"
-          >
-            Open workspace →
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link
+              href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
+              className="text-sm text-zinc-400 transition-colors hover:text-white"
+            >
+              Open workspace →
+            </Link>
+            <a
+              href={saveState.imageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-zinc-600 transition-colors hover:text-zinc-300"
+            >
+              Full size ↗
+            </a>
+            <button
+              type="button"
+              onClick={handleDownload}
+              className="text-sm text-zinc-600 transition-colors hover:text-zinc-300"
+            >
+              Download ↓
+            </button>
+          </div>
           <button
             type="button"
             onClick={resetForm}
