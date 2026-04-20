@@ -3,13 +3,13 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import DesignEditForm from "./DesignEditForm";
+import DesignImageSection from "./DesignImageSection";
 import {
   devMarkGenerationReady,
   devMarkGenerationFailed,
   devSetTestImageUrl,
   devClearImageUrl,
 } from "@/app/account/actions";
-import GenerateImageButton from "./GenerateImageButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -113,88 +113,14 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           </h1>
 
           <div className="mt-8">
-            {design.image_status === "ready" && design.image_url ? (
-              <div className="overflow-hidden rounded-xl border border-zinc-800">
-                {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-                <img
-                  src={design.image_url}
-                  alt={
-                    design.product_type
-                      ? `${design.product_type} design`
-                      : "Generated design"
-                  }
-                  className="block h-auto w-full"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            ) : design.image_status === "generating" ? (
-              <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
-                <div className="text-center">
-                  <p className="text-sm font-medium text-zinc-400">
-                    Generating image…
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-600">
-                    This may take a moment.
-                  </p>
-                </div>
-              </div>
-            ) : design.image_status === "failed" ? (
-              <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
-                <div className="text-center">
-                  <p className="text-sm font-medium text-zinc-500">
-                    Generation failed
-                  </p>
-                  <p className="mt-1 text-xs text-zinc-700">
-                    Something went wrong. You can try again below.
-                  </p>
-                </div>
-              </div>
-            ) : design.image_status === "ready" && !design.image_url ? (
-              <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
-                <p className="text-sm text-zinc-600">Image unavailable</p>
-              </div>
-            ) : (
-              <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
-                <p className="text-sm text-zinc-600">No image generated yet</p>
-              </div>
-            )}
-
-            <div className="mt-4">
-              {design.image_status === "ready" ? (
-                <div className="flex flex-wrap items-center gap-4">
-                  <Link
-                    href={refineHref}
-                    className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
-                  >
-                    Refine in studio →
-                  </Link>
-                  <GenerateImageButton
-                    designId={design.id}
-                    imageStatus={design.image_status}
-                    colorPalette={colorPalette}
-                    secondary
-                  />
-                </div>
-              ) : design.image_status !== "generating" ? (
-                <div className="space-y-3">
-                  <GenerateImageButton
-                    designId={design.id}
-                    imageStatus={design.image_status}
-                    colorPalette={colorPalette}
-                  />
-                  <p className="text-xs text-zinc-700">
-                    Want to change the prompt first?{" "}
-                    <Link
-                      href={refineHref}
-                      className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-white"
-                    >
-                      Refine in studio →
-                    </Link>
-                  </p>
-                </div>
-              ) : null}
-            </div>
+            <DesignImageSection
+              designId={design.id}
+              imageStatus={design.image_status}
+              imageUrl={design.image_url}
+              productType={design.product_type}
+              colorPalette={colorPalette}
+              refineHref={refineHref}
+            />
           </div>
 
           {design.image_status === "generating" && (

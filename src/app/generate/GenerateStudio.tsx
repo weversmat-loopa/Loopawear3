@@ -16,6 +16,9 @@ type SaveState =
   | { status: "idle" }
   | { status: "saving" }
   | { status: "success"; id: string; wasUpdate: boolean }
+  | { status: "generating"; id: string }
+  | { status: "generated"; id: string; imageUrl: string }
+  | { status: "generate_failed"; id: string }
   | { status: "auth_required" }
   | { status: "save_failed" };
 
@@ -64,6 +67,32 @@ export default function GenerateStudio({
     setColorPalette(null);
     setDesignId(null);
     setSaveState({ status: "idle" });
+  }
+
+  async function handleGenerate(id: string) {
+    setSaveState({ status: "generating", id });
+
+    try {
+      const res = await fetch(`/api/designs/${id}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ colorPalette }),
+      });
+
+      if (!res.ok) {
+        setSaveState({ status: "generate_failed", id });
+        return;
+      }
+
+      const body = await res.json().catch(() => ({})) as { imageUrl?: string };
+      if (body.imageUrl) {
+        setSaveState({ status: "generated", id, imageUrl: body.imageUrl });
+      } else {
+        setSaveState({ status: "generate_failed", id });
+      }
+    } catch {
+      setSaveState({ status: "generate_failed", id });
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -202,7 +231,68 @@ export default function GenerateStudio({
         </form>
 
         <div className="mt-10 min-h-[320px] rounded-xl border border-dashed border-zinc-800">
-          {saveState.status === "success" ? (
+          {saveState.status === "generating" ? (
+            <div className="flex aspect-square w-full items-center justify-center rounded-xl">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
+                <p className="text-sm font-medium text-zinc-400">Generating image…</p>
+                <p className="text-xs text-zinc-600">This may take a moment.</p>
+              </div>
+            </div>
+          ) : saveState.status === "generated" ? (
+            <div className="overflow-hidden rounded-xl">
+              {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+              <img
+                src={saveState.imageUrl}
+                alt={productType ? `${productType} design` : "Generated design"}
+                className="block h-auto w-full"
+                loading="lazy"
+                decoding="async"
+              />
+              <div className="flex flex-wrap items-center gap-3 p-4">
+                <button
+                  type="button"
+                  onClick={() => handleGenerate(saveState.id)}
+                  className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+                >
+                  Regenerate
+                </button>
+                <Link
+                  href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
+                  className="text-sm text-zinc-500 underline underline-offset-2 transition-colors hover:text-white"
+                >
+                  Open workspace →
+                </Link>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
+                >
+                  New design
+                </button>
+              </div>
+            </div>
+          ) : saveState.status === "generate_failed" ? (
+            <div className="flex min-h-[320px] flex-col items-center justify-center gap-3 p-6 text-center">
+              <p className="text-sm font-medium text-zinc-500">Generation failed</p>
+              <p className="text-xs text-zinc-700">Something went wrong. You can try again.</p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleGenerate(saveState.id)}
+                  className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                >
+                  Retry
+                </button>
+                <Link
+                  href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
+                  className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+                >
+                  Open workspace →
+                </Link>
+              </div>
+            </div>
+          ) : saveState.status === "success" ? (
             <div className="flex min-h-[320px] flex-col justify-center gap-5 p-6">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wider text-zinc-600">
@@ -231,13 +321,17 @@ export default function GenerateStudio({
                   &ldquo;{prompt.trim()}&rdquo;
                 </p>
               </div>
-              <p className="text-xs text-zinc-600">
-                Open your design workspace to generate an image.
-              </p>
               <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleGenerate(saveState.id)}
+                  className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                >
+                  Generate image
+                </button>
                 <Link
                   href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-                  className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                  className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
                 >
                   Open workspace →
                 </Link>
@@ -312,7 +406,7 @@ export default function GenerateStudio({
                 Your design will appear here
               </p>
               <p className="text-xs text-zinc-700">
-                Fill in the form above and hit Generate
+                Fill in the form above to get started
               </p>
             </div>
           )}
