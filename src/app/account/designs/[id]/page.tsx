@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/server";
 import DesignEditForm from "./DesignEditForm";
 import DesignImageSection from "./DesignImageSection";
 import {
+  publishDraft,
+  unpublishDesign,
   devMarkGenerationReady,
   devMarkGenerationFailed,
   devSetTestImageUrl,
@@ -96,7 +98,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
         </Link>
 
         <div className="mt-10">
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <span
               className={`rounded-full border px-2.5 py-0.5 text-xs ${
                 isPublished
@@ -106,6 +108,28 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             >
               {isPublished ? "Published" : "Draft"}
             </span>
+            {!isPublished && design.image_status === "ready" && (
+              <form action={publishDraft}>
+                <input type="hidden" name="designId" value={design.id} />
+                <button
+                  type="submit"
+                  className="rounded-full bg-white px-4 py-1 text-xs font-semibold text-black transition-opacity hover:opacity-75"
+                >
+                  Publish →
+                </button>
+              </form>
+            )}
+            {isPublished && (
+              <form action={unpublishDesign}>
+                <input type="hidden" name="designId" value={design.id} />
+                <button
+                  type="submit"
+                  className="rounded-full border border-zinc-700 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300"
+                >
+                  Unpublish
+                </button>
+              </form>
+            )}
           </div>
 
           <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">

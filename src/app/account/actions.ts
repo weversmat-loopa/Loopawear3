@@ -34,7 +34,7 @@ export async function publishDraft(formData: FormData) {
   }
 
   redirect(
-    `/account?success=${encodeURIComponent("Design published to the marketplace.")}`
+    `/account/designs/${designId}?success=${encodeURIComponent("Design published.")}`
   );
 }
 
@@ -69,7 +69,7 @@ export async function unpublishDesign(formData: FormData) {
   }
 
   redirect(
-    `/account?success=${encodeURIComponent("Design moved back to drafts.")}`
+    `/account/designs/${designId}?success=${encodeURIComponent("Design moved back to drafts.")}`
   );
 }
 
