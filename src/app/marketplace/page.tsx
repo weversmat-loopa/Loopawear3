@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { createClient } from "@/utils/supabase/server";
 import MarketplaceBrowse from "./MarketplaceBrowse";
 import type { MarketplaceDesign } from "./MarketplaceBrowse";
+import { PRODUCT_FILTERS } from "./filters";
+import type { ProductFilter } from "./filters";
 
 export const metadata: Metadata = {
   title: "Marketplace",
@@ -9,7 +11,11 @@ export const metadata: Metadata = {
     "Discover and shop original AI-generated apparel from independent creators on Loopawear.",
 };
 
-export default async function MarketplacePage() {
+type Props = {
+  searchParams?: Promise<{ type?: string }>;
+};
+
+export default async function MarketplacePage({ searchParams }: Props) {
   const supabase = await createClient();
 
   const { data: designsRaw } = await supabase
@@ -46,5 +52,12 @@ export default async function MarketplacePage() {
     creator_name: creatorNames[d.creator_id] ?? null,
   }));
 
-  return <MarketplaceBrowse designs={designs} />;
+  const params = await searchParams;
+  const typeParam = params?.type ?? null;
+  const initialFilter: ProductFilter =
+    PRODUCT_FILTERS.includes(typeParam as (typeof PRODUCT_FILTERS)[number])
+      ? (typeParam as ProductFilter)
+      : null;
+
+  return <MarketplaceBrowse designs={designs} initialFilter={initialFilter} />;
 }

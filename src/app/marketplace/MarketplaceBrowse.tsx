@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 
-const PRODUCT_FILTERS = ["T-shirt", "Hoodie", "Sweatshirt", "Tote bag"] as const;
-
-type ProductFilter = (typeof PRODUCT_FILTERS)[number] | null;
+import { PRODUCT_FILTERS } from "./filters";
+import type { ProductFilter } from "./filters";
 
 export type MarketplaceDesign = {
   id: string;
@@ -20,10 +19,11 @@ export type MarketplaceDesign = {
 
 interface MarketplaceBrowseProps {
   designs: MarketplaceDesign[];
+  initialFilter?: ProductFilter;
 }
 
-export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
-  const [activeFilter, setActiveFilter] = useState<ProductFilter>(null);
+export default function MarketplaceBrowse({ designs, initialFilter = null }: MarketplaceBrowseProps) {
+  const [activeFilter, setActiveFilter] = useState<ProductFilter>(initialFilter);
   const [query, setQuery] = useState("");
 
   const trimmedQuery = query.trim().toLowerCase();

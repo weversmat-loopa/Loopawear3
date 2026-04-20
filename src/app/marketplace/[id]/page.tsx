@@ -126,9 +126,12 @@ export default async function DesignPage({ params }: Props) {
           <div className="mt-8 flex flex-col lg:mt-0">
             <div className="flex flex-wrap items-center gap-2">
               {design.product_type && (
-                <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                <Link
+                  href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
+                  className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                >
                   {design.product_type}
-                </span>
+                </Link>
               )}
               {design.style && (
                 <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
