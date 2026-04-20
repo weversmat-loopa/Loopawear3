@@ -164,7 +164,10 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
                         by {design.creator_name}
                       </p>
                     )}
-                    <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-600">
+                    {design.style && (
+                      <p className="text-xs text-zinc-600">{design.style}</p>
+                    )}
+                    <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-700">
                       {design.prompt}
                     </p>
                   </div>

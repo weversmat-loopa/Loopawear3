@@ -65,6 +65,25 @@ export default async function DesignPage({ params }: Props) {
     creatorName = profile?.display_name ?? null;
   }
 
+  // Fetch up to 3 other published designs by the same creator
+  let moreByCreator: {
+    id: string;
+    product_type: string | null;
+    image_url: string | null;
+    prompt: string;
+  }[] = [];
+  if (design.creator_id) {
+    const { data: more } = await supabase
+      .from("designs")
+      .select("id, product_type, image_url, prompt")
+      .eq("creator_id", design.creator_id)
+      .eq("status", "published")
+      .neq("id", design.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+    moreByCreator = more ?? [];
+  }
+
   const studioParams = new URLSearchParams({ prompt: design.prompt });
   if (design.product_type) studioParams.set("product_type", design.product_type);
   if (design.style) studioParams.set("style", design.style);
@@ -154,6 +173,64 @@ export default async function DesignPage({ params }: Props) {
             </div>
           </div>
         </div>
+
+        {/* More by this creator */}
+        {moreByCreator.length > 0 && (
+          <div className="mt-16 border-t border-zinc-900 pt-10">
+            <div className="flex items-baseline justify-between gap-4">
+              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                More by {creatorName ?? "this creator"}
+              </h2>
+              {design.creator_id && (
+                <Link
+                  href={`/creators/${design.creator_id}`}
+                  className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+                >
+                  See all →
+                </Link>
+              )}
+            </div>
+            <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {moreByCreator.map((related) => (
+                <li key={related.id}>
+                  <Link
+                    href={`/marketplace/${related.id}`}
+                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-600"
+                  >
+                    {related.image_url ? (
+                      <div className="aspect-square w-full overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+                        <img
+                          src={related.image_url}
+                          alt={
+                            related.product_type
+                              ? `${related.product_type} design`
+                              : "Design"
+                          }
+                          className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                    ) : (
+                      <div className="aspect-square w-full bg-zinc-900" />
+                    )}
+                    <div className="p-3">
+                      <p className="text-xs font-medium text-white">
+                        {related.product_type
+                          ? `${related.product_type} Design`
+                          : "Design"}
+                      </p>
+                      <p className="mt-0.5 line-clamp-1 text-xs text-zinc-600">
+                        {related.prompt}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </main>
   );
