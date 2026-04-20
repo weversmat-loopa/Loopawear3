@@ -65,7 +65,13 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
         </h1>
         <p className="mt-2 text-sm text-zinc-400">
           Discover original AI-generated apparel from independent creators.
-          Every piece starts with a prompt.
+          Every piece starts with a prompt.{" "}
+          <Link
+            href="/generate"
+            className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-zinc-300"
+          >
+            Create your own →
+          </Link>
         </p>
 
         {/* Search */}

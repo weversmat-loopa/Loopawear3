@@ -143,6 +143,19 @@ export default async function CreatorPage({ params }: Props) {
             </div>
           )}
         </div>
+
+        {/* Studio CTA */}
+        <div className="mt-16 border-t border-zinc-900 pt-8 pb-4">
+          <p className="text-sm text-zinc-500">
+            Inspired by what you see?{" "}
+            <Link
+              href="/generate"
+              className="text-zinc-400 underline underline-offset-2 transition-colors hover:text-white"
+            >
+              Create your own design →
+            </Link>
+          </p>
+        </div>
       </div>
     </main>
   );
