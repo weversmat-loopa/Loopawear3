@@ -46,7 +46,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_url, created_at")
+    .select("id, prompt, product_type, style, image_url, created_at, creator_id")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -54,6 +54,21 @@ export default async function DesignPage({ params }: Props) {
   if (!design) {
     notFound();
   }
+
+  let creatorName: string | null = null;
+  if (design.creator_id) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", design.creator_id)
+      .maybeSingle();
+    creatorName = profile?.display_name ?? null;
+  }
+
+  const studioParams = new URLSearchParams({ prompt: design.prompt });
+  if (design.product_type) studioParams.set("product_type", design.product_type);
+  if (design.style) studioParams.set("style", design.style);
+  const studioHref = `/generate?${studioParams.toString()}`;
 
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-12">
@@ -83,30 +98,39 @@ export default async function DesignPage({ params }: Props) {
             </div>
           )}
 
-          {(design.product_type || design.style) && (
-            <div className="mt-6 flex flex-wrap gap-2">
-              {design.product_type && (
-                <span className="rounded-full border border-zinc-800 px-3 py-1 text-xs text-zinc-500">
-                  {design.product_type}
-                </span>
+          <div className="mt-6">
+            <h1 className="text-2xl font-bold tracking-tight text-white">
+              {design.product_type ? `${design.product_type} Design` : "Design"}
+            </h1>
+            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              {creatorName && (
+                <span className="text-sm text-zinc-500">by {creatorName}</span>
               )}
               {design.style && (
-                <span className="rounded-full border border-zinc-800 px-3 py-1 text-xs text-zinc-500">
+                <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
                   {design.style}
                 </span>
               )}
             </div>
-          )}
+          </div>
 
-          <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
-            {design.product_type ? `${design.product_type} Design` : "Design"}
-          </h1>
-
-          <p className="mt-6 text-base leading-relaxed text-zinc-300">
+          <p className="mt-6 text-sm leading-relaxed text-zinc-400">
             &ldquo;{design.prompt}&rdquo;
           </p>
 
-          <p className="mt-10 border-t border-zinc-900 pt-6 text-xs text-zinc-600">
+          <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-zinc-900 pt-6">
+            <Link
+              href={studioHref}
+              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+            >
+              Create something similar →
+            </Link>
+            <p className="text-xs text-zinc-600">
+              Opens the studio with this prompt pre-filled.
+            </p>
+          </div>
+
+          <p className="mt-8 text-xs text-zinc-700">
             Published {formatDate(design.created_at)}
           </p>
         </div>

@@ -6,7 +6,6 @@ import { useState } from "react";
 const PRODUCT_FILTERS = ["T-shirt", "Hoodie", "Sweatshirt", "Tote bag"] as const;
 
 type ProductFilter = (typeof PRODUCT_FILTERS)[number] | null;
-type SortOption = "newest" | "popular";
 
 export type MarketplaceDesign = {
   id: string;
@@ -15,6 +14,7 @@ export type MarketplaceDesign = {
   style: string | null;
   image_url: string | null;
   created_at: string;
+  creator_name: string | null;
 };
 
 interface MarketplaceBrowseProps {
@@ -23,16 +23,10 @@ interface MarketplaceBrowseProps {
 
 export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
   const [activeFilter, setActiveFilter] = useState<ProductFilter>(null);
-  const [sort, setSort] = useState<SortOption>("newest");
 
   const filtered = activeFilter
     ? designs.filter((d) => d.product_type === activeFilter)
     : designs;
-
-  const sorted =
-    sort === "newest"
-      ? filtered
-      : [...filtered].sort(() => 0); // no real popularity metric yet
 
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-10">
@@ -48,54 +42,43 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
           Every piece starts with a prompt.
         </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-          <div className="flex flex-wrap gap-2">
+        <div className="mt-8 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveFilter(null)}
+            className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+              activeFilter === null
+                ? "border-white bg-white text-black"
+                : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+            }`}
+          >
+            All
+          </button>
+          {PRODUCT_FILTERS.map((type) => (
             <button
+              key={type}
               type="button"
-              onClick={() => setActiveFilter(null)}
+              onClick={() =>
+                setActiveFilter(activeFilter === type ? null : type)
+              }
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                activeFilter === null
+                activeFilter === type
                   ? "border-white bg-white text-black"
                   : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
               }`}
             >
-              All
+              {type}
             </button>
-            {PRODUCT_FILTERS.map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() =>
-                  setActiveFilter(activeFilter === type ? null : type)
-                }
-                className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                  activeFilter === type
-                    ? "border-white bg-white text-black"
-                    : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                }`}
-              >
-                {type}
-              </button>
-            ))}
-          </div>
-
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as SortOption)}
-            className="cursor-pointer rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-400 outline-none focus:border-zinc-600"
-          >
-            <option value="newest">Newest</option>
-            <option value="popular">Popular</option>
-          </select>
+          ))}
         </div>
 
-        {sorted.length > 0 ? (
-          <ul className="mt-6 grid grid-cols-1 gap-4 border-t border-zinc-900 pt-6 sm:grid-cols-2 lg:grid-cols-3">
-            {sorted.map((design) => (
+        {filtered.length > 0 ? (
+          <ul className="mt-6 grid grid-cols-1 gap-4 border-t border-zinc-900 pt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filtered.map((design) => (
               <li key={design.id}>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700"
+                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-600"
                 >
                   {design.image_url ? (
                     <div className="aspect-square w-full overflow-hidden">
@@ -107,7 +90,7 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
                             ? `${design.product_type} design`
                             : "Design"
                         }
-                        className="block h-full w-full object-cover"
+                        className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                         loading="lazy"
                         decoding="async"
                       />
@@ -115,23 +98,19 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
                   ) : (
                     <div className="aspect-square w-full bg-zinc-900" />
                   )}
-                  <div className="flex flex-col gap-2 p-4">
-                    {(design.product_type || design.style) && (
-                      <div className="flex flex-wrap gap-1.5">
-                        {design.product_type && (
-                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                            {design.product_type}
-                          </span>
-                        )}
-                        {design.style && (
-                          <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                            {design.style}
-                          </span>
-                        )}
-                      </div>
+                  <div className="flex flex-col gap-1 p-4">
+                    <p className="text-sm font-medium text-white">
+                      {design.product_type
+                        ? `${design.product_type} Design`
+                        : "Design"}
+                    </p>
+                    {design.creator_name && (
+                      <p className="text-xs text-zinc-500">
+                        by {design.creator_name}
+                      </p>
                     )}
-                    <p className="line-clamp-2 text-sm leading-relaxed text-zinc-300">
-                      &ldquo;{design.prompt}&rdquo;
+                    <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-600">
+                      {design.prompt}
                     </p>
                   </div>
                 </Link>
