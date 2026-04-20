@@ -365,26 +365,43 @@ export default function GenerateStudio({
                 </p>
               )}
 
-              <div className="pt-1">
-                <button
-                  type="submit"
-                  disabled={!prompt.trim() || isWorking}
-                  className="rounded-full bg-white px-7 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {buttonLabel()}
-                </button>
-                {saveState.status === "generated" && (
-                  <p className="mt-3 text-xs text-zinc-600">
-                    Design saved to your account.{" "}
+              {saveState.status === "generated" ? (
+                <div className="space-y-4 border-t border-zinc-900 pt-5">
+                  <div>
                     <Link
-                      href="/account"
-                      className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-white"
+                      href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
+                      className="inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
                     >
-                      View all designs →
+                      Open in workspace →
                     </Link>
-                  </p>
-                )}
-              </div>
+                    <p className="mt-2 text-xs text-zinc-600">
+                      Manage, publish, or share this design from your workspace.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={!prompt.trim() || isWorking}
+                      className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      {buttonLabel()}
+                    </button>
+                    <span className="text-xs text-zinc-700">
+                      Not happy? Adjust and try again.
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="pt-1">
+                  <button
+                    type="submit"
+                    disabled={!prompt.trim() || isWorking}
+                    className="rounded-full bg-white px-7 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {buttonLabel()}
+                  </button>
+                </div>
+              )}
             </form>
           </div>
 
