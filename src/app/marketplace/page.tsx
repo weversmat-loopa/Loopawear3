@@ -42,6 +42,7 @@ export default async function MarketplacePage() {
 
   const designs: MarketplaceDesign[] = designsData.map((d) => ({
     ...d,
+    creator_id: d.creator_id ?? null,
     creator_name: creatorNames[d.creator_id] ?? null,
   }));
 

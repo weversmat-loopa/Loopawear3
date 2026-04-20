@@ -14,6 +14,7 @@ export type MarketplaceDesign = {
   style: string | null;
   image_url: string | null;
   created_at: string;
+  creator_id: string | null;
   creator_name: string | null;
 };
 
@@ -106,7 +107,17 @@ export default function MarketplaceBrowse({ designs }: MarketplaceBrowseProps) {
                     </p>
                     {design.creator_name && (
                       <p className="text-xs text-zinc-500">
-                        by {design.creator_name}
+                        {design.creator_id ? (
+                          <Link
+                            href={`/creators/${design.creator_id}`}
+                            className="transition-colors hover:text-zinc-300"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            by {design.creator_name}
+                          </Link>
+                        ) : (
+                          <>by {design.creator_name}</>
+                        )}
                       </p>
                     )}
                     <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-600">

@@ -104,7 +104,12 @@ export default async function DesignPage({ params }: Props) {
             </h1>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {creatorName && (
-                <span className="text-sm text-zinc-500">by {creatorName}</span>
+                <Link
+                  href={`/creators/${design.creator_id}`}
+                  className="text-sm text-zinc-500 transition-colors hover:text-zinc-300"
+                >
+                  by {creatorName}
+                </Link>
               )}
               {design.style && (
                 <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
