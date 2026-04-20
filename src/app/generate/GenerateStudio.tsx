@@ -124,6 +124,7 @@ export default function GenerateStudio({
   function buttonLabel() {
     if (saveState.status === "saving") return "Saving…";
     if (saveState.status === "generating") return "Generating…";
+    if (saveState.status === "generated") return "Regenerate";
     return "Generate";
   }
 
@@ -148,24 +149,17 @@ export default function GenerateStudio({
           loading="lazy"
           decoding="async"
         />
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-zinc-900 px-4 py-3">
-          <button
-            type="button"
-            onClick={() => handleGenerate(saveState.id)}
-            className="text-sm text-zinc-400 transition-colors hover:text-white"
-          >
-            Regenerate
-          </button>
+        <div className="flex items-center justify-between border-t border-zinc-900 px-4 py-3">
           <Link
             href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-            className="text-sm text-zinc-600 transition-colors hover:text-zinc-300"
+            className="text-sm text-zinc-400 transition-colors hover:text-white"
           >
             Open workspace →
           </Link>
           <button
             type="button"
             onClick={resetForm}
-            className="ml-auto text-sm text-zinc-700 transition-colors hover:text-zinc-400"
+            className="text-sm text-zinc-700 transition-colors hover:text-zinc-400"
           >
             New design
           </button>
@@ -215,7 +209,9 @@ export default function GenerateStudio({
                 Design Studio
               </h1>
               <p className="mt-1 text-xs text-zinc-500">
-                Describe what you want and generate the artwork.
+                {saveState.status === "generated"
+                  ? "Adjust your prompt or options and regenerate."
+                  : "Describe what you want and generate the artwork."}
               </p>
             </div>
 
@@ -334,7 +330,7 @@ export default function GenerateStudio({
                 </p>
               )}
 
-              <div className="flex items-center justify-between pt-1">
+              <div className="pt-1">
                 <button
                   type="submit"
                   disabled={!prompt.trim() || isWorking}
@@ -343,13 +339,15 @@ export default function GenerateStudio({
                   {buttonLabel()}
                 </button>
                 {saveState.status === "generated" && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="text-sm text-zinc-700 transition-colors hover:text-zinc-400"
-                  >
-                    New design
-                  </button>
+                  <p className="mt-3 text-xs text-zinc-600">
+                    Design saved to your account.{" "}
+                    <Link
+                      href="/account"
+                      className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-white"
+                    >
+                      View all designs →
+                    </Link>
+                  </p>
                 )}
               </div>
             </form>
