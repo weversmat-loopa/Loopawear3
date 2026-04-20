@@ -172,11 +172,9 @@ export default function GenerateStudio({
         </div>
       </div>
     ) : saveState.status === "generate_failed" ? (
-      <div className="flex min-h-[360px] flex-col items-center justify-center gap-3 rounded-xl border border-zinc-900 bg-zinc-950 p-6 text-center">
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-xl border border-zinc-900 bg-zinc-950 p-6 text-center">
         <p className="text-sm font-medium text-zinc-500">Generation failed</p>
-        <p className="text-xs text-zinc-700">
-          Something went wrong. You can try again.
-        </p>
+        <p className="text-xs text-zinc-700">Something went wrong. You can try again.</p>
         <div className="mt-1 flex flex-wrap justify-center gap-3">
           <button
             type="button"
@@ -194,160 +192,170 @@ export default function GenerateStudio({
         </div>
       </div>
     ) : (
-      <div className="flex min-h-[360px] flex-col items-center justify-center gap-1 rounded-xl border border-zinc-900 bg-zinc-950">
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-1 rounded-xl border border-zinc-900 bg-zinc-950">
         <p className="text-sm text-zinc-600">Your image will appear here</p>
-        <p className="text-xs text-zinc-700">
-          Describe your design and click Generate
-        </p>
+        <p className="text-xs text-zinc-700">Describe your design and click Generate</p>
       </div>
     );
 
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-10">
-      <div className="mx-auto w-full max-w-2xl">
-        <h1 className="text-2xl font-bold tracking-tight text-white">
-          Design Studio
-        </h1>
-        <p className="mt-2 text-sm text-zinc-400">
-          Describe what you want to create and generate the artwork.
-        </p>
+      <div className="mx-auto w-full max-w-5xl">
+        <div className="lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
 
-        <div className="mt-8">{canvas}</div>
-
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <div>
-            <label
-              htmlFor="prompt"
-              className="text-xs font-medium uppercase tracking-wider text-zinc-500"
-            >
-              Prompt
-            </label>
-            <textarea
-              id="prompt"
-              name="prompt"
-              rows={4}
-              value={prompt}
-              onChange={(e) => {
-                setPrompt(e.target.value);
-                resetSaveState();
-              }}
-              placeholder="Describe what you want to create..."
-              className="mt-2 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
-            />
+          {/* Canvas — sticky on desktop so it stays visible while scrolling controls */}
+          <div className="mb-6 lg:mb-0 lg:self-start lg:sticky lg:top-10">
+            {canvas}
           </div>
 
+          {/* Controls panel */}
           <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              Style
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {STYLE_MOODS.map((style) => (
-                <button
-                  key={style}
-                  type="button"
-                  onClick={() => {
-                    setStyleMood(styleMood === style ? null : style);
+            <div className="mb-6">
+              <h1 className="text-xl font-bold tracking-tight text-white">
+                Design Studio
+              </h1>
+              <p className="mt-1 text-xs text-zinc-500">
+                Describe what you want and generate the artwork.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label
+                  htmlFor="prompt"
+                  className="text-xs font-medium uppercase tracking-wider text-zinc-500"
+                >
+                  Prompt
+                </label>
+                <textarea
+                  id="prompt"
+                  name="prompt"
+                  rows={4}
+                  value={prompt}
+                  onChange={(e) => {
+                    setPrompt(e.target.value);
                     resetSaveState();
                   }}
-                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    styleMood === style
-                      ? "border-white bg-white text-black"
-                      : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                  }`}
-                >
-                  {style}
-                </button>
-              ))}
-            </div>
-          </div>
+                  placeholder="Describe what you want to create..."
+                  className="mt-2 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
+                />
+              </div>
 
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              Colors
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {COLOR_PALETTES.map((palette) => (
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  Style
+                </p>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  {STYLE_MOODS.map((style) => (
+                    <button
+                      key={style}
+                      type="button"
+                      onClick={() => {
+                        setStyleMood(styleMood === style ? null : style);
+                        resetSaveState();
+                      }}
+                      className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                        styleMood === style
+                          ? "border-white bg-white text-black"
+                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                      }`}
+                    >
+                      {style}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  Colors
+                </p>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  {COLOR_PALETTES.map((palette) => (
+                    <button
+                      key={palette}
+                      type="button"
+                      onClick={() => {
+                        setColorPalette(colorPalette === palette ? null : palette);
+                        resetSaveState();
+                      }}
+                      className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                        colorPalette === palette
+                          ? "border-white bg-white text-black"
+                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                      }`}
+                    >
+                      {palette}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  Product
+                </p>
+                <div className="mt-2.5 flex flex-wrap gap-2">
+                  {PRODUCT_TYPES.map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => {
+                        setProductType(productType === type ? null : type);
+                        resetSaveState();
+                      }}
+                      className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                        productType === type
+                          ? "border-white bg-white text-black"
+                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {saveState.status === "auth_required" && (
+                <p className="text-sm text-zinc-500">
+                  <Link
+                    href="/login"
+                    className="text-zinc-300 underline underline-offset-2 transition-colors hover:text-white"
+                  >
+                    Sign in
+                  </Link>{" "}
+                  to generate and save designs.
+                </p>
+              )}
+
+              {saveState.status === "save_failed" && (
+                <p className="text-sm text-red-500">
+                  Something went wrong. Please try again.
+                </p>
+              )}
+
+              <div className="flex items-center justify-between pt-1">
                 <button
-                  key={palette}
-                  type="button"
-                  onClick={() => {
-                    setColorPalette(colorPalette === palette ? null : palette);
-                    resetSaveState();
-                  }}
-                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    colorPalette === palette
-                      ? "border-white bg-white text-black"
-                      : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                  }`}
+                  type="submit"
+                  disabled={!prompt.trim() || isWorking}
+                  className="rounded-full bg-white px-7 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  {palette}
+                  {buttonLabel()}
                 </button>
-              ))}
-            </div>
+                {saveState.status === "generated" && (
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="text-sm text-zinc-700 transition-colors hover:text-zinc-400"
+                  >
+                    New design
+                  </button>
+                )}
+              </div>
+            </form>
           </div>
 
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              Product
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {PRODUCT_TYPES.map((type) => (
-                <button
-                  key={type}
-                  type="button"
-                  onClick={() => {
-                    setProductType(productType === type ? null : type);
-                    resetSaveState();
-                  }}
-                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    productType === type
-                      ? "border-white bg-white text-black"
-                      : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {saveState.status === "auth_required" && (
-            <p className="text-sm text-zinc-500">
-              <Link
-                href="/login"
-                className="text-zinc-300 underline underline-offset-2 transition-colors hover:text-white"
-              >
-                Sign in
-              </Link>{" "}
-              to generate and save designs.
-            </p>
-          )}
-
-          {saveState.status === "save_failed" && (
-            <p className="text-sm text-red-500">
-              Something went wrong. Please try again.
-            </p>
-          )}
-
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              disabled={!prompt.trim() || isWorking}
-              className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              {buttonLabel()}
-            </button>
-            {saveState.status === "generated" && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="text-sm text-zinc-700 transition-colors hover:text-zinc-400"
-              >
-                New design
-              </button>
-            )}
-          </div>
-        </form>
+        </div>
       </div>
     </main>
   );
