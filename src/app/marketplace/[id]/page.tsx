@@ -72,7 +72,7 @@ export default async function DesignPage({ params }: Props) {
 
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-12">
-      <div className="mx-auto w-full max-w-2xl">
+      <div className="mx-auto w-full max-w-4xl">
         <Link
           href="/marketplace"
           className="text-sm text-zinc-500 transition-colors hover:text-white"
@@ -80,36 +80,36 @@ export default async function DesignPage({ params }: Props) {
           ← Marketplace
         </Link>
 
-        <div className="mt-10">
-          {design.image_url && (
-            <div className="overflow-hidden rounded-xl border border-zinc-800">
-              {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-              <img
-                src={design.image_url}
-                alt={
-                  design.product_type
-                    ? `${design.product_type} design`
-                    : "Design"
-                }
-                className="block h-auto w-full"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-          )}
+        <div className="mt-10 lg:grid lg:grid-cols-2 lg:gap-12">
+          {/* Image */}
+          <div className="lg:sticky lg:top-10 lg:self-start">
+            {design.image_url ? (
+              <div className="overflow-hidden rounded-xl border border-zinc-800">
+                {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
+                <img
+                  src={design.image_url}
+                  alt={
+                    design.product_type
+                      ? `${design.product_type} design`
+                      : "Design"
+                  }
+                  className="block h-auto w-full"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+            ) : (
+              <div className="aspect-square w-full rounded-xl border border-zinc-800 bg-zinc-950" />
+            )}
+          </div>
 
-          <div className="mt-6">
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              {design.product_type ? `${design.product_type} Design` : "Design"}
-            </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-              {creatorName && (
-                <Link
-                  href={`/creators/${design.creator_id}`}
-                  className="text-sm text-zinc-500 transition-colors hover:text-zinc-300"
-                >
-                  by {creatorName}
-                </Link>
+          {/* Info */}
+          <div className="mt-8 flex flex-col lg:mt-0">
+            <div className="flex flex-wrap items-center gap-2">
+              {design.product_type && (
+                <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
+                  {design.product_type}
+                </span>
               )}
               {design.style && (
                 <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
@@ -117,27 +117,42 @@ export default async function DesignPage({ params }: Props) {
                 </span>
               )}
             </div>
-          </div>
 
-          <p className="mt-6 text-sm leading-relaxed text-zinc-400">
-            &ldquo;{design.prompt}&rdquo;
-          </p>
+            <h1 className="mt-4 text-2xl font-bold tracking-tight text-white">
+              {design.product_type ? `${design.product_type} Design` : "Design"}
+            </h1>
 
-          <div className="mt-8 flex flex-wrap items-center gap-4 border-t border-zinc-900 pt-6">
-            <Link
-              href={studioHref}
-              className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
-            >
-              Create something similar →
-            </Link>
-            <p className="text-xs text-zinc-600">
-              Opens the studio with this prompt pre-filled.
+            {creatorName && (
+              <Link
+                href={`/creators/${design.creator_id}`}
+                className="mt-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-300"
+              >
+                by {creatorName}
+              </Link>
+            )}
+
+            <p className="mt-6 text-sm leading-relaxed text-zinc-400">
+              &ldquo;{design.prompt}&rdquo;
             </p>
-          </div>
 
-          <p className="mt-8 text-xs text-zinc-700">
-            Published {formatDate(design.created_at)}
-          </p>
+            <div className="mt-auto pt-10">
+              <div className="border-t border-zinc-900 pt-6">
+                <Link
+                  href={studioHref}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                >
+                  Create something similar →
+                </Link>
+                <p className="mt-2 text-center text-xs text-zinc-600">
+                  Opens the studio with this prompt pre-filled.
+                </p>
+              </div>
+
+              <p className="mt-6 text-xs text-zinc-700">
+                Published {formatDate(design.created_at)}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </main>
