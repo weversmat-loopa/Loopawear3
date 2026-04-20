@@ -24,9 +24,7 @@ function buildGenerationPrompt(
   style: string | null,
   colorPalette: string | null
 ): string {
-  const parts: string[] = [
-    "Flat graphic design artwork suitable for apparel screen printing.",
-  ];
+  const parts: string[] = [];
 
   if (style && STYLE_KEYWORDS[style]) {
     parts.push(STYLE_KEYWORDS[style] + ".");
@@ -38,9 +36,7 @@ function buildGenerationPrompt(
 
   parts.push(userPrompt.trim() + ".");
 
-  parts.push(
-    "No background. No model wearing clothes. No photorealism. Isolated graphic on white."
-  );
+  parts.push("No people. No human figures. No faces.");
 
   return parts.join(" ");
 }
