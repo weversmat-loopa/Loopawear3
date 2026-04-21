@@ -171,7 +171,9 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                       </p>
                     )}
                     {design.style && (
-                      <p className="text-xs text-zinc-600">{design.style}</p>
+                      <span className="w-fit rounded-full border border-zinc-800 px-2 py-0.5 text-xs text-zinc-600">
+                        {design.style}
+                      </span>
                     )}
                     <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-700">
                       {design.prompt}

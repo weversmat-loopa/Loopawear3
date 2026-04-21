@@ -124,21 +124,16 @@ export default async function DesignPage({ params }: Props) {
 
           {/* Info */}
           <div className="mt-8 flex flex-col lg:mt-0">
-            <div className="flex flex-wrap items-center gap-2">
-              {design.product_type && (
+            {design.product_type && (
+              <div>
                 <Link
                   href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
                   className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
                 >
                   {design.product_type}
                 </Link>
-              )}
-              {design.style && (
-                <span className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500">
-                  {design.style}
-                </span>
-              )}
-            </div>
+              </div>
+            )}
 
             <h1 className="mt-4 text-2xl font-bold tracking-tight text-white">
               {design.product_type ? `${design.product_type} Design` : "Design"}
@@ -157,7 +152,19 @@ export default async function DesignPage({ params }: Props) {
               &ldquo;{design.prompt}&rdquo;
             </p>
 
-            <div className="mt-auto pt-10">
+            {/* Structured details */}
+            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-900 pt-6 text-sm">
+              {design.style && (
+                <>
+                  <dt className="text-zinc-600">Style</dt>
+                  <dd className="text-zinc-400">{design.style}</dd>
+                </>
+              )}
+              <dt className="text-zinc-600">Published</dt>
+              <dd className="text-zinc-400">{formatDate(design.created_at)}</dd>
+            </dl>
+
+            <div className="mt-auto pt-8">
               <div className="border-t border-zinc-900 pt-6">
                 <Link
                   href={studioHref}
@@ -169,10 +176,6 @@ export default async function DesignPage({ params }: Props) {
                   Opens the studio with this prompt pre-filled.
                 </p>
               </div>
-
-              <p className="mt-6 text-xs text-zinc-700">
-                Published {formatDate(design.created_at)}
-              </p>
             </div>
           </div>
         </div>
