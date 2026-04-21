@@ -8,7 +8,6 @@ import { signOut } from "@/lib/auth/actions";
 const links = [
   { label: "Marketplace", href: "/marketplace" },
   { label: "Studio", href: "/generate" },
-  { label: "Account", href: "/account" },
 ];
 
 interface NavbarProps {
@@ -28,13 +27,15 @@ export default function Navbar({ user }: NavbarProps) {
       </Link>
 
       <div className="flex items-center gap-6">
-        <nav className="flex items-center">
+        <nav className="flex items-center gap-1">
           {links.map(({ label, href }) => (
             <Link
               key={href}
               href={href}
-              className={`flex h-14 items-center px-3 text-sm font-medium transition-colors hover:text-white ${
-                pathname === href ? "text-white" : "text-zinc-400"
+              className={`flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+                pathname === href
+                  ? "border-zinc-600 text-white"
+                  : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
               }`}
             >
               {label}
@@ -47,9 +48,11 @@ export default function Navbar({ user }: NavbarProps) {
             <>
               <Link
                 href="/account"
-                className="max-w-[180px] truncate text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+                className={`text-sm font-medium transition-colors hover:text-white ${
+                  pathname === "/account" ? "text-white" : "text-zinc-400"
+                }`}
               >
-                {user.email}
+                Account
               </Link>
               <form action={signOut}>
                 <button

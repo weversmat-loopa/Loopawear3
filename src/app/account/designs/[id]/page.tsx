@@ -120,15 +120,23 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               </form>
             )}
             {isPublished && (
-              <form action={unpublishDesign}>
-                <input type="hidden" name="designId" value={design.id} />
-                <button
-                  type="submit"
-                  className="rounded-full border border-zinc-700 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300"
+              <>
+                <Link
+                  href={`/marketplace/${design.id}`}
+                  className="text-xs text-zinc-400 transition-colors hover:text-white"
                 >
-                  Unpublish
-                </button>
-              </form>
+                  View on marketplace ↗
+                </Link>
+                <form action={unpublishDesign}>
+                  <input type="hidden" name="designId" value={design.id} />
+                  <button
+                    type="submit"
+                    className="rounded-full border border-zinc-700 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300"
+                  >
+                    Unpublish
+                  </button>
+                </form>
+              </>
             )}
           </div>
 
