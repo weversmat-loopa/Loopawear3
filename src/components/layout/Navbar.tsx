@@ -7,7 +7,7 @@ import { signOut } from "@/lib/auth/actions";
 
 const links = [
   { label: "Marketplace", href: "/marketplace" },
-  { label: "Generate", href: "/generate" },
+  { label: "Studio", href: "/generate" },
   { label: "Account", href: "/account" },
 ];
 

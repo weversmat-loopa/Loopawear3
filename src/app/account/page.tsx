@@ -242,8 +242,9 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             <div className="mt-4 rounded-xl border border-dashed border-zinc-800 px-6 py-10 text-center">
               <p className="text-sm text-zinc-500">No drafts yet</p>
               <p className="mt-1 text-xs text-zinc-700">
-                <Link href="/generate" className="underline underline-offset-2 hover:text-zinc-500 transition-colors">
-                  Go to Generate
+                Head to the{" "}
+                <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-zinc-500">
+                  Studio
                 </Link>{" "}
                 to create your first design.
               </p>
