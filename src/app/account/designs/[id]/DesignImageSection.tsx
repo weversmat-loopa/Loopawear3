@@ -149,12 +149,6 @@ export default function DesignImageSection({
 
   const actionRow = anyGenerating ? null : imageStatus === "ready" ? (
     <div className="flex flex-wrap items-center gap-4">
-      <Link
-        href={refineHref}
-        className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
-      >
-        Refine in studio →
-      </Link>
       <button
         type="button"
         onClick={handleGenerate}
@@ -163,6 +157,12 @@ export default function DesignImageSection({
       >
         Regenerate
       </button>
+      <Link
+        href={refineHref}
+        className="text-sm text-zinc-500 transition-colors hover:text-white"
+      >
+        Refine in studio →
+      </Link>
       {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   ) : (

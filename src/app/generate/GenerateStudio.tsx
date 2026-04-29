@@ -143,6 +143,7 @@ export default function GenerateStudio({
     if (saveState.status === "saving") return "Saving…";
     if (saveState.status === "generating") return "Generating…";
     if (saveState.status === "generated") return "Regenerate";
+    if (saveState.status === "generate_failed") return "Retry";
     return "Generate";
   }
 
@@ -208,7 +209,7 @@ export default function GenerateStudio({
           <button
             type="button"
             onClick={() => handleGenerate(saveState.id)}
-            className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+            className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
           >
             Retry
           </button>
@@ -246,6 +247,8 @@ export default function GenerateStudio({
               <p className="mt-1 text-xs text-zinc-500">
                 {saveState.status === "generated"
                   ? "Adjust your prompt or options and regenerate."
+                  : saveState.status === "generate_failed"
+                  ? "Something went wrong. Adjust your prompt or retry."
                   : "Describe what you want and generate the artwork."}
               </p>
             </div>
@@ -375,7 +378,7 @@ export default function GenerateStudio({
                       Open in workspace →
                     </Link>
                     <p className="mt-2 text-xs text-zinc-600">
-                      Manage, publish, or share this design from your workspace.
+                      Manage and publish this design from your workspace.
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
