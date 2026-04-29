@@ -151,15 +151,20 @@ export default function GenerateStudio({
 
   const canvas =
     saveState.status === "generating" ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-900 bg-zinc-950">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
-          <p className="text-sm font-medium text-zinc-400">Generating…</p>
-          <p className="text-xs text-zinc-600">This may take a moment.</p>
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative flex h-10 w-10 items-center justify-center">
+            <div className="absolute inset-0 animate-ping rounded-full bg-violet-500/[0.12]" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-300" />
+          </div>
+          <div className="space-y-1 text-center">
+            <p className="text-sm font-medium text-zinc-300">Generating your design…</p>
+            <p className="text-xs text-zinc-600">This may take a moment.</p>
+          </div>
         </div>
       </div>
     ) : saveState.status === "generated" ? (
-      <div className="overflow-hidden rounded-xl border border-zinc-900">
+      <div className="overflow-hidden rounded-2xl border border-zinc-800/60">
         {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
         <img
           src={saveState.imageUrl}
@@ -168,11 +173,11 @@ export default function GenerateStudio({
           loading="lazy"
           decoding="async"
         />
-        <div className="flex items-center justify-between border-t border-zinc-900 px-4 py-3">
+        <div className="flex items-center justify-between border-t border-zinc-800/60 bg-zinc-950/80 px-4 py-3">
           <div className="flex items-center gap-4">
             <Link
               href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-              className="text-sm text-zinc-400 transition-colors hover:text-white"
+              className="text-sm font-medium text-zinc-300 transition-colors hover:text-white"
             >
               Open workspace →
             </Link>
@@ -180,14 +185,14 @@ export default function GenerateStudio({
               href={saveState.imageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-zinc-600 transition-colors hover:text-zinc-300"
+              className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
             >
               Full size ↗
             </a>
             <button
               type="button"
               onClick={handleDownload}
-              className="text-sm text-zinc-600 transition-colors hover:text-zinc-300"
+              className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
             >
               Download ↓
             </button>
@@ -195,17 +200,17 @@ export default function GenerateStudio({
           <button
             type="button"
             onClick={resetForm}
-            className="text-sm text-zinc-700 transition-colors hover:text-zinc-400"
+            className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
           >
             New design
           </button>
         </div>
       </div>
     ) : saveState.status === "generate_failed" ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-xl border border-zinc-900 bg-zinc-950 p-6 text-center">
-        <p className="text-sm font-medium text-zinc-500">Generation failed</p>
-        <p className="text-xs text-zinc-700">Something went wrong. You can try again.</p>
-        <div className="mt-1 flex flex-wrap justify-center gap-3">
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black p-6 text-center">
+        <p className="text-sm font-medium text-zinc-400">Generation failed</p>
+        <p className="text-xs text-zinc-600">Something went wrong. You can try again.</p>
+        <div className="mt-2 flex flex-wrap justify-center gap-3">
           <button
             type="button"
             onClick={() => handleGenerate(saveState.id)}
@@ -222,14 +227,14 @@ export default function GenerateStudio({
         </div>
       </div>
     ) : (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-1 rounded-xl border border-zinc-900 bg-zinc-950">
-        <p className="text-sm text-zinc-600">Your image will appear here</p>
-        <p className="text-xs text-zinc-700">Describe your design and click Generate</p>
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
+        <p className="text-sm font-medium text-zinc-500">Your design will appear here</p>
+        <p className="text-xs text-zinc-700">Describe your vision and click Generate</p>
       </div>
     );
 
   return (
-    <main className="flex flex-1 flex-col bg-black px-6 py-10">
+    <main className="flex flex-1 flex-col bg-black px-6 py-12">
       <div className="mx-auto w-full max-w-5xl">
         <div className="flex flex-col-reverse gap-6 lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
 
@@ -239,9 +244,9 @@ export default function GenerateStudio({
           </div>
 
           {/* Controls panel */}
-          <div>
-            <div className="mb-6">
-              <h1 className="text-xl font-bold tracking-tight text-white">
+          <div className="rounded-2xl border border-zinc-800/60 bg-zinc-950/60 p-6 lg:p-7">
+            <div className="mb-7">
+              <h1 className="text-lg font-semibold tracking-tight text-white">
                 Design Studio
               </h1>
               <p className="mt-1 text-xs text-zinc-500">
@@ -249,15 +254,15 @@ export default function GenerateStudio({
                   ? "Adjust your prompt or options and regenerate."
                   : saveState.status === "generate_failed"
                   ? "Something went wrong. Adjust your prompt or retry."
-                  : "Describe what you want and generate the artwork."}
+                  : "Describe your vision and generate the artwork."}
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
                   htmlFor="prompt"
-                  className="text-xs font-medium uppercase tracking-wider text-zinc-500"
+                  className="text-xs font-medium uppercase tracking-widest text-zinc-600"
                 >
                   Prompt
                 </label>
@@ -271,15 +276,15 @@ export default function GenerateStudio({
                     resetSaveState();
                   }}
                   placeholder="Describe what you want to create..."
-                  className="mt-2 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600"
+                  className="mt-2.5 w-full resize-none rounded-xl border border-zinc-800/80 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 outline-none transition-colors focus:border-violet-500/50"
                 />
               </div>
 
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <div className="border-t border-zinc-800/50 pt-6">
+                <p className="text-xs font-medium uppercase tracking-widest text-zinc-600">
                   Style
                 </p>
-                <div className="mt-2.5 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {STYLE_MOODS.map((style) => (
                     <button
                       key={style}
@@ -291,7 +296,7 @@ export default function GenerateStudio({
                       className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                         styleMood === style
                           ? "border-white bg-white text-black"
-                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                          : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white"
                       }`}
                     >
                       {style}
@@ -300,11 +305,11 @@ export default function GenerateStudio({
                 </div>
               </div>
 
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <div className="border-t border-zinc-800/50 pt-6">
+                <p className="text-xs font-medium uppercase tracking-widest text-zinc-600">
                   Colors
                 </p>
-                <div className="mt-2.5 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {COLOR_PALETTES.map((palette) => (
                     <button
                       key={palette}
@@ -316,7 +321,7 @@ export default function GenerateStudio({
                       className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                         colorPalette === palette
                           ? "border-white bg-white text-black"
-                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                          : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white"
                       }`}
                     >
                       {palette}
@@ -325,11 +330,11 @@ export default function GenerateStudio({
                 </div>
               </div>
 
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <div className="border-t border-zinc-800/50 pt-6">
+                <p className="text-xs font-medium uppercase tracking-widest text-zinc-600">
                   Product
                 </p>
-                <div className="mt-2.5 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2">
                   {PRODUCT_TYPES.map((type) => (
                     <button
                       key={type}
@@ -341,7 +346,7 @@ export default function GenerateStudio({
                       className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                         productType === type
                           ? "border-white bg-white text-black"
-                          : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                          : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white"
                       }`}
                     >
                       {type}
@@ -369,7 +374,7 @@ export default function GenerateStudio({
               )}
 
               {saveState.status === "generated" ? (
-                <div className="space-y-4 border-t border-zinc-900 pt-5">
+                <div className="space-y-4 border-t border-zinc-800/50 pt-6">
                   <div>
                     <Link
                       href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
@@ -389,17 +394,17 @@ export default function GenerateStudio({
                     >
                       {buttonLabel()}
                     </button>
-                    <span className="text-xs text-zinc-700">
+                    <span className="text-xs text-zinc-600">
                       Not happy? Adjust and try again.
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="pt-1">
+                <div className="border-t border-zinc-800/50 pt-6">
                   <button
                     type="submit"
                     disabled={!prompt.trim() || isWorking}
-                    className="rounded-full bg-white px-7 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="w-full rounded-full bg-white py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {buttonLabel()}
                   </button>

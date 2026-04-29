@@ -11,19 +11,25 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <PageShell>
-      <span className="mb-6 rounded-full border border-zinc-800 px-4 py-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
-        AI-powered apparel
-      </span>
-      <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl">
-        Wear what you imagine.
+      <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-zinc-700/60 bg-zinc-900/80 px-4 py-1.5 backdrop-blur-sm">
+        <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+        <span className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+          AI-powered apparel
+        </span>
+      </div>
+
+      <h1 className="bg-gradient-to-b from-white via-white to-violet-200 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-7xl">
+        Wear what<br className="hidden sm:block" /> you imagine.
       </h1>
-      <p className="mt-5 max-w-sm text-base leading-relaxed text-zinc-400">
-        Describe your design and let AI bring it to life. Place it on real
-        apparel — keep it for yourself or sell it to the world.
+
+      <p className="mt-6 max-w-md text-base leading-relaxed text-zinc-500">
+        Describe your vision and let AI bring it to life on real apparel.
+        Keep it for yourself — or publish it to the world.
       </p>
-      <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+
+      <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
         <Button href="/generate" variant="primary">
-          Start designing
+          Start designing →
         </Button>
         <Button href="/marketplace" variant="ghost">
           Browse marketplace
