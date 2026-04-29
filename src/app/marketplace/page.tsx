@@ -20,7 +20,7 @@ export default async function MarketplacePage({ searchParams }: Props) {
 
   const { data: designsRaw } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_url, created_at, creator_id")
+    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(100);

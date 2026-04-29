@@ -11,6 +11,7 @@ type Style = (typeof STYLES)[number] | null;
 
 interface DesignEditFormProps {
   designId: string;
+  initialTitle: string | null;
   initialPrompt: string;
   initialProductType: string | null;
   initialStyle: string | null;
@@ -18,6 +19,7 @@ interface DesignEditFormProps {
 
 export default function DesignEditForm({
   designId,
+  initialTitle,
   initialPrompt,
   initialProductType,
   initialStyle,
@@ -34,6 +36,23 @@ export default function DesignEditForm({
       <input type="hidden" name="designId" value={designId} />
       <input type="hidden" name="product_type" value={productType ?? ""} />
       <input type="hidden" name="style" value={style ?? ""} />
+
+      <div>
+        <label
+          htmlFor="title"
+          className="text-xs font-medium uppercase tracking-wider text-zinc-500"
+        >
+          Title
+        </label>
+        <input
+          id="title"
+          name="title"
+          type="text"
+          defaultValue={initialTitle ?? ""}
+          placeholder="Give your design a public name…"
+          className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-zinc-600"
+        />
+      </div>
 
       <div>
         <label

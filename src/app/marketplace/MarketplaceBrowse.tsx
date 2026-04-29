@@ -8,6 +8,7 @@ import type { ProductFilter } from "./filters";
 
 export type MarketplaceDesign = {
   id: string;
+  title: string | null;
   prompt: string;
   product_type: string | null;
   style: string | null;
@@ -126,10 +127,12 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
           ))}
         </div>
 
-        {/* Result count — only shown when actively filtering */}
-        {isFiltering && results.length > 0 && (
+        {/* Count — total when browsing, result count when filtering */}
+        {results.length > 0 && (
           <p className="mt-4 text-xs text-zinc-600">
-            {results.length} {results.length === 1 ? "design" : "designs"} found
+            {isFiltering
+              ? `${results.length} of ${designs.length} ${designs.length === 1 ? "design" : "designs"}`
+              : `${designs.length} ${designs.length === 1 ? "design" : "designs"} published`}
           </p>
         )}
 
@@ -161,9 +164,7 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                   )}
                   <div className="flex flex-col gap-1 p-4">
                     <p className="text-sm font-medium text-white">
-                      {design.product_type
-                        ? `${design.product_type} Design`
-                        : "Design"}
+                      {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                     </p>
                     {design.creator_name && (
                       <p className="text-xs text-zinc-500">

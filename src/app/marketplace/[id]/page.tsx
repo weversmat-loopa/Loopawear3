@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("prompt, product_type")
+    .select("title, prompt, product_type")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -30,12 +30,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Design not found" };
   }
 
-  const title = design.product_type
-    ? `${design.product_type} Design`
-    : "Design";
-
   return {
-    title,
+    title: design.title ?? (design.product_type ? `${design.product_type} Design` : "Design"),
     description: design.prompt.slice(0, 160),
   };
 }
@@ -46,7 +42,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_url, created_at, creator_id")
+    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -68,6 +64,7 @@ export default async function DesignPage({ params }: Props) {
   // Fetch up to 3 other published designs by the same creator
   let moreByCreator: {
     id: string;
+    title: string | null;
     product_type: string | null;
     image_url: string | null;
     prompt: string;
@@ -75,7 +72,7 @@ export default async function DesignPage({ params }: Props) {
   if (design.creator_id) {
     const { data: more } = await supabase
       .from("designs")
-      .select("id, product_type, image_url, prompt")
+      .select("id, title, product_type, image_url, prompt")
       .eq("creator_id", design.creator_id)
       .eq("status", "published")
       .neq("id", design.id)
@@ -136,7 +133,7 @@ export default async function DesignPage({ params }: Props) {
             )}
 
             <h1 className="mt-4 text-2xl font-bold tracking-tight text-white">
-              {design.product_type ? `${design.product_type} Design` : "Design"}
+              {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
             {creatorName && (
@@ -223,9 +220,7 @@ export default async function DesignPage({ params }: Props) {
                     )}
                     <div className="p-3">
                       <p className="text-xs font-medium text-white">
-                        {related.product_type
-                          ? `${related.product_type} Design`
-                          : "Design"}
+                        {related.title ?? (related.product_type ? `${related.product_type} Design` : "Design")}
                       </p>
                       <p className="mt-0.5 line-clamp-1 text-xs text-zinc-600">
                         {related.prompt}

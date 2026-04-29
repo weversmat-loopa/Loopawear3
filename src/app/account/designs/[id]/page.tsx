@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("product_type")
+    .select("title, product_type")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!design) return { title: "Design" };
 
   return {
-    title: design.product_type ? `${design.product_type} Design` : "Design",
+    title: design.title ?? (design.product_type ? `${design.product_type} Design` : "Design"),
     robots: { index: false },
   };
 }
@@ -65,7 +65,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, status, image_status, image_url, created_at")
+    .select("id, title, prompt, product_type, style, status, image_status, image_url, created_at")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -141,7 +141,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           </div>
 
           <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
-            {design.product_type ? `${design.product_type} Design` : "Design"}
+            {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
           </h1>
 
           <div className="mt-8">
@@ -155,7 +155,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             />
           </div>
 
-          {design.image_status === "generating" && (
+          {process.env.NODE_ENV === "development" && design.image_status === "generating" && (
             <div className="mt-5 rounded-xl border border-dashed border-zinc-800 px-4 py-3">
               <p className="text-xs text-zinc-700">
                 Dev — simulate generation result
@@ -183,7 +183,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          {design.image_status !== "generating" && (
+          {process.env.NODE_ENV === "development" && design.image_status !== "generating" && (
             <div className="mt-5 rounded-xl border border-dashed border-zinc-800 px-4 py-3">
               <p className="text-xs text-zinc-700">Dev — test image URL</p>
               <form action={devSetTestImageUrl} className="mt-2.5 flex gap-2">
@@ -229,6 +229,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
 
             <DesignEditForm
               designId={design.id}
+              initialTitle={design.title ?? null}
               initialPrompt={design.prompt}
               initialProductType={design.product_type}
               initialStyle={design.style}

@@ -43,7 +43,7 @@ export default async function CreatorPage({ params }: Props) {
 
   const { data: designs } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_url")
+    .select("id, title, prompt, product_type, style, image_url")
     .eq("creator_id", id)
     .eq("status", "published")
     .order("created_at", { ascending: false })
@@ -86,10 +86,7 @@ export default async function CreatorPage({ params }: Props) {
         <div className="mt-10">
           {publishedDesigns.length > 0 ? (
             <>
-              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-                Designs
-              </h2>
-              <ul className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {publishedDesigns.map((design) => (
                   <li key={design.id}>
                     <Link
@@ -116,12 +113,12 @@ export default async function CreatorPage({ params }: Props) {
                       )}
                       <div className="flex flex-col gap-1 p-4">
                         <p className="text-sm font-medium text-white">
-                          {design.product_type
-                            ? `${design.product_type} Design`
-                            : "Design"}
+                          {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                         </p>
                         {design.style && (
-                          <p className="text-xs text-zinc-500">{design.style}</p>
+                          <span className="w-fit rounded-full border border-zinc-800 px-2 py-0.5 text-xs text-zinc-600">
+                            {design.style}
+                          </span>
                         )}
                         <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-600">
                           {design.prompt}

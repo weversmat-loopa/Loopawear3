@@ -88,6 +88,7 @@ export async function updateDesign(formData: FormData) {
     redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
   }
 
+  const title = String(formData.get("title") ?? "").trim() || null;
   const prompt = String(formData.get("prompt") ?? "").trim();
   const productType = String(formData.get("product_type") ?? "").trim() || null;
   const style = String(formData.get("style") ?? "").trim() || null;
@@ -100,7 +101,7 @@ export async function updateDesign(formData: FormData) {
 
   const { error } = await supabase
     .from("designs")
-    .update({ prompt, product_type: productType, style })
+    .update({ title, prompt, product_type: productType, style })
     .eq("id", designId)
     .eq("creator_id", user.id);
 

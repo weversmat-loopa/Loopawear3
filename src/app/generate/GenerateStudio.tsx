@@ -231,10 +231,10 @@ export default function GenerateStudio({
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-10">
       <div className="mx-auto w-full max-w-5xl">
-        <div className="lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
+        <div className="flex flex-col-reverse gap-6 lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
 
-          {/* Canvas — sticky on desktop so it stays visible while scrolling controls */}
-          <div className="mb-6 lg:mb-0 lg:self-start lg:sticky lg:top-10">
+          {/* Canvas — flex-col-reverse pushes it below controls on mobile; lg:grid restores left-column position on desktop */}
+          <div className="lg:self-start lg:sticky lg:top-10">
             {canvas}
           </div>
 

@@ -33,7 +33,7 @@ export default function Navbar({ user }: NavbarProps) {
               key={href}
               href={href}
               className={`flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                pathname === href
+                pathname === href || pathname.startsWith(href + "/")
                   ? "border-zinc-600 text-white"
                   : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
               }`}
@@ -49,7 +49,7 @@ export default function Navbar({ user }: NavbarProps) {
               <Link
                 href="/account"
                 className={`text-sm font-medium transition-colors hover:text-white ${
-                  pathname === "/account" ? "text-white" : "text-zinc-400"
+                  pathname === "/account" || pathname.startsWith("/account/") ? "text-white" : "text-zinc-400"
                 }`}
               >
                 Account

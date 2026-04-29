@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
 import { updateDisplayName, publishDraft, unpublishDesign } from "./actions";
+import ConfirmForm from "@/components/ui/ConfirmForm";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -28,6 +29,7 @@ type AccountPageProps = {
 
 type DesignRow = {
   id: string;
+  title: string | null;
   prompt: string;
   product_type: string | null;
   style: string | null;
@@ -54,7 +56,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: draftsRaw } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_url, image_status, created_at")
+    .select("id, title, prompt, product_type, style, image_url, image_status, created_at")
     .eq("creator_id", user.id)
     .eq("status", "draft")
     .order("created_at", { ascending: false })
@@ -62,7 +64,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: publishedRaw } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_url, image_status, created_at")
+    .select("id, title, prompt, product_type, style, image_url, image_status, created_at")
     .eq("creator_id", user.id)
     .eq("status", "published")
     .order("created_at", { ascending: false })
@@ -160,7 +162,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block w-20 shrink-0 overflow-hidden bg-zinc-900"
+                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-900"
                       tabIndex={-1}
                       aria-hidden
                     >
@@ -184,9 +186,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                             href={`/account/designs/${design.id}`}
                             className="text-sm font-medium text-white transition-colors hover:text-zinc-300"
                           >
-                            {design.product_type
-                              ? `${design.product_type} Design`
-                              : "Design"}
+                            {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                           </Link>
                           {design.image_status === "generating" && (
                             <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-xs text-zinc-500">
@@ -221,15 +221,18 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                             Edit
                           </Link>
                           {design.image_status === "ready" && (
-                            <form action={publishDraft}>
-                              <input type="hidden" name="designId" value={design.id} />
+                            <ConfirmForm
+                              action={publishDraft}
+                              message="Publish this design to the marketplace?"
+                              hiddenFields={{ designId: design.id }}
+                            >
                               <button
                                 type="submit"
                                 className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black transition-opacity hover:opacity-75"
                               >
                                 Publish →
                               </button>
-                            </form>
+                            </ConfirmForm>
                           )}
                         </div>
                       </div>
@@ -277,7 +280,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block w-20 shrink-0 overflow-hidden bg-zinc-900"
+                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-900"
                       tabIndex={-1}
                       aria-hidden
                     >
@@ -300,9 +303,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                           href={`/account/designs/${design.id}`}
                           className="text-sm font-medium text-white transition-colors hover:text-zinc-300"
                         >
-                          {design.product_type
-                            ? `${design.product_type} Design`
-                            : "Design"}
+                          {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                         </Link>
                         <p className="mt-1 line-clamp-1 text-xs text-zinc-600">
                           {design.prompt}
@@ -325,15 +326,18 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                           >
                             View ↗
                           </Link>
-                          <form action={unpublishDesign}>
-                            <input type="hidden" name="designId" value={design.id} />
+                          <ConfirmForm
+                            action={unpublishDesign}
+                            message="Remove this design from the marketplace?"
+                            hiddenFields={{ designId: design.id }}
+                          >
                             <button
                               type="submit"
                               className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
                             >
                               Unpublish
                             </button>
-                          </form>
+                          </ConfirmForm>
                         </div>
                       </div>
                     </div>
