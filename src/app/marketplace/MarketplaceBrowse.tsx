@@ -58,13 +58,16 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-10">
       <div className="mx-auto w-full max-w-6xl">
-        <span className="rounded-full border border-zinc-800 px-3 py-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
-          Marketplace
-        </span>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-white">
+        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-700/60 bg-zinc-900/80 px-4 py-1.5 backdrop-blur-sm">
+          <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+          <span className="text-xs font-medium uppercase tracking-widest text-zinc-400">
+            Marketplace
+          </span>
+        </div>
+        <h1 className="mt-4 bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
           Explore designs
         </h1>
-        <p className="mt-2 text-sm text-zinc-400">
+        <p className="mt-2 text-sm text-zinc-500">
           Discover original AI-generated apparel from independent creators.
           Every piece starts with a prompt.{" "}
           <Link
@@ -82,7 +85,7 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by keyword, style, or creator…"
-            className="w-full rounded-full border border-zinc-800 bg-transparent px-5 py-2.5 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-zinc-600"
+            className="w-full rounded-full border border-zinc-800 bg-transparent px-5 py-2.5 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-violet-500/50"
           />
           {trimmedQuery && (
             <button
@@ -142,7 +145,7 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
               <li key={design.id}>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-600"
+                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700"
                 >
                   {design.image_url ? (
                     <div className="aspect-square w-full overflow-hidden">
@@ -160,7 +163,7 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                       />
                     </div>
                   ) : (
-                    <div className="aspect-square w-full bg-zinc-900" />
+                    <div className="aspect-square w-full bg-gradient-to-b from-zinc-900 to-zinc-950" />
                   )}
                   <div className="flex flex-col gap-1 p-4">
                     <p className="text-sm font-medium text-white">

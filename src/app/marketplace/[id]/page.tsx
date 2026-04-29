@@ -100,7 +100,7 @@ export default async function DesignPage({ params }: Props) {
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
             {design.image_url ? (
-              <div className="overflow-hidden rounded-xl border border-zinc-800">
+              <div className="overflow-hidden rounded-2xl border border-zinc-800/60">
                 {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
                 <img
                   src={design.image_url}
@@ -115,7 +115,7 @@ export default async function DesignPage({ params }: Props) {
                 />
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-xl border border-zinc-800 bg-zinc-950" />
+              <div className="aspect-square w-full rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-900 to-zinc-950" />
             )}
           </div>
 
@@ -125,21 +125,21 @@ export default async function DesignPage({ params }: Props) {
               <div>
                 <Link
                   href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
-                  className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                  className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500 transition-colors hover:border-violet-500/30 hover:text-violet-300"
                 >
                   {design.product_type}
                 </Link>
               </div>
             )}
 
-            <h1 className="mt-4 text-2xl font-bold tracking-tight text-white">
+            <h1 className="mt-4 bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
               {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
             {creatorName && (
               <Link
                 href={`/creators/${design.creator_id}`}
-                className="mt-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-300"
+                className="mt-1.5 text-sm text-zinc-500 transition-colors hover:text-violet-300"
               >
                 by {creatorName}
               </Link>
@@ -181,9 +181,12 @@ export default async function DesignPage({ params }: Props) {
         {moreByCreator.length > 0 && (
           <div className="mt-16 border-t border-zinc-900 pt-10">
             <div className="flex items-baseline justify-between gap-4">
-              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-                More by {creatorName ?? "this creator"}
-              </h2>
+              <div className="flex items-center gap-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+                <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                  More by {creatorName ?? "this creator"}
+                </h2>
+              </div>
               {design.creator_id && (
                 <Link
                   href={`/creators/${design.creator_id}`}
@@ -198,7 +201,7 @@ export default async function DesignPage({ params }: Props) {
                 <li key={related.id}>
                   <Link
                     href={`/marketplace/${related.id}`}
-                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-600"
+                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700"
                   >
                     {related.image_url ? (
                       <div className="aspect-square w-full overflow-hidden">
@@ -216,7 +219,7 @@ export default async function DesignPage({ params }: Props) {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-square w-full bg-zinc-900" />
+                      <div className="aspect-square w-full bg-gradient-to-b from-zinc-900 to-zinc-950" />
                     )}
                     <div className="p-3">
                       <p className="text-xs font-medium text-white">
