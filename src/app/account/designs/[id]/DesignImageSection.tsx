@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cancelStuckGeneration } from "@/app/account/actions";
 
 interface DesignImageSectionProps {
   designId: string;
@@ -200,10 +201,28 @@ export default function DesignImageSection({
     </div>
   );
 
+  // Recovery row: shown when the server reports generating but nothing is
+  // actively running client-side — lets the user escape a stuck state.
+  const stuckRecoveryRow = serverGenerating && !isGenerating ? (
+    <div className="mt-4 flex flex-wrap items-center gap-3">
+      <p className="text-xs text-zinc-600">Taking longer than expected?</p>
+      <form action={cancelStuckGeneration}>
+        <input type="hidden" name="designId" value={designId} />
+        <button
+          type="submit"
+          className="text-xs text-zinc-500 underline underline-offset-2 transition-colors hover:text-zinc-300"
+        >
+          Cancel and retry
+        </button>
+      </form>
+    </div>
+  ) : null;
+
   return (
     <div>
       {imageArea}
       {actionRow && <div className="mt-4">{actionRow}</div>}
+      {stuckRecoveryRow}
     </div>
   );
 }

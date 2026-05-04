@@ -237,6 +237,34 @@ export async function devClearImageUrl(formData: FormData) {
   redirect(`/account/designs/${designId}`);
 }
 
+export async function cancelStuckGeneration(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  // Conditional update — only resets if status is exactly "generating".
+  // Safe to call even if the generation completed concurrently; the condition
+  // simply matches zero rows without touching any other state.
+  await supabase
+    .from("designs")
+    .update({ image_status: "failed" })
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .eq("image_status", "generating");
+
+  redirect(`/account/designs/${designId}`);
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {
