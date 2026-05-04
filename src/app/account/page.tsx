@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
-import { updateDisplayName, publishDraft, unpublishDesign } from "./actions";
+import { updateDisplayName, publishDraft, unpublishDesign, deleteDesign } from "./actions";
 import ConfirmForm from "@/components/ui/ConfirmForm";
 
 function formatDate(iso: string) {
@@ -247,6 +247,18 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                               </button>
                             </ConfirmForm>
                           )}
+                          <ConfirmForm
+                            action={deleteDesign}
+                            message="Delete this design permanently? This cannot be undone."
+                            hiddenFields={{ designId: design.id }}
+                          >
+                            <button
+                              type="submit"
+                              className="text-xs text-zinc-700 transition-colors hover:text-red-400"
+                            >
+                              Delete
+                            </button>
+                          </ConfirmForm>
                         </div>
                       </div>
                     </div>
@@ -350,6 +362,18 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                               className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
                             >
                               Unpublish
+                            </button>
+                          </ConfirmForm>
+                          <ConfirmForm
+                            action={deleteDesign}
+                            message="Delete this design permanently? It will be removed from the marketplace. This cannot be undone."
+                            hiddenFields={{ designId: design.id }}
+                          >
+                            <button
+                              type="submit"
+                              className="text-xs text-zinc-700 transition-colors hover:text-red-400"
+                            >
+                              Delete
                             </button>
                           </ConfirmForm>
                         </div>

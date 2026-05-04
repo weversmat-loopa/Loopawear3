@@ -237,6 +237,53 @@ export async function devClearImageUrl(formData: FormData) {
   redirect(`/account/designs/${designId}`);
 }
 
+export async function deleteDesign(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/account?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  // Verify ownership exists before deleting
+  const { data: design } = await supabase
+    .from("designs")
+    .select("id")
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .maybeSingle();
+
+  if (!design) {
+    redirect(`/account?error=${encodeURIComponent("Design not found.")}`);
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .delete()
+    .eq("id", designId)
+    .eq("creator_id", user.id);
+
+  if (error) {
+    redirect(
+      `/account?error=${encodeURIComponent("Could not delete design. Please try again.")}`
+    );
+  }
+
+  // Best-effort Storage cleanup — orphaned files are acceptable if this fails
+  await supabase.storage
+    .from("design-images")
+    .remove([`designs/${designId}.png`]);
+
+  redirect("/account");
+}
+
 export async function cancelStuckGeneration(formData: FormData) {
   const supabase = await createClient();
   const {

@@ -4,9 +4,11 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import DesignEditForm from "./DesignEditForm";
 import DesignImageSection from "./DesignImageSection";
+import ConfirmForm from "@/components/ui/ConfirmForm";
 import {
   publishDraft,
   unpublishDesign,
+  deleteDesign,
   devMarkGenerationReady,
   devMarkGenerationFailed,
   devSetTestImageUrl,
@@ -239,10 +241,22 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             />
           </div>
 
-          <div className="mt-10 border-t border-zinc-900 pt-6">
+          <div className="mt-10 border-t border-zinc-900 pt-6 flex items-center justify-between">
             <p className="text-xs text-zinc-600">
               Created {formatDate(design.created_at)}
             </p>
+            <ConfirmForm
+              action={deleteDesign}
+              message="Delete this design permanently? This cannot be undone."
+              hiddenFields={{ designId: design.id }}
+            >
+              <button
+                type="submit"
+                className="text-xs text-zinc-700 transition-colors hover:text-red-400"
+              >
+                Delete design
+              </button>
+            </ConfirmForm>
           </div>
         </div>
       </div>
