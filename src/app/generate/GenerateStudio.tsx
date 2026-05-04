@@ -158,20 +158,20 @@ export default function GenerateStudio({
 
   const canvas =
     saveState.status === "generating" ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-200 bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="relative flex h-10 w-10 items-center justify-center">
-            <div className="absolute inset-0 animate-ping rounded-full bg-violet-500/[0.12]" />
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-300" />
+            <div className="absolute inset-0 animate-ping rounded-full bg-violet-100" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-500" />
           </div>
           <div className="space-y-1 text-center">
-            <p className="text-sm font-medium text-zinc-300">Generating your design…</p>
-            <p className="text-xs text-zinc-600">This may take a moment.</p>
+            <p className="text-sm font-medium text-zinc-700">Generating your design…</p>
+            <p className="text-xs text-zinc-400">This may take a moment.</p>
           </div>
         </div>
       </div>
     ) : saveState.status === "generated" ? (
-      <div className="overflow-hidden rounded-2xl border border-zinc-800/60">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
         <img
           src={saveState.imageUrl}
@@ -180,11 +180,11 @@ export default function GenerateStudio({
           loading="lazy"
           decoding="async"
         />
-        <div className="flex items-center justify-between border-t border-zinc-800/60 bg-zinc-950/80 px-4 py-3">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between border-t border-zinc-100 bg-white px-5 py-3.5">
+          <div className="flex items-center gap-5">
             <Link
               href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-              className="text-sm font-medium text-zinc-300 transition-colors hover:text-white"
+              className="text-sm font-medium text-zinc-900 transition-colors hover:text-violet-600"
             >
               Open workspace →
             </Link>
@@ -192,14 +192,14 @@ export default function GenerateStudio({
               href={saveState.imageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
+              className="text-sm text-zinc-400 transition-colors hover:text-zinc-600"
             >
               Full size ↗
             </a>
             <button
               type="button"
               onClick={handleDownload}
-              className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
+              className="text-sm text-zinc-400 transition-colors hover:text-zinc-600"
             >
               Download ↓
             </button>
@@ -207,47 +207,62 @@ export default function GenerateStudio({
           <button
             type="button"
             onClick={resetForm}
-            className="text-sm text-zinc-600 transition-colors hover:text-zinc-400"
+            className="text-sm text-zinc-400 transition-colors hover:text-zinc-600"
           >
             New design
           </button>
         </div>
       </div>
     ) : saveState.status === "generate_failed" ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black p-6 text-center">
-        <p className="text-sm font-medium text-zinc-400">Generation failed</p>
-        <p className="text-xs text-zinc-600">Something went wrong. You can try again.</p>
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white p-6 text-center">
+        <p className="text-sm font-medium text-zinc-700">Generation failed</p>
+        <p className="text-xs text-zinc-400">Something went wrong. You can try again.</p>
         <div className="mt-2 flex flex-wrap justify-center gap-3">
           <button
             type="button"
             onClick={() => handleGenerate(saveState.id)}
-            className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+            className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900"
           >
             Retry
           </button>
           <Link
             href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-            className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white"
+            className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900"
           >
             Open workspace →
           </Link>
         </div>
       </div>
     ) : creditsExhausted ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black p-6 text-center">
-        <p className="text-sm font-medium text-zinc-400">No generation credits remaining</p>
-        <p className="text-xs text-zinc-600">You've used all your available credits.</p>
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white p-6 text-center">
+        <p className="text-sm font-medium text-zinc-600">No generation credits remaining</p>
+        <p className="text-xs text-zinc-400">You&apos;ve used all your available credits.</p>
       </div>
     ) : (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
-        <p className="text-sm font-medium text-zinc-500">Your design will appear here</p>
-        <p className="text-xs text-zinc-700">Describe your vision and click Generate</p>
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-200 bg-white">
+        <p className="text-sm font-medium text-zinc-400">Your design will appear here</p>
+        <p className="text-xs text-zinc-300">Describe your vision and click Generate</p>
       </div>
     );
 
   return (
-    <main className="flex flex-1 flex-col bg-black px-6 py-12">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-18">
       <div className="mx-auto w-full max-w-5xl">
+
+        {/* Page header */}
+        <div className="mb-10">
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+            Design Studio
+          </h1>
+          <p className="mt-1.5 text-sm text-zinc-500">
+            {saveState.status === "generated"
+              ? "Adjust your prompt or options and regenerate."
+              : saveState.status === "generate_failed"
+              ? "Something went wrong. Adjust your prompt or retry."
+              : "Describe your vision and generate the artwork."}
+          </p>
+        </div>
+
         <div className="flex flex-col-reverse gap-6 lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
 
           {/* Canvas — flex-col-reverse pushes it below controls on mobile; lg:grid restores left-column position on desktop */}
@@ -256,25 +271,12 @@ export default function GenerateStudio({
           </div>
 
           {/* Controls panel */}
-          <div className="rounded-2xl border border-zinc-800/60 bg-zinc-950/60 p-6 lg:p-7">
-            <div className="mb-7">
-              <h1 className="text-lg font-semibold tracking-tight text-white">
-                Design Studio
-              </h1>
-              <p className="mt-1 text-xs text-zinc-500">
-                {saveState.status === "generated"
-                  ? "Adjust your prompt or options and regenerate."
-                  : saveState.status === "generate_failed"
-                  ? "Something went wrong. Adjust your prompt or retry."
-                  : "Describe your vision and generate the artwork."}
-              </p>
-            </div>
-
+          <div className="rounded-2xl border border-zinc-200 bg-white p-6 lg:p-7">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label
                   htmlFor="prompt"
-                  className="text-xs font-medium uppercase tracking-widest text-zinc-600"
+                  className="text-xs font-medium uppercase tracking-widest text-zinc-400"
                 >
                   Prompt
                 </label>
@@ -288,12 +290,12 @@ export default function GenerateStudio({
                     resetSaveState();
                   }}
                   placeholder="Describe what you want to create..."
-                  className="mt-2.5 w-full resize-none rounded-xl border border-zinc-800/80 bg-black/40 px-4 py-3 text-sm text-white placeholder:text-zinc-600 outline-none transition-colors focus:border-violet-500/50"
+                  className="mt-2.5 w-full resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60"
                 />
               </div>
 
-              <div className="border-t border-zinc-800/50 pt-6">
-                <p className="text-xs font-medium uppercase tracking-widest text-zinc-600">
+              <div className="border-t border-zinc-100 pt-6">
+                <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
                   Style
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -307,8 +309,8 @@ export default function GenerateStudio({
                       }}
                       className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                         styleMood === style
-                          ? "border-white bg-white text-black"
-                          : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white"
+                          ? "border-zinc-900 bg-zinc-900 text-white"
+                          : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900"
                       }`}
                     >
                       {style}
@@ -317,8 +319,8 @@ export default function GenerateStudio({
                 </div>
               </div>
 
-              <div className="border-t border-zinc-800/50 pt-6">
-                <p className="text-xs font-medium uppercase tracking-widest text-zinc-600">
+              <div className="border-t border-zinc-100 pt-6">
+                <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
                   Colors
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -332,8 +334,8 @@ export default function GenerateStudio({
                       }}
                       className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                         colorPalette === palette
-                          ? "border-white bg-white text-black"
-                          : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white"
+                          ? "border-zinc-900 bg-zinc-900 text-white"
+                          : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900"
                       }`}
                     >
                       {palette}
@@ -342,8 +344,8 @@ export default function GenerateStudio({
                 </div>
               </div>
 
-              <div className="border-t border-zinc-800/50 pt-6">
-                <p className="text-xs font-medium uppercase tracking-widest text-zinc-600">
+              <div className="border-t border-zinc-100 pt-6">
+                <p className="text-xs font-medium uppercase tracking-widest text-zinc-400">
                   Product
                 </p>
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -357,8 +359,8 @@ export default function GenerateStudio({
                       }}
                       className={`rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
                         productType === type
-                          ? "border-white bg-white text-black"
-                          : "border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-white"
+                          ? "border-zinc-900 bg-zinc-900 text-white"
+                          : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900"
                       }`}
                     >
                       {type}
@@ -371,7 +373,7 @@ export default function GenerateStudio({
                 <p className="text-sm text-zinc-500">
                   <Link
                     href="/login"
-                    className="text-zinc-300 underline underline-offset-2 transition-colors hover:text-white"
+                    className="text-zinc-900 underline underline-offset-2 transition-colors hover:text-violet-600"
                   >
                     Sign in
                   </Link>{" "}
@@ -392,15 +394,15 @@ export default function GenerateStudio({
               )}
 
               {saveState.status === "generated" ? (
-                <div className="space-y-4 border-t border-zinc-800/50 pt-6">
+                <div className="space-y-4 border-t border-zinc-100 pt-6">
                   <div>
                     <Link
                       href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-                      className="inline-flex w-full items-center justify-center rounded-full bg-white px-7 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                      className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-7 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
                     >
                       Open in workspace →
                     </Link>
-                    <p className="mt-2 text-xs text-zinc-600">
+                    <p className="mt-2 text-xs text-zinc-400">
                       Manage and publish this design from your workspace.
                     </p>
                   </div>
@@ -408,21 +410,21 @@ export default function GenerateStudio({
                     <button
                       type="submit"
                       disabled={!prompt.trim() || isWorking || creditsExhausted}
-                      className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {buttonLabel()}
                     </button>
-                    <span className="text-xs text-zinc-600">
+                    <span className="text-xs text-zinc-400">
                       Not happy? Adjust and try again.
                     </span>
                   </div>
                 </div>
               ) : (
-                <div className="border-t border-zinc-800/50 pt-6">
+                <div className="border-t border-zinc-100 pt-6">
                   <button
                     type="submit"
                     disabled={!prompt.trim() || isWorking || creditsExhausted}
-                    className="w-full rounded-full bg-white py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="w-full rounded-full bg-zinc-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {buttonLabel()}
                   </button>
