@@ -78,21 +78,21 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   const error = params?.error;
 
   return (
-    <main className="flex flex-1 flex-col bg-black px-6 py-12">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-2xl">
-        <h1 className="bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
           Your account
         </h1>
 
         {success && (
-          <p className="mt-4 text-sm text-green-400">{success}</p>
+          <p className="mt-4 text-sm text-green-600">{success}</p>
         )}
         {error && (
-          <p className="mt-4 text-sm text-red-400">{error}</p>
+          <p className="mt-4 text-sm text-red-600">{error}</p>
         )}
 
         {/* Profile settings */}
-        <div className="mt-8 divide-y divide-zinc-800/60 rounded-2xl border border-zinc-800/60 bg-zinc-950">
+        <div className="mt-8 divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-white">
           <div className="px-5 py-4">
             <form action={updateDisplayName}>
               <label
@@ -112,7 +112,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                 />
                 <button
                   type="submit"
-                  className="shrink-0 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-300"
+                  className="shrink-0 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
                 >
                   Save
                 </button>
@@ -124,14 +124,14 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
               Email
             </p>
-            <p className="mt-1 text-sm text-white">{user.email}</p>
+            <p className="mt-1 text-sm text-zinc-900">{user.email}</p>
           </div>
 
           <div className="px-5 py-4">
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
               Role
             </p>
-            <p className="mt-1 text-sm capitalize text-white">
+            <p className="mt-1 text-sm capitalize text-zinc-900">
               {profile?.role ?? "buyer"}
             </p>
           </div>
@@ -140,9 +140,9 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
               Generation credits
             </p>
-            <p className="mt-1 text-sm text-white">
+            <p className="mt-1 text-sm text-zinc-900">
               {profile?.generation_credits ?? 0}{" "}
-              <span className="text-zinc-600">
+              <span className="text-zinc-400">
                 {(profile?.generation_credits ?? 0) === 1 ? "credit" : "credits"} remaining
               </span>
             </p>
@@ -153,11 +153,11 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         <section className="mt-12">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-            <h2 className="text-base font-semibold tracking-tight text-white">
+            <h2 className="text-base font-semibold tracking-tight text-zinc-900">
               Drafts
             </h2>
             {drafts.length > 0 && (
-              <span className="text-sm text-zinc-600">{drafts.length}</span>
+              <span className="text-sm text-zinc-400">{drafts.length}</span>
             )}
           </div>
           <p className="mt-1 text-sm text-zinc-500">
@@ -169,13 +169,13 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {drafts.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-800/60 bg-zinc-950"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white"
                 >
                   <div className="flex">
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950"
+                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100"
                       tabIndex={-1}
                       aria-hidden
                     >
@@ -197,39 +197,39 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                         <div className="flex items-center gap-2">
                           <Link
                             href={`/account/designs/${design.id}`}
-                            className="text-sm font-medium text-white transition-colors hover:text-zinc-300"
+                            className="text-sm font-medium text-zinc-900 transition-colors hover:text-violet-600"
                           >
                             {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                           </Link>
                           {design.image_status === "generating" && (
-                            <span className="rounded-full border border-violet-800/60 px-2 py-0.5 text-xs text-violet-400/70">
+                            <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs text-violet-600">
                               Generating…
                             </span>
                           )}
                           {design.image_status === "failed" && (
-                            <span className="rounded-full border border-red-900 px-2 py-0.5 text-xs text-red-500">
+                            <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs text-red-600">
                               Failed
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 line-clamp-1 text-xs text-zinc-600">
+                        <p className="mt-1 line-clamp-1 text-xs text-zinc-400">
                           {design.prompt}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-3">
                         {design.product_type && (
-                          <span className="rounded-full border border-zinc-800 px-2 py-0.5 text-xs text-zinc-600">
+                          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500">
                             {design.product_type}
                           </span>
                         )}
-                        <span className="text-xs text-zinc-700">
+                        <span className="text-xs text-zinc-400">
                           {formatDate(design.created_at)}
                         </span>
                         <div className="ml-auto flex items-center gap-3">
                           <Link
                             href={`/account/designs/${design.id}`}
-                            className="text-xs text-zinc-500 transition-colors hover:text-zinc-300"
+                            className="text-xs text-zinc-500 transition-colors hover:text-zinc-900"
                           >
                             Edit
                           </Link>
@@ -241,7 +241,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                             >
                               <button
                                 type="submit"
-                                className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-black transition-opacity hover:opacity-75"
+                                className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700"
                               >
                                 Publish →
                               </button>
@@ -254,7 +254,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                           >
                             <button
                               type="submit"
-                              className="text-xs text-zinc-700 transition-colors hover:text-red-400"
+                              className="text-xs text-zinc-400 transition-colors hover:text-red-500"
                             >
                               Delete
                             </button>
@@ -267,11 +267,11 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               ))}
             </ul>
           ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-zinc-800 px-6 py-10 text-center">
+            <div className="mt-4 rounded-xl border border-dashed border-zinc-300 px-6 py-10 text-center">
               <p className="text-sm text-zinc-500">No drafts yet</p>
-              <p className="mt-1 text-xs text-zinc-700">
+              <p className="mt-1 text-xs text-zinc-400">
                 Head to the{" "}
-                <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-violet-300">
+                <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-violet-600">
                   Studio
                 </Link>{" "}
                 to create your first design.
@@ -284,11 +284,11 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         <section className="mt-12 pb-16">
           <div className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-            <h2 className="text-base font-semibold tracking-tight text-white">
+            <h2 className="text-base font-semibold tracking-tight text-zinc-900">
               Published
             </h2>
             {publishedDesigns.length > 0 && (
-              <span className="text-sm text-zinc-600">{publishedDesigns.length}</span>
+              <span className="text-sm text-zinc-400">{publishedDesigns.length}</span>
             )}
           </div>
           <p className="mt-1 text-sm text-zinc-500">
@@ -300,13 +300,13 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {publishedDesigns.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-800/60 bg-zinc-950"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white"
                 >
                   <div className="flex">
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950"
+                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100"
                       tabIndex={-1}
                       aria-hidden
                     >
@@ -327,28 +327,28 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                       <div>
                         <Link
                           href={`/account/designs/${design.id}`}
-                          className="text-sm font-medium text-white transition-colors hover:text-zinc-300"
+                          className="text-sm font-medium text-zinc-900 transition-colors hover:text-violet-600"
                         >
                           {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                         </Link>
-                        <p className="mt-1 line-clamp-1 text-xs text-zinc-600">
+                        <p className="mt-1 line-clamp-1 text-xs text-zinc-400">
                           {design.prompt}
                         </p>
                       </div>
 
                       <div className="flex items-center gap-3">
                         {design.product_type && (
-                          <span className="rounded-full border border-zinc-800 px-2 py-0.5 text-xs text-zinc-600">
+                          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500">
                             {design.product_type}
                           </span>
                         )}
-                        <span className="text-xs text-zinc-700">
+                        <span className="text-xs text-zinc-400">
                           {formatDate(design.created_at)}
                         </span>
                         <div className="ml-auto flex items-center gap-3">
                           <Link
                             href={`/marketplace/${design.id}`}
-                            className="text-xs text-zinc-400 transition-colors hover:text-white"
+                            className="text-xs text-zinc-500 transition-colors hover:text-zinc-900"
                           >
                             View ↗
                           </Link>
@@ -359,7 +359,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                           >
                             <button
                               type="submit"
-                              className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+                              className="text-xs text-zinc-500 transition-colors hover:text-zinc-900"
                             >
                               Unpublish
                             </button>
@@ -371,7 +371,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                           >
                             <button
                               type="submit"
-                              className="text-xs text-zinc-700 transition-colors hover:text-red-400"
+                              className="text-xs text-zinc-400 transition-colors hover:text-red-500"
                             >
                               Delete
                             </button>
@@ -384,9 +384,9 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               ))}
             </ul>
           ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-zinc-800 px-6 py-10 text-center">
+            <div className="mt-4 rounded-xl border border-dashed border-zinc-300 px-6 py-10 text-center">
               <p className="text-sm text-zinc-500">No published designs yet</p>
-              <p className="mt-1 text-xs text-zinc-700">
+              <p className="mt-1 text-xs text-zinc-400">
                 Publish a draft to make it visible in the marketplace.
               </p>
             </div>

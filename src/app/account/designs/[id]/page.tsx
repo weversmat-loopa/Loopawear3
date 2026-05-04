@@ -90,11 +90,11 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
   const refineHref = `/generate?${refineParams.toString()}`;
 
   return (
-    <main className="flex flex-1 flex-col bg-black px-6 py-12">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-2xl">
         <Link
           href="/account"
-          className="text-sm text-zinc-500 transition-colors hover:text-violet-300"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
         >
           ← Your account
         </Link>
@@ -104,8 +104,8 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             <span
               className={`rounded-full border px-2.5 py-0.5 text-xs ${
                 isPublished
-                  ? "border-violet-700/50 text-violet-400/80"
-                  : "border-zinc-800 text-zinc-500"
+                  ? "border-violet-300 bg-violet-50 text-violet-600"
+                  : "border-zinc-200 text-zinc-500"
               }`}
             >
               {isPublished ? "Published" : "Draft"}
@@ -115,7 +115,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                 <input type="hidden" name="designId" value={design.id} />
                 <button
                   type="submit"
-                  className="rounded-full bg-white px-4 py-1 text-xs font-semibold text-black transition-opacity hover:opacity-75"
+                  className="rounded-full bg-zinc-900 px-4 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700"
                 >
                   Publish →
                 </button>
@@ -125,7 +125,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               <>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-300"
+                  className="text-xs text-zinc-500 transition-colors hover:text-zinc-900"
                 >
                   View on marketplace ↗
                 </Link>
@@ -133,7 +133,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-full border border-zinc-700 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300"
+                    className="rounded-full border border-zinc-200 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-900 hover:text-zinc-900"
                   >
                     Unpublish
                   </button>
@@ -142,7 +142,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          <h1 className="mt-5 bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-zinc-900">
             {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
           </h1>
 
@@ -158,8 +158,8 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           </div>
 
           {process.env.NODE_ENV === "development" && design.image_status === "generating" && (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-800 px-4 py-3">
-              <p className="text-xs text-zinc-700">
+            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3">
+              <p className="text-xs text-zinc-400">
                 Dev — simulate generation result
               </p>
               <div className="mt-2.5 flex gap-2">
@@ -167,7 +167,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
                   >
                     Mark ready
                   </button>
@@ -176,7 +176,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
                   >
                     Mark failed
                   </button>
@@ -186,19 +186,19 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           )}
 
           {process.env.NODE_ENV === "development" && design.image_status !== "generating" && (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-800 px-4 py-3">
-              <p className="text-xs text-zinc-700">Dev — test image URL</p>
+            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3">
+              <p className="text-xs text-zinc-400">Dev — test image URL</p>
               <form action={devSetTestImageUrl} className="mt-2.5 flex gap-2">
                 <input type="hidden" name="designId" value={design.id} />
                 <input
                   name="image_url"
                   type="url"
                   placeholder="https://..."
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-800 bg-transparent px-3 py-1.5 text-xs text-zinc-400 outline-none placeholder:text-zinc-700 focus:border-zinc-600"
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 outline-none placeholder:text-zinc-400 focus:border-zinc-400"
                 />
                 <button
                   type="submit"
-                  className="shrink-0 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                  className="shrink-0 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
                 >
                   Set
                 </button>
@@ -208,7 +208,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-zinc-800 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-300"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
                   >
                     Clear image URL
                   </button>
@@ -217,7 +217,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          <div className="mt-12 border-t border-zinc-900 pt-8">
+          <div className="mt-12 border-t border-zinc-200 pt-8">
             <div className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
               <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
@@ -226,10 +226,10 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             </div>
 
             {success && (
-              <p className="mt-4 text-sm text-green-400">{success}</p>
+              <p className="mt-4 text-sm text-green-600">{success}</p>
             )}
             {error && (
-              <p className="mt-4 text-sm text-red-400">{error}</p>
+              <p className="mt-4 text-sm text-red-600">{error}</p>
             )}
 
             <DesignEditForm
@@ -241,8 +241,8 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             />
           </div>
 
-          <div className="mt-10 border-t border-zinc-900 pt-6 flex items-center justify-between">
-            <p className="text-xs text-zinc-600">
+          <div className="mt-10 border-t border-zinc-200 pt-6 flex items-center justify-between">
+            <p className="text-xs text-zinc-400">
               Created {formatDate(design.created_at)}
             </p>
             <ConfirmForm
@@ -252,7 +252,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             >
               <button
                 type="submit"
-                className="text-xs text-zinc-700 transition-colors hover:text-red-400"
+                className="text-xs text-zinc-400 transition-colors hover:text-red-500"
               >
                 Delete design
               </button>
