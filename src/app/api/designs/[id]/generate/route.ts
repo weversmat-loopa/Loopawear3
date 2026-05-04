@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { fal } from "@fal-ai/client";
 import { createClient } from "@/utils/supabase/server";
 
+export const maxDuration = 300;
+
 fal.config({ credentials: process.env.FAL_KEY });
 
 const STYLE_KEYWORDS: Record<string, string> = {
@@ -47,6 +49,10 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<Params> }
 ) {
+  if (!process.env.FAL_KEY) {
+    return NextResponse.json({ error: "configuration_error" }, { status: 500 });
+  }
+
   const { id } = await params;
   const body = await req.json().catch(() => ({})) as { colorPalette?: string };
   const colorPalette = typeof body.colorPalette === "string" ? body.colorPalette : null;
@@ -63,7 +69,7 @@ export async function POST(
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style, image_status")
+    .select("id, prompt, product_type, style")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -72,15 +78,25 @@ export async function POST(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  if (design.image_status === "generating") {
-    return NextResponse.json({ error: "already_generating" }, { status: 409 });
+  if (!design.prompt.trim()) {
+    return NextResponse.json({ error: "invalid_design" }, { status: 422 });
   }
 
-  await supabase
+  // Atomically claim the generation slot — only succeeds if not already generating.
+  // This collapses the status check and update into one operation, eliminating the
+  // race window between a separate read and write.
+  const { data: claimed } = await supabase
     .from("designs")
     .update({ image_status: "generating" })
     .eq("id", id)
-    .eq("creator_id", user.id);
+    .eq("creator_id", user.id)
+    .neq("image_status", "generating")
+    .select("id")
+    .maybeSingle();
+
+  if (!claimed) {
+    return NextResponse.json({ error: "already_generating" }, { status: 409 });
+  }
 
   const prompt = buildGenerationPrompt(
     design.prompt,
