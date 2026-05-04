@@ -71,7 +71,7 @@ export default function DesignImageSection({
   if (isGenerating && imageUrl) {
     return (
       <div>
-        <div className="relative overflow-hidden rounded-xl border border-zinc-800">
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-800/60">
           {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
           <img
             src={imageUrl}
@@ -94,9 +94,9 @@ export default function DesignImageSection({
   if (isGenerating) {
     return (
       <div>
-        <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
+        <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
           <div className="flex flex-col items-center gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-200" />
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-300" />
             <p className="text-sm font-medium text-zinc-400">Generating image…</p>
             <p className="text-xs text-zinc-600">This may take a moment.</p>
           </div>
@@ -109,7 +109,7 @@ export default function DesignImageSection({
   // Server state: ready with image
   const imageArea =
     imageStatus === "ready" && imageUrl ? (
-      <div className="overflow-hidden rounded-xl border border-zinc-800">
+      <div className="overflow-hidden rounded-2xl border border-zinc-800/60">
         {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
         <img
           src={imageUrl}
@@ -120,14 +120,14 @@ export default function DesignImageSection({
         />
       </div>
     ) : serverGenerating ? (
-      <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
+      <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
         <div className="text-center">
           <p className="text-sm font-medium text-zinc-400">Generating image…</p>
           <p className="mt-1 text-xs text-zinc-600">This may take a moment.</p>
         </div>
       </div>
     ) : imageStatus === "failed" ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
         <div className="text-center">
           <p className="text-sm font-medium text-zinc-500">Generation failed</p>
           <p className="mt-1 text-xs text-zinc-700">
@@ -136,11 +136,11 @@ export default function DesignImageSection({
         </div>
       </div>
     ) : imageStatus === "ready" && !imageUrl ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
         <p className="text-sm text-zinc-600">Image unavailable</p>
       </div>
     ) : (
-      <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
         <p className="text-sm text-zinc-600">No image generated yet</p>
       </div>
     );

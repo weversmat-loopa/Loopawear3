@@ -7,7 +7,7 @@ export default function Input({
   return (
     <input
       className={[
-        "w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-zinc-600",
+        "w-full rounded-lg border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-violet-500/50",
         className,
       ]
         .filter(Boolean)

@@ -80,7 +80,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   return (
     <main className="flex flex-1 flex-col bg-black px-6 py-12">
       <div className="mx-auto w-full max-w-2xl">
-        <h1 className="text-2xl font-bold tracking-tight text-white">
+        <h1 className="bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
           Your account
         </h1>
 
@@ -92,7 +92,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         )}
 
         {/* Profile settings */}
-        <div className="mt-8 divide-y divide-zinc-800 rounded-xl border border-zinc-800 bg-zinc-950">
+        <div className="mt-8 divide-y divide-zinc-800/60 rounded-2xl border border-zinc-800/60 bg-zinc-950">
           <div className="px-5 py-4">
             <form action={updateDisplayName}>
               <label
@@ -112,7 +112,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                 />
                 <button
                   type="submit"
-                  className="shrink-0 text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+                  className="shrink-0 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-300"
                 >
                   Save
                 </button>
@@ -139,7 +139,8 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
         {/* Drafts */}
         <section className="mt-12">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
             <h2 className="text-base font-semibold tracking-tight text-white">
               Drafts
             </h2>
@@ -156,13 +157,13 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {drafts.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950"
+                  className="overflow-hidden rounded-xl border border-zinc-800/60 bg-zinc-950"
                 >
                   <div className="flex">
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-900"
+                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950"
                       tabIndex={-1}
                       aria-hidden
                     >
@@ -189,7 +190,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                             {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                           </Link>
                           {design.image_status === "generating" && (
-                            <span className="rounded-full border border-zinc-700 px-2 py-0.5 text-xs text-zinc-500">
+                            <span className="rounded-full border border-violet-800/60 px-2 py-0.5 text-xs text-violet-400/70">
                               Generating…
                             </span>
                           )}
@@ -246,7 +247,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               <p className="text-sm text-zinc-500">No drafts yet</p>
               <p className="mt-1 text-xs text-zinc-700">
                 Head to the{" "}
-                <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-zinc-500">
+                <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-violet-300">
                   Studio
                 </Link>{" "}
                 to create your first design.
@@ -257,7 +258,8 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
         {/* Published */}
         <section className="mt-12 pb-16">
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
             <h2 className="text-base font-semibold tracking-tight text-white">
               Published
             </h2>
@@ -274,13 +276,13 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {publishedDesigns.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950"
+                  className="overflow-hidden rounded-xl border border-zinc-800/60 bg-zinc-950"
                 >
                   <div className="flex">
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-900"
+                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-gradient-to-b from-zinc-900 to-zinc-950"
                       tabIndex={-1}
                       aria-hidden
                     >

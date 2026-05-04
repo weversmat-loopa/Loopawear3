@@ -50,7 +50,7 @@ export default function DesignEditForm({
           type="text"
           defaultValue={initialTitle ?? ""}
           placeholder="Give your design a public name…"
-          className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-zinc-600"
+          className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white placeholder-zinc-600 outline-none focus:border-violet-500/50"
         />
       </div>
 
@@ -67,7 +67,7 @@ export default function DesignEditForm({
           rows={4}
           defaultValue={initialPrompt}
           placeholder="Describe your design..."
-          className="mt-2 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm leading-relaxed text-white placeholder-zinc-600 outline-none focus:border-zinc-600"
+          className="mt-2 w-full resize-none rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm leading-relaxed text-white placeholder-zinc-600 outline-none focus:border-violet-500/50"
         />
       </div>
 

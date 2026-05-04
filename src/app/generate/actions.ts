@@ -26,23 +26,33 @@ export async function saveDraft(
   }
 
   if (input.designId) {
-    const { data, error } = await supabase
+    const { data: existing } = await supabase
       .from("designs")
-      .update({
-        prompt: input.prompt.trim(),
-        product_type: input.productType,
-        style: input.styleMood,
-      })
+      .select("status")
       .eq("id", input.designId)
       .eq("creator_id", user.id)
-      .select("id")
-      .single();
+      .maybeSingle();
 
-    if (error || !data) {
-      return { error: "save_failed" };
+    if (existing?.status === "draft") {
+      const { data, error } = await supabase
+        .from("designs")
+        .update({
+          prompt: input.prompt.trim(),
+          product_type: input.productType,
+          style: input.styleMood,
+        })
+        .eq("id", input.designId)
+        .eq("creator_id", user.id)
+        .select("id")
+        .single();
+
+      if (error || !data) {
+        return { error: "save_failed" };
+      }
+
+      return { id: data.id };
     }
-
-    return { id: data.id };
+    // Design is published or not found — fall through to create a new draft
   }
 
   const { data, error } = await supabase

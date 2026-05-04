@@ -92,7 +92,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
       <div className="mx-auto w-full max-w-2xl">
         <Link
           href="/account"
-          className="text-sm text-zinc-500 transition-colors hover:text-white"
+          className="text-sm text-zinc-500 transition-colors hover:text-violet-300"
         >
           ← Your account
         </Link>
@@ -102,7 +102,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             <span
               className={`rounded-full border px-2.5 py-0.5 text-xs ${
                 isPublished
-                  ? "border-zinc-600 text-zinc-400"
+                  ? "border-violet-700/50 text-violet-400/80"
                   : "border-zinc-800 text-zinc-500"
               }`}
             >
@@ -123,7 +123,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               <>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="text-xs text-zinc-400 transition-colors hover:text-white"
+                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-300"
                 >
                   View on marketplace ↗
                 </Link>
@@ -140,7 +140,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          <h1 className="mt-5 text-2xl font-bold tracking-tight text-white">
+          <h1 className="mt-5 bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
             {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
           </h1>
 
@@ -216,9 +216,12 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           )}
 
           <div className="mt-12 border-t border-zinc-900 pt-8">
-            <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
-              Design details
-            </h2>
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                Design details
+              </h2>
+            </div>
 
             {success && (
               <p className="mt-4 text-sm text-green-400">{success}</p>

@@ -20,7 +20,7 @@ const COLOR_PALETTE_KEYWORDS: Record<string, string> = {
 
 function buildGenerationPrompt(
   userPrompt: string,
-  productType: string | null,
+  _productType: string | null,
   style: string | null,
   colorPalette: string | null
 ): string {

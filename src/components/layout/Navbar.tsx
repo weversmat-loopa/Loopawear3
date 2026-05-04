@@ -18,10 +18,10 @@ export default function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
 
   return (
-    <header className="flex h-14 w-full items-center justify-between border-b border-zinc-800 bg-black px-6">
+    <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-zinc-800/60 bg-black/95 px-6 backdrop-blur-sm">
       <Link
         href="/"
-        className="text-sm font-bold tracking-tight text-white transition-opacity hover:opacity-80"
+        className="text-sm font-bold tracking-tight text-white transition-colors hover:text-violet-200"
       >
         Loopawear
       </Link>
@@ -34,8 +34,8 @@ export default function Navbar({ user }: NavbarProps) {
               href={href}
               className={`flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                 pathname === href || pathname.startsWith(href + "/")
-                  ? "border-zinc-600 text-white"
-                  : "border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-white"
+                  ? "border-zinc-700 bg-zinc-900/80 text-white"
+                  : "border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white"
               }`}
             >
               {label}
@@ -43,7 +43,7 @@ export default function Navbar({ user }: NavbarProps) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3 border-l border-zinc-800 pl-6">
+        <div className="flex items-center gap-3 border-l border-zinc-800/60 pl-6">
           {user ? (
             <>
               <Link
@@ -57,7 +57,7 @@ export default function Navbar({ user }: NavbarProps) {
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+                  className="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-300"
                 >
                   Log out
                 </button>
@@ -67,7 +67,7 @@ export default function Navbar({ user }: NavbarProps) {
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-zinc-400 transition-colors hover:text-white"
+                className="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-300"
               >
                 Log in
               </Link>
