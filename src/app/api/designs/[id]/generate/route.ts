@@ -129,9 +129,9 @@ export async function POST(
       },
     });
 
-    const imageUrl = result.data.images?.[0]?.url;
+    const falImageUrl = result.data.images?.[0]?.url;
 
-    if (!imageUrl) {
+    if (!falImageUrl) {
       await supabase
         .from("designs")
         .update({ image_status: "failed" })
@@ -140,11 +140,47 @@ export async function POST(
       return NextResponse.json({ error: "no_image_url" }, { status: 500 });
     }
 
-    await supabase
+    // Persist to Supabase Storage so we're not dependent on temporary fal CDN URLs.
+    let imageUrl: string;
+    try {
+      const imageRes = await fetch(falImageUrl);
+      if (!imageRes.ok) throw new Error("download_failed");
+      const imageBuffer = Buffer.from(await imageRes.arrayBuffer());
+
+      const storagePath = `designs/${id}.png`;
+      const { error: uploadError } = await supabase.storage
+        .from("design-images")
+        .upload(storagePath, imageBuffer, { contentType: "image/png", upsert: true });
+
+      if (uploadError) throw new Error("upload_failed");
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("design-images")
+        .getPublicUrl(storagePath);
+
+      imageUrl = publicUrl;
+    } catch {
+      await Promise.all([
+        supabase
+          .from("designs")
+          .update({ image_status: "failed" })
+          .eq("id", id)
+          .eq("creator_id", user.id),
+        supabase.rpc("increment_generation_credits", { user_id: user.id }),
+      ]);
+      return NextResponse.json({ error: "storage_failed" }, { status: 500 });
+    }
+
+    const { error: dbError } = await supabase
       .from("designs")
       .update({ image_status: "ready", image_url: imageUrl })
       .eq("id", id)
       .eq("creator_id", user.id);
+
+    if (dbError) {
+      await supabase.rpc("increment_generation_credits", { user_id: user.id });
+      return NextResponse.json({ error: "storage_failed" }, { status: 500 });
+    }
 
     return NextResponse.json({ imageUrl });
   } catch {
