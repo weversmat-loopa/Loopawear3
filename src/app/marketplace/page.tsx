@@ -38,7 +38,7 @@ export default async function MarketplacePage({ searchParams }: Props) {
   let creatorNames: Record<string, string | null> = {};
   if (creatorIds.length > 0) {
     const { data: profiles } = await supabase
-      .from("profiles")
+      .from("public_profiles")
       .select("id, display_name")
       .in("id", creatorIds);
     creatorNames = Object.fromEntries(

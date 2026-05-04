@@ -54,7 +54,7 @@ export default async function DesignPage({ params }: Props) {
   let creatorName: string | null = null;
   if (design.creator_id) {
     const { data: profile } = await supabase
-      .from("profiles")
+      .from("public_profiles")
       .select("display_name")
       .eq("id", design.creator_id)
       .maybeSingle();

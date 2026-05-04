@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient();
 
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("public_profiles")
     .select("display_name")
     .eq("id", id)
     .maybeSingle();
@@ -32,7 +32,7 @@ export default async function CreatorPage({ params }: Props) {
   const supabase = await createClient();
 
   const { data: profile } = await supabase
-    .from("profiles")
+    .from("public_profiles")
     .select("display_name")
     .eq("id", id)
     .maybeSingle();
