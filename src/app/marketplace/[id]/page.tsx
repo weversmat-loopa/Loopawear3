@@ -87,11 +87,11 @@ export default async function DesignPage({ params }: Props) {
   const studioHref = `/generate?${studioParams.toString()}`;
 
   return (
-    <main className="flex flex-1 flex-col bg-black px-6 py-12">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-4xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-white"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
         >
           ← Marketplace
         </Link>
@@ -100,7 +100,7 @@ export default async function DesignPage({ params }: Props) {
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
             {design.image_url ? (
-              <div className="overflow-hidden rounded-2xl border border-zinc-800/60">
+              <div className="overflow-hidden rounded-2xl border border-zinc-200">
                 {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
                 <img
                   src={design.image_url}
@@ -115,7 +115,7 @@ export default async function DesignPage({ params }: Props) {
                 />
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-900 to-zinc-950" />
+              <div className="aspect-square w-full rounded-2xl border border-zinc-200 bg-zinc-100" />
             )}
           </div>
 
@@ -125,51 +125,51 @@ export default async function DesignPage({ params }: Props) {
               <div>
                 <Link
                   href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
-                  className="rounded-full border border-zinc-800 px-2.5 py-0.5 text-xs text-zinc-500 transition-colors hover:border-violet-500/30 hover:text-violet-300"
+                  className="rounded-full border border-zinc-200 px-2.5 py-0.5 text-xs text-zinc-600 transition-colors hover:border-violet-400/50 hover:text-violet-600"
                 >
                   {design.product_type}
                 </Link>
               </div>
             )}
 
-            <h1 className="mt-4 bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-2xl font-bold tracking-tight text-transparent">
+            <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900">
               {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
             {creatorName && (
               <Link
                 href={`/creators/${design.creator_id}`}
-                className="mt-1.5 text-sm text-zinc-500 transition-colors hover:text-violet-300"
+                className="mt-1.5 text-sm text-zinc-500 transition-colors hover:text-violet-600"
               >
                 by {creatorName}
               </Link>
             )}
 
-            <p className="mt-6 text-sm leading-relaxed text-zinc-400">
+            <p className="mt-6 text-sm leading-relaxed text-zinc-500">
               &ldquo;{design.prompt}&rdquo;
             </p>
 
             {/* Structured details */}
-            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-900 pt-6 text-sm">
+            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-200 pt-6 text-sm">
               {design.style && (
                 <>
-                  <dt className="text-zinc-600">Style</dt>
-                  <dd className="text-zinc-400">{design.style}</dd>
+                  <dt className="text-zinc-500">Style</dt>
+                  <dd className="text-zinc-700">{design.style}</dd>
                 </>
               )}
-              <dt className="text-zinc-600">Published</dt>
-              <dd className="text-zinc-400">{formatDate(design.created_at)}</dd>
+              <dt className="text-zinc-500">Published</dt>
+              <dd className="text-zinc-700">{formatDate(design.created_at)}</dd>
             </dl>
 
             <div className="mt-auto pt-8">
-              <div className="border-t border-zinc-900 pt-6">
+              <div className="border-t border-zinc-200 pt-6">
                 <Link
                   href={studioHref}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
                 >
                   Create something similar →
                 </Link>
-                <p className="mt-2 text-center text-xs text-zinc-600">
+                <p className="mt-2 text-center text-xs text-zinc-400">
                   Opens the studio with this prompt pre-filled.
                 </p>
               </div>
@@ -179,7 +179,7 @@ export default async function DesignPage({ params }: Props) {
 
         {/* More by this creator */}
         {moreByCreator.length > 0 && (
-          <div className="mt-16 border-t border-zinc-900 pt-10">
+          <div className="mt-16 border-t border-zinc-200 pt-10">
             <div className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
@@ -190,7 +190,7 @@ export default async function DesignPage({ params }: Props) {
               {design.creator_id && (
                 <Link
                   href={`/creators/${design.creator_id}`}
-                  className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-900"
                 >
                   See all →
                 </Link>
@@ -201,7 +201,7 @@ export default async function DesignPage({ params }: Props) {
                 <li key={related.id}>
                   <Link
                     href={`/marketplace/${related.id}`}
-                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700"
+                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md"
                   >
                     {related.image_url ? (
                       <div className="aspect-square w-full overflow-hidden">
@@ -219,13 +219,13 @@ export default async function DesignPage({ params }: Props) {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-square w-full bg-gradient-to-b from-zinc-900 to-zinc-950" />
+                      <div className="aspect-square w-full bg-zinc-100" />
                     )}
                     <div className="p-3">
-                      <p className="text-xs font-medium text-white">
+                      <p className="text-xs font-medium text-zinc-900">
                         {related.title ?? (related.product_type ? `${related.product_type} Design` : "Design")}
                       </p>
-                      <p className="mt-0.5 line-clamp-1 text-xs text-zinc-600">
+                      <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">
                         {related.prompt}
                       </p>
                     </div>

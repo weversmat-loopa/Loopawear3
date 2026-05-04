@@ -54,23 +54,23 @@ export default async function CreatorPage({ params }: Props) {
   const displayName = profile.display_name ?? "Anonymous creator";
 
   return (
-    <main className="flex flex-1 flex-col bg-black px-6 py-12">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-5xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-white"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
         >
           ← Marketplace
         </Link>
 
         {/* Creator header */}
-        <div className="mt-10 border-b border-zinc-900 pb-10">
+        <div className="mt-10 border-b border-zinc-200 pb-10">
           <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-violet-500/20 text-2xl font-bold text-white">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-zinc-200 text-2xl font-bold text-white">
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="bg-gradient-to-b from-white to-zinc-300 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+              <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
                 {displayName}
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
@@ -91,7 +91,7 @@ export default async function CreatorPage({ params }: Props) {
                   <li key={design.id}>
                     <Link
                       href={`/marketplace/${design.id}`}
-                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-950 transition-colors hover:border-zinc-700"
+                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md"
                     >
                       {design.image_url ? (
                         <div className="aspect-square w-full overflow-hidden">
@@ -109,18 +109,18 @@ export default async function CreatorPage({ params }: Props) {
                           />
                         </div>
                       ) : (
-                        <div className="aspect-square w-full bg-gradient-to-b from-zinc-900 to-zinc-950" />
+                        <div className="aspect-square w-full bg-zinc-100" />
                       )}
                       <div className="flex flex-col gap-1 p-4">
-                        <p className="text-sm font-medium text-white">
+                        <p className="text-sm font-medium text-zinc-900">
                           {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                         </p>
                         {design.style && (
-                          <span className="w-fit rounded-full border border-zinc-800 px-2 py-0.5 text-xs text-zinc-600">
+                          <span className="w-fit rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500">
                             {design.style}
                           </span>
                         )}
-                        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-600">
+                        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-400">
                           {design.prompt}
                         </p>
                       </div>
@@ -131,10 +131,10 @@ export default async function CreatorPage({ params }: Props) {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-sm font-medium text-zinc-500">
+              <p className="text-sm font-medium text-zinc-600">
                 No published designs yet
               </p>
-              <p className="mt-2 text-sm text-zinc-700">
+              <p className="mt-2 text-sm text-zinc-400">
                 This creator hasn&apos;t published anything yet.
               </p>
             </div>
@@ -142,12 +142,12 @@ export default async function CreatorPage({ params }: Props) {
         </div>
 
         {/* Studio CTA */}
-        <div className="mt-16 border-t border-zinc-900 pt-8 pb-4">
+        <div className="mt-16 border-t border-zinc-200 pt-8 pb-4">
           <p className="text-sm text-zinc-500">
             Inspired by what you see?{" "}
             <Link
               href="/generate"
-              className="text-zinc-400 underline underline-offset-2 transition-colors hover:text-violet-300"
+              className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-violet-600"
             >
               Create your own design →
             </Link>
