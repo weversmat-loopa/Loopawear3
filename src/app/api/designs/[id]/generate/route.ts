@@ -67,9 +67,10 @@ export async function POST(
     return NextResponse.json({ error: "auth_required" }, { status: 401 });
   }
 
+  // Fetch design including image_status so we can restore it if credits are exhausted
   const { data: design } = await supabase
     .from("designs")
-    .select("id, prompt, product_type, style")
+    .select("id, prompt, product_type, style, image_status")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -83,8 +84,6 @@ export async function POST(
   }
 
   // Atomically claim the generation slot — only succeeds if not already generating.
-  // This collapses the status check and update into one operation, eliminating the
-  // race window between a separate read and write.
   const { data: claimed } = await supabase
     .from("designs")
     .update({ image_status: "generating" })
@@ -96,6 +95,22 @@ export async function POST(
 
   if (!claimed) {
     return NextResponse.json({ error: "already_generating" }, { status: 409 });
+  }
+
+  // Decrement credits after slot is claimed — a request blocked by already_generating
+  // does not cost the user a credit. Returns -1 if balance is zero.
+  const { data: newCredits } = await supabase.rpc("decrement_generation_credits", {
+    user_id: user.id,
+  });
+
+  if (newCredits === -1) {
+    // Restore the previous image_status before returning
+    await supabase
+      .from("designs")
+      .update({ image_status: design.image_status ?? "none" })
+      .eq("id", id)
+      .eq("creator_id", user.id);
+    return NextResponse.json({ error: "credits_exhausted" }, { status: 402 });
   }
 
   const prompt = buildGenerationPrompt(
@@ -133,11 +148,15 @@ export async function POST(
 
     return NextResponse.json({ imageUrl });
   } catch {
-    await supabase
-      .from("designs")
-      .update({ image_status: "failed" })
-      .eq("id", id)
-      .eq("creator_id", user.id);
+    // fal API failure — mark failed and refund the credit
+    await Promise.all([
+      supabase
+        .from("designs")
+        .update({ image_status: "failed" })
+        .eq("id", id)
+        .eq("creator_id", user.id),
+      supabase.rpc("increment_generation_credits", { user_id: user.id }),
+    ]);
     return NextResponse.json({ error: "generation_failed" }, { status: 500 });
   }
 }

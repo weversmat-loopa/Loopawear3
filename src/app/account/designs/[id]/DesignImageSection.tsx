@@ -52,6 +52,8 @@ export default function DesignImageSection({
         setError(
           body.error === "already_generating"
             ? "Generation already in progress."
+            : body.error === "credits_exhausted"
+            ? "You've used all your generation credits."
             : "Generation failed. Please try again."
         );
         return;

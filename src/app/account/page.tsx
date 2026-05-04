@@ -50,7 +50,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, role")
+    .select("display_name, role, generation_credits")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -133,6 +133,18 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
             </p>
             <p className="mt-1 text-sm capitalize text-white">
               {profile?.role ?? "buyer"}
+            </p>
+          </div>
+
+          <div className="px-5 py-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              Generation credits
+            </p>
+            <p className="mt-1 text-sm text-white">
+              {profile?.generation_credits ?? 0}{" "}
+              <span className="text-zinc-600">
+                {(profile?.generation_credits ?? 0) === 1 ? "credit" : "credits"} remaining
+              </span>
             </p>
           </div>
         </div>

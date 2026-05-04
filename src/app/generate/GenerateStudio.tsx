@@ -18,6 +18,7 @@ type SaveState =
   | { status: "generating"; id: string }
   | { status: "generated"; id: string; imageUrl: string }
   | { status: "generate_failed"; id: string }
+  | { status: "credits_exhausted" }
   | { status: "auth_required" }
   | { status: "save_failed" };
 
@@ -57,6 +58,7 @@ export default function GenerateStudio({
 
   const isWorking =
     saveState.status === "saving" || saveState.status === "generating";
+  const creditsExhausted = saveState.status === "credits_exhausted";
 
   function resetSaveState() {
     if (saveState.status !== "idle" && saveState.status !== "generating") {
@@ -84,7 +86,12 @@ export default function GenerateStudio({
       });
 
       if (!res.ok) {
-        setSaveState({ status: "generate_failed", id });
+        const errBody = await res.json().catch(() => ({})) as { error?: string };
+        if (errBody.error === "credits_exhausted") {
+          setSaveState({ status: "credits_exhausted" });
+        } else {
+          setSaveState({ status: "generate_failed", id });
+        }
         return;
       }
 
@@ -225,6 +232,11 @@ export default function GenerateStudio({
             Open workspace →
           </Link>
         </div>
+      </div>
+    ) : creditsExhausted ? (
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black p-6 text-center">
+        <p className="text-sm font-medium text-zinc-400">No generation credits remaining</p>
+        <p className="text-xs text-zinc-600">You've used all your available credits.</p>
       </div>
     ) : (
       <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl border border-zinc-800/60 bg-gradient-to-b from-zinc-950 to-black">
@@ -367,6 +379,12 @@ export default function GenerateStudio({
                 </p>
               )}
 
+              {creditsExhausted && (
+                <p className="text-sm text-zinc-500">
+                  You&apos;ve used all your generation credits.
+                </p>
+              )}
+
               {saveState.status === "save_failed" && (
                 <p className="text-sm text-red-500">
                   Something went wrong. Please try again.
@@ -389,7 +407,7 @@ export default function GenerateStudio({
                   <div className="flex items-center gap-3">
                     <button
                       type="submit"
-                      disabled={!prompt.trim() || isWorking}
+                      disabled={!prompt.trim() || isWorking || creditsExhausted}
                       className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-zinc-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {buttonLabel()}
@@ -403,7 +421,7 @@ export default function GenerateStudio({
                 <div className="border-t border-zinc-800/50 pt-6">
                   <button
                     type="submit"
-                    disabled={!prompt.trim() || isWorking}
+                    disabled={!prompt.trim() || isWorking || creditsExhausted}
                     className="w-full rounded-full bg-white py-2.5 text-sm font-semibold text-black transition-opacity hover:opacity-75 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {buttonLabel()}
