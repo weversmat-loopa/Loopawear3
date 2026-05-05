@@ -8,6 +8,16 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+type DesignRow = {
+  id: string;
+  title: string | null;
+  prompt: string;
+  product_type: string | null;
+  image_url: string | null;
+  image_status: string | null;
+  status: string;
+};
+
 function StatCard({
   label,
   value,
@@ -93,6 +103,14 @@ export default async function CreatorDashboardPage() {
     .eq("creator_id", user.id)
     .eq("status", "draft");
 
+  const { data: recentRaw } = await supabase
+    .from("designs")
+    .select("id, title, prompt, product_type, image_url, image_status, status")
+    .eq("creator_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(4);
+
+  const recentDesigns: DesignRow[] = recentRaw ?? [];
   const published = publishedCount ?? 0;
   const drafts = draftCount ?? 0;
   const total = published + drafts;
@@ -146,6 +164,107 @@ export default async function CreatorDashboardPage() {
           <StatCard label="Total designs" value={total} />
           <StatCard label="Credits" value={credits} />
         </div>
+
+        {/* Recent designs — real data */}
+        <section className="mt-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+              <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+                Recent designs
+              </h2>
+              {recentDesigns.length > 0 && (
+                <span className="text-sm text-zinc-400">{recentDesigns.length}</span>
+              )}
+            </div>
+            {recentDesigns.length > 0 && (
+              <Link
+                href="/account"
+                className="text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+              >
+                See all →
+              </Link>
+            )}
+          </div>
+
+          {recentDesigns.length > 0 ? (
+            <ul className="mt-4 space-y-2">
+              {recentDesigns.map((design) => (
+                <li
+                  key={design.id}
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                >
+                  <Link
+                    href={`/account/designs/${design.id}`}
+                    className="flex transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                  >
+                    {/* Thumbnail */}
+                    <div className="aspect-square w-14 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                      {design.image_url ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen
+                        <img
+                          src={design.image_url}
+                          alt=""
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : null}
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex flex-1 flex-col justify-center gap-1 px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          {design.title ??
+                            (design.product_type
+                              ? `${design.product_type} Design`
+                              : "Design")}
+                        </span>
+                        {design.status === "published" ? (
+                          <span className="rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs text-green-600 dark:border-green-800 dark:bg-green-950 dark:text-green-400">
+                            Published
+                          </span>
+                        ) : (
+                          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+                            Draft
+                          </span>
+                        )}
+                        {design.image_status === "generating" && (
+                          <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs text-violet-600">
+                            Generating…
+                          </span>
+                        )}
+                        {design.image_status === "failed" && (
+                          <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs text-red-600">
+                            Failed
+                          </span>
+                        )}
+                      </div>
+                      <p className="line-clamp-1 text-xs text-zinc-400 dark:text-zinc-500">
+                        {design.prompt}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="mt-4 rounded-xl border border-dashed border-zinc-300 px-6 py-8 text-center dark:border-zinc-700">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">No designs yet</p>
+              <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                Head to the{" "}
+                <Link
+                  href="/generate"
+                  className="underline underline-offset-2 transition-colors hover:text-violet-600"
+                >
+                  Studio
+                </Link>{" "}
+                to create your first design.
+              </p>
+            </div>
+          )}
+        </section>
 
         {/* Sales — placeholder, not connected */}
         <section className="mt-10">
