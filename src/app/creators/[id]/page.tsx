@@ -58,19 +58,19 @@ export default async function CreatorPage({ params }: Props) {
       <div className="mx-auto w-full max-w-5xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
         >
           ← Marketplace
         </Link>
 
         {/* Creator header */}
-        <div className="mt-10 border-b border-zinc-200 pb-10">
+        <div className="mt-10 border-b border-zinc-200 pb-10 dark:border-zinc-800">
           <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-zinc-200 text-2xl font-bold text-white">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-zinc-200 text-2xl font-bold text-white dark:bg-white dark:text-zinc-900 dark:ring-zinc-700">
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
+              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
                 {displayName}
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
@@ -91,7 +91,7 @@ export default async function CreatorPage({ params }: Props) {
                   <li key={design.id}>
                     <Link
                       href={`/marketplace/${design.id}`}
-                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md"
+                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                     >
                       {design.image_url ? (
                         <div className="aspect-square w-full overflow-hidden">
@@ -109,14 +109,14 @@ export default async function CreatorPage({ params }: Props) {
                           />
                         </div>
                       ) : (
-                        <div className="aspect-square w-full bg-zinc-100" />
+                        <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
                       )}
                       <div className="flex flex-col gap-1 p-4">
-                        <p className="text-sm font-medium text-zinc-900">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                           {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                         </p>
                         {design.style && (
-                          <span className="w-fit rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500">
+                          <span className="w-fit rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
                             {design.style}
                           </span>
                         )}
@@ -131,10 +131,10 @@ export default async function CreatorPage({ params }: Props) {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-24 text-center">
-              <p className="text-sm font-medium text-zinc-600">
+              <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
                 No published designs yet
               </p>
-              <p className="mt-2 text-sm text-zinc-400">
+              <p className="mt-2 text-sm text-zinc-400 dark:text-zinc-500">
                 This creator hasn&apos;t published anything yet.
               </p>
             </div>
@@ -142,7 +142,7 @@ export default async function CreatorPage({ params }: Props) {
         </div>
 
         {/* Studio CTA */}
-        <div className="mt-16 border-t border-zinc-200 pt-8 pb-4">
+        <div className="mt-16 border-t border-zinc-200 pt-8 pb-4 dark:border-zinc-800">
           <p className="text-sm text-zinc-500">
             Inspired by what you see?{" "}
             <Link

@@ -40,7 +40,7 @@ export default function DesignEditForm({
       <div>
         <label
           htmlFor="title"
-          className="text-xs font-medium uppercase tracking-wider text-zinc-500"
+          className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
         >
           Title
         </label>
@@ -50,14 +50,14 @@ export default function DesignEditForm({
           type="text"
           defaultValue={initialTitle ?? ""}
           placeholder="Give your design a public name…"
-          className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60"
+          className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
         />
       </div>
 
       <div>
         <label
           htmlFor="prompt"
-          className="text-xs font-medium uppercase tracking-wider text-zinc-500"
+          className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
         >
           Prompt
         </label>
@@ -67,12 +67,12 @@ export default function DesignEditForm({
           rows={4}
           defaultValue={initialPrompt}
           placeholder="Describe your design..."
-          className="mt-2 w-full resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm leading-relaxed text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60"
+          className="mt-2 w-full resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm leading-relaxed text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
         />
       </div>
 
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Product type
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -83,8 +83,8 @@ export default function DesignEditForm({
               onClick={() => setProductType(productType === type ? null : type)}
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 productType === type
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
               {type}
@@ -94,7 +94,7 @@ export default function DesignEditForm({
       </div>
 
       <div>
-        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+        <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
           Style
         </p>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -105,8 +105,8 @@ export default function DesignEditForm({
               onClick={() => setStyle(style === s ? null : s)}
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 style === s
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
               {s}
@@ -117,7 +117,7 @@ export default function DesignEditForm({
 
       <button
         type="submit"
-        className="rounded-xl border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900"
+        className="rounded-xl border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
       >
         Save changes
       </button>

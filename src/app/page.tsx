@@ -11,14 +11,14 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <PageShell>
-      <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5">
-        <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
-        <span className="text-xs font-medium uppercase tracking-widest text-violet-600">
+      <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 dark:border-violet-800/60 dark:bg-violet-950/50">
+        <span className="h-1.5 w-1.5 rounded-full bg-violet-500 dark:bg-violet-400" />
+        <span className="text-xs font-medium uppercase tracking-widest text-violet-600 dark:text-violet-400">
           AI-powered apparel
         </span>
       </div>
 
-      <h1 className="text-5xl font-bold tracking-tight text-zinc-900 sm:text-7xl">
+      <h1 className="text-5xl font-bold tracking-tight text-zinc-900 sm:text-7xl dark:text-zinc-100">
         Wear what<br className="hidden sm:block" /> you imagine.
       </h1>
 

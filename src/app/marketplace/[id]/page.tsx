@@ -91,7 +91,7 @@ export default async function DesignPage({ params }: Props) {
       <div className="mx-auto w-full max-w-4xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
         >
           ← Marketplace
         </Link>
@@ -100,7 +100,7 @@ export default async function DesignPage({ params }: Props) {
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
             {design.image_url ? (
-              <div className="overflow-hidden rounded-2xl border border-zinc-200">
+              <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
                 {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
                 <img
                   src={design.image_url}
@@ -115,7 +115,7 @@ export default async function DesignPage({ params }: Props) {
                 />
               </div>
             ) : (
-              <div className="aspect-square w-full rounded-2xl border border-zinc-200 bg-zinc-100" />
+              <div className="aspect-square w-full rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800" />
             )}
           </div>
 
@@ -125,14 +125,14 @@ export default async function DesignPage({ params }: Props) {
               <div>
                 <Link
                   href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
-                  className="rounded-full border border-zinc-200 px-2.5 py-0.5 text-xs text-zinc-600 transition-colors hover:border-violet-400/50 hover:text-violet-600"
+                  className="rounded-full border border-zinc-200 px-2.5 py-0.5 text-xs text-zinc-600 transition-colors hover:border-violet-400/50 hover:text-violet-600 dark:border-zinc-700 dark:text-zinc-400"
                 >
                   {design.product_type}
                 </Link>
               </div>
             )}
 
-            <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900">
+            <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
               {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
@@ -150,22 +150,22 @@ export default async function DesignPage({ params }: Props) {
             </p>
 
             {/* Structured details */}
-            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-200 pt-6 text-sm">
+            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-200 pt-6 text-sm dark:border-zinc-800">
               {design.style && (
                 <>
-                  <dt className="text-zinc-500">Style</dt>
-                  <dd className="text-zinc-700">{design.style}</dd>
+                  <dt className="text-zinc-500 dark:text-zinc-400">Style</dt>
+                  <dd className="text-zinc-700 dark:text-zinc-300">{design.style}</dd>
                 </>
               )}
-              <dt className="text-zinc-500">Published</dt>
-              <dd className="text-zinc-700">{formatDate(design.created_at)}</dd>
+              <dt className="text-zinc-500 dark:text-zinc-400">Published</dt>
+              <dd className="text-zinc-700 dark:text-zinc-300">{formatDate(design.created_at)}</dd>
             </dl>
 
             <div className="mt-auto pt-8">
-              <div className="border-t border-zinc-200 pt-6">
+              <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
                 <Link
                   href={studioHref}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
+                  className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
                 >
                   Create something similar →
                 </Link>
@@ -179,18 +179,18 @@ export default async function DesignPage({ params }: Props) {
 
         {/* More by this creator */}
         {moreByCreator.length > 0 && (
-          <div className="mt-16 border-t border-zinc-200 pt-10">
+          <div className="mt-16 border-t border-zinc-200 pt-10 dark:border-zinc-800">
             <div className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+                <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                   More by {creatorName ?? "this creator"}
                 </h2>
               </div>
               {design.creator_id && (
                 <Link
                   href={`/creators/${design.creator_id}`}
-                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-900"
+                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   See all →
                 </Link>
@@ -201,7 +201,7 @@ export default async function DesignPage({ params }: Props) {
                 <li key={related.id}>
                   <Link
                     href={`/marketplace/${related.id}`}
-                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md"
+                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                   >
                     {related.image_url ? (
                       <div className="aspect-square w-full overflow-hidden">
@@ -219,10 +219,10 @@ export default async function DesignPage({ params }: Props) {
                         />
                       </div>
                     ) : (
-                      <div className="aspect-square w-full bg-zinc-100" />
+                      <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
                     )}
                     <div className="p-3">
-                      <p className="text-xs font-medium text-zinc-900">
+                      <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
                         {related.title ?? (related.product_type ? `${related.product_type} Design` : "Design")}
                       </p>
                       <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">

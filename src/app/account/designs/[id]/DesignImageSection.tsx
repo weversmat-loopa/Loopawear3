@@ -74,7 +74,7 @@ export default function DesignImageSection({
   if (isGenerating && imageUrl) {
     return (
       <div>
-        <div className="relative overflow-hidden rounded-2xl border border-zinc-200">
+        <div className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
           {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
           <img
             src={imageUrl}
@@ -83,9 +83,9 @@ export default function DesignImageSection({
             decoding="async"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600" />
-            <p className="text-sm font-medium text-zinc-700">Generating new image…</p>
-            <p className="text-xs text-zinc-400">This may take a moment.</p>
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Generating new image…</p>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">This may take a moment.</p>
           </div>
         </div>
         <div className="mt-4" />
@@ -97,11 +97,11 @@ export default function DesignImageSection({
   if (isGenerating) {
     return (
       <div>
-        <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50">
+        <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
           <div className="flex flex-col items-center gap-3">
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600" />
-            <p className="text-sm font-medium text-zinc-600">Generating image…</p>
-            <p className="text-xs text-zinc-400">This may take a moment.</p>
+            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
+            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Generating image…</p>
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">This may take a moment.</p>
           </div>
         </div>
         <div className="mt-4" />
@@ -112,7 +112,7 @@ export default function DesignImageSection({
   // Server state: ready with image
   const imageArea =
     imageStatus === "ready" && imageUrl ? (
-      <div className="overflow-hidden rounded-2xl border border-zinc-200">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
         {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
         <img
           src={imageUrl}
@@ -123,27 +123,27 @@ export default function DesignImageSection({
         />
       </div>
     ) : serverGenerating ? (
-      <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50">
+      <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <div className="text-center">
-          <p className="text-sm font-medium text-zinc-600">Generating image…</p>
-          <p className="mt-1 text-xs text-zinc-400">This may take a moment.</p>
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Generating image…</p>
+          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">This may take a moment.</p>
         </div>
       </div>
     ) : imageStatus === "failed" ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
         <div className="text-center">
-          <p className="text-sm font-medium text-zinc-600">Generation failed</p>
-          <p className="mt-1 text-xs text-zinc-400">
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">Generation failed</p>
+          <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
             Something went wrong. You can try again below.
           </p>
         </div>
       </div>
     ) : imageStatus === "ready" && !imageUrl ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
         <p className="text-sm text-zinc-400">Image unavailable</p>
       </div>
     ) : (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
         <p className="text-sm text-zinc-400">No image generated yet</p>
       </div>
     );
@@ -156,7 +156,7 @@ export default function DesignImageSection({
         type="button"
         onClick={handleGenerate}
         disabled={!canGenerate}
-        className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40"
+        className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
       >
         Regenerate
       </button>
@@ -175,8 +175,8 @@ export default function DesignImageSection({
           type="button"
           onClick={handleGenerate}
           disabled={!canGenerate}
-          className={`rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors ${
-            canGenerate ? "hover:bg-zinc-700" : "cursor-not-allowed opacity-40"
+          className={`rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors dark:bg-white dark:text-zinc-900 ${
+            canGenerate ? "hover:bg-zinc-700 dark:hover:bg-zinc-100" : "cursor-not-allowed opacity-40"
           }`}
         >
           {imageStatus === "failed" ? "Retry generation" : "Generate image"}
@@ -210,7 +210,7 @@ export default function DesignImageSection({
         <input type="hidden" name="designId" value={designId} />
         <button
           type="submit"
-          className="text-xs text-zinc-500 underline underline-offset-2 transition-colors hover:text-zinc-900"
+          className="text-xs text-zinc-500 underline underline-offset-2 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
         >
           Cancel and retry
         </button>

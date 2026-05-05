@@ -58,13 +58,13 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
   return (
     <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-6xl">
-        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5">
+        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-zinc-50 px-4 py-1.5 dark:border-zinc-700 dark:bg-zinc-800">
           <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-          <span className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+          <span className="text-xs font-medium uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Marketplace
           </span>
         </div>
-        <h1 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900">
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
           Explore designs
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
@@ -85,7 +85,7 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by keyword, style, or creator…"
-            className="w-full rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 transition-colors focus:border-violet-400/60"
+            className="w-full rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
           />
           {trimmedQuery && (
             <button
@@ -106,8 +106,8 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
             onClick={() => setActiveFilter(null)}
             className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
               activeFilter === null
-                ? "border-zinc-900 bg-zinc-900 text-white"
-                : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900"
+                ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
             }`}
           >
             All
@@ -121,8 +121,8 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
               }
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 activeFilter === type
-                  ? "border-zinc-900 bg-zinc-900 text-white"
-                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
               {type}
@@ -140,12 +140,12 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
         )}
 
         {results.length > 0 ? (
-          <ul className="mt-6 grid grid-cols-1 gap-4 border-t border-zinc-200 pt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="mt-6 grid grid-cols-1 gap-4 border-t border-zinc-200 pt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 dark:border-zinc-800">
             {results.map((design) => (
               <li key={design.id}>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md"
+                  className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                 >
                   {design.image_url ? (
                     <div className="aspect-square w-full overflow-hidden">
@@ -163,10 +163,10 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                       />
                     </div>
                   ) : (
-                    <div className="aspect-square w-full bg-zinc-100" />
+                    <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
                   )}
                   <div className="flex flex-col gap-1 p-4">
-                    <p className="text-sm font-medium text-zinc-900">
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
                       {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
                     </p>
                     {design.creator_name && (
@@ -175,7 +175,7 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                       </p>
                     )}
                     {design.style && (
-                      <span className="w-fit rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500">
+                      <span className="w-fit rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
                         {design.style}
                       </span>
                     )}
@@ -188,14 +188,14 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
             ))}
           </ul>
         ) : (
-          <div className="mt-6 flex flex-col items-center justify-center border-t border-zinc-200 py-24 text-center">
-            <p className="text-sm font-medium text-zinc-600">{emptyHeading()}</p>
-            <p className="mt-2 text-sm text-zinc-400">{emptySubtext()}</p>
+          <div className="mt-6 flex flex-col items-center justify-center border-t border-zinc-200 py-24 text-center dark:border-zinc-800">
+            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">{emptyHeading()}</p>
+            <p className="mt-2 text-sm text-zinc-400 dark:text-zinc-500">{emptySubtext()}</p>
             {isFiltering && (
               <button
                 type="button"
                 onClick={() => { setQuery(""); setActiveFilter(null); }}
-                className="mt-4 text-xs text-zinc-400 underline underline-offset-2 transition-colors hover:text-zinc-900"
+                className="mt-4 text-xs text-zinc-400 underline underline-offset-2 transition-colors hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100"
               >
                 Clear all filters
               </button>

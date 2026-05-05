@@ -10,8 +10,8 @@ interface ButtonProps {
 }
 
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-zinc-900 text-white transition-colors hover:bg-zinc-700",
-  ghost: "border border-zinc-300 text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900",
+  primary: "bg-zinc-900 text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100",
+  ghost: "border border-zinc-300 text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white",
 };
 
 export default function Button({

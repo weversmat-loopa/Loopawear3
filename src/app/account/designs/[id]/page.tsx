@@ -94,7 +94,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
       <div className="mx-auto w-full max-w-2xl">
         <Link
           href="/account"
-          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
         >
           ← Your account
         </Link>
@@ -105,7 +105,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               className={`rounded-full border px-2.5 py-0.5 text-xs ${
                 isPublished
                   ? "border-violet-300 bg-violet-50 text-violet-600"
-                  : "border-zinc-200 text-zinc-500"
+                  : "border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
               }`}
             >
               {isPublished ? "Published" : "Draft"}
@@ -115,7 +115,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                 <input type="hidden" name="designId" value={design.id} />
                 <button
                   type="submit"
-                  className="rounded-full bg-zinc-900 px-4 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700"
+                  className="rounded-full bg-zinc-900 px-4 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
                 >
                   Publish →
                 </button>
@@ -125,7 +125,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               <>
                 <Link
                   href={`/marketplace/${design.id}`}
-                  className="text-xs text-zinc-500 transition-colors hover:text-zinc-900"
+                  className="text-xs text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
                 >
                   View on marketplace ↗
                 </Link>
@@ -133,7 +133,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-full border border-zinc-200 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-900 hover:text-zinc-900"
+                    className="rounded-full border border-zinc-200 px-4 py-1 text-xs font-medium text-zinc-500 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
                   >
                     Unpublish
                   </button>
@@ -142,7 +142,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             )}
           </div>
 
-          <h1 className="mt-5 text-2xl font-bold tracking-tight text-zinc-900">
+          <h1 className="mt-5 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
             {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
           </h1>
 
@@ -158,7 +158,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           </div>
 
           {process.env.NODE_ENV === "development" && design.image_status === "generating" && (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3">
+            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3 dark:border-zinc-700">
               <p className="text-xs text-zinc-400">
                 Dev — simulate generation result
               </p>
@@ -167,7 +167,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
                   >
                     Mark ready
                   </button>
@@ -176,7 +176,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
                   >
                     Mark failed
                   </button>
@@ -186,7 +186,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
           )}
 
           {process.env.NODE_ENV === "development" && design.image_status !== "generating" && (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3">
+            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3 dark:border-zinc-700">
               <p className="text-xs text-zinc-400">Dev — test image URL</p>
               <form action={devSetTestImageUrl} className="mt-2.5 flex gap-2">
                 <input type="hidden" name="designId" value={design.id} />
@@ -194,7 +194,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   name="image_url"
                   type="url"
                   placeholder="https://..."
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 outline-none placeholder:text-zinc-400 focus:border-zinc-400"
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder:text-zinc-500"
                 />
                 <button
                   type="submit"
@@ -208,7 +208,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                   <input type="hidden" name="designId" value={design.id} />
                   <button
                     type="submit"
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
+                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
                   >
                     Clear image URL
                   </button>
@@ -217,10 +217,10 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             </div>
           )}
 
-          <div className="mt-12 border-t border-zinc-200 pt-8">
+          <div className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800">
             <div className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">
+              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
                 Design details
               </h2>
             </div>
@@ -241,7 +241,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             />
           </div>
 
-          <div className="mt-10 border-t border-zinc-200 pt-6 flex items-center justify-between">
+          <div className="mt-10 border-t border-zinc-200 pt-6 flex items-center justify-between dark:border-zinc-800">
             <p className="text-xs text-zinc-400">
               Created {formatDate(design.created_at)}
             </p>
