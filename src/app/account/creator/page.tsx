@@ -103,6 +103,12 @@ export default async function CreatorDashboardPage() {
     .eq("creator_id", user.id)
     .eq("status", "draft");
 
+  const { count: pendingCount } = await supabase
+    .from("designs")
+    .select("*", { count: "exact", head: true })
+    .eq("creator_id", user.id)
+    .eq("status", "pending_review");
+
   const { data: recentRaw } = await supabase
     .from("designs")
     .select("id, title, prompt, product_type, image_url, image_status, status")
@@ -113,7 +119,7 @@ export default async function CreatorDashboardPage() {
   const recentDesigns: DesignRow[] = recentRaw ?? [];
   const published = publishedCount ?? 0;
   const drafts = draftCount ?? 0;
-  const total = published + drafts;
+  const pending = pendingCount ?? 0;
   const credits = profile?.generation_credits ?? 0;
   const displayName = profile?.display_name ?? "Anonymous";
 
@@ -160,8 +166,8 @@ export default async function CreatorDashboardPage() {
         {/* Design stats — real data */}
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Published" value={published} />
+          <StatCard label="In review" value={pending} />
           <StatCard label="Drafts" value={drafts} />
-          <StatCard label="Total designs" value={total} />
           <StatCard label="Credits" value={credits} />
         </div>
 
@@ -224,6 +230,10 @@ export default async function CreatorDashboardPage() {
                         {design.status === "published" ? (
                           <span className="rounded-full border border-green-200 bg-green-50 px-2 py-0.5 text-xs text-green-600 dark:border-green-800 dark:bg-green-950 dark:text-green-400">
                             Published
+                          </span>
+                        ) : design.status === "pending_review" ? (
+                          <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400">
+                            In review
                           </span>
                         ) : (
                           <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">

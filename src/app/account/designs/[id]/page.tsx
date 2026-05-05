@@ -6,7 +6,7 @@ import DesignEditForm from "./DesignEditForm";
 import DesignImageSection from "./DesignImageSection";
 import ConfirmForm from "@/components/ui/ConfirmForm";
 import {
-  publishDraft,
+  submitForReview,
   unpublishDesign,
   deleteDesign,
   devMarkGenerationReady,
@@ -82,6 +82,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
   const colorPalette = sp?.color_palette ?? null;
 
   const isPublished = design.status === "published";
+  const isPendingReview = design.status === "pending_review";
 
   const refineParams = new URLSearchParams({ prompt: design.prompt, design_id: design.id });
   if (design.product_type) refineParams.set("product_type", design.product_type);
@@ -105,19 +106,21 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               className={`rounded-full border px-2.5 py-0.5 text-xs ${
                 isPublished
                   ? "border-violet-300 bg-violet-50 text-violet-600"
+                  : isPendingReview
+                  ? "border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400"
                   : "border-zinc-200 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
               }`}
             >
-              {isPublished ? "Published" : "Draft"}
+              {isPublished ? "Published" : isPendingReview ? "In review" : "Draft"}
             </span>
-            {!isPublished && design.image_status === "ready" && (
-              <form action={publishDraft}>
+            {!isPublished && !isPendingReview && design.image_status === "ready" && (
+              <form action={submitForReview}>
                 <input type="hidden" name="designId" value={design.id} />
                 <button
                   type="submit"
                   className="rounded-full bg-zinc-900 px-4 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
                 >
-                  Publish →
+                  Submit for review →
                 </button>
               </form>
             )}

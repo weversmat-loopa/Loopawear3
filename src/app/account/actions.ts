@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 
-export async function publishDraft(formData: FormData) {
+export async function submitForReview(formData: FormData) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -22,19 +22,19 @@ export async function publishDraft(formData: FormData) {
 
   const { error } = await supabase
     .from("designs")
-    .update({ status: "published" })
+    .update({ status: "pending_review" })
     .eq("id", designId)
     .eq("creator_id", user.id)
     .eq("status", "draft");
 
   if (error) {
     redirect(
-      `/account?error=${encodeURIComponent("Could not publish design. Please try again.")}`
+      `/account?error=${encodeURIComponent("Could not submit design for review. Please try again.")}`
     );
   }
 
   redirect(
-    `/account/designs/${designId}?success=${encodeURIComponent("Design published.")}`
+    `/account/designs/${designId}?success=${encodeURIComponent("Design submitted for review.")}`
   );
 }
 
