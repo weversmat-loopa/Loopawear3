@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
-import { updateDisplayName, publishDraft, unpublishDesign, deleteDesign } from "./actions";
+import { updateDisplayName, updateBio, publishDraft, unpublishDesign, deleteDesign } from "./actions";
 import ConfirmForm from "@/components/ui/ConfirmForm";
 
 function formatDate(iso: string) {
@@ -50,7 +50,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, role, generation_credits")
+    .select("display_name, role, generation_credits, bio")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -116,6 +116,39 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                 >
                   Save
                 </button>
+              </div>
+            </form>
+          </div>
+
+          <div className="px-5 py-4">
+            <form action={updateBio}>
+              <label
+                htmlFor="bio"
+                className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+              >
+                Bio
+              </label>
+              <div className="mt-2">
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows={3}
+                  defaultValue={profile?.bio ?? ""}
+                  placeholder="A short intro about you…"
+                  maxLength={300}
+                  className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+                />
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    Optional · max 300 characters
+                  </p>
+                  <button
+                    type="submit"
+                    className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                  >
+                    Save
+                  </button>
+                </div>
               </div>
             </form>
           </div>

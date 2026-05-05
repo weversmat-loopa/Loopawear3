@@ -33,7 +33,7 @@ export default async function CreatorPage({ params }: Props) {
 
   const { data: profile } = await supabase
     .from("public_profiles")
-    .select("display_name")
+    .select("display_name, bio")
     .eq("id", id)
     .maybeSingle();
 
@@ -80,6 +80,11 @@ export default async function CreatorPage({ params }: Props) {
               </p>
             </div>
           </div>
+          {profile.bio && (
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {profile.bio}
+            </p>
+          )}
         </div>
 
         {/* Designs grid */}

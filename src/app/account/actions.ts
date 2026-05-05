@@ -312,6 +312,33 @@ export async function cancelStuckGeneration(formData: FormData) {
   redirect(`/account/designs/${designId}`);
 }
 
+export async function updateBio(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const raw = String(formData.get("bio") ?? "").trim();
+  const bio = raw.slice(0, 300) || null;
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ bio })
+    .eq("id", user.id);
+
+  if (error) {
+    redirect(
+      `/account?error=${encodeURIComponent("Could not update bio. Please try again.")}`
+    );
+  }
+
+  redirect(`/account?success=${encodeURIComponent("Bio updated.")}`);
+}
+
 export async function updateDisplayName(formData: FormData) {
   const supabase = await createClient();
   const {
