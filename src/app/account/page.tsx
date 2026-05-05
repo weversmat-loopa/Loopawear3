@@ -182,7 +182,13 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
           </div>
         </div>
 
-        <div className="mt-3 flex justify-end">
+        <div className="mt-3 flex items-center justify-end gap-4">
+          <Link
+            href="/account/creator"
+            className="text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+          >
+            Creator Dashboard →
+          </Link>
           <Link
             href={`/creators/${user.id}`}
             className="text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
