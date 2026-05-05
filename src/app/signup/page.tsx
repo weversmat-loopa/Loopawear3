@@ -35,7 +35,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
               activate your account, then{" "}
               <Link
                 href="/login"
-                className="text-zinc-300 transition-colors hover:text-white"
+                className="text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
               >
                 log in
               </Link>
@@ -95,7 +95,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
           Already have an account?{" "}
           <Link
             href="/login"
-            className="text-zinc-300 transition-colors hover:text-white"
+            className="text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
           >
             Log in
           </Link>

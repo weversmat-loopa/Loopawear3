@@ -69,7 +69,7 @@ export default async function ForgotPasswordPage({ searchParams }: Props) {
         <p className="mt-6 text-center text-sm text-zinc-500">
           <Link
             href="/login"
-            className="text-zinc-300 transition-colors hover:text-white"
+            className="text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
           >
             Back to log in
           </Link>

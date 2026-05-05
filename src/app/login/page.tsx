@@ -46,7 +46,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               </label>
               <Link
                 href="/forgot-password"
-                className="text-xs text-zinc-600 transition-colors hover:text-zinc-400"
+                className="text-xs text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               >
                 Forgot password?
               </Link>
@@ -74,7 +74,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           Don&apos;t have an account?{" "}
           <Link
             href="/signup"
-            className="text-zinc-300 transition-colors hover:text-white"
+            className="text-zinc-700 transition-colors hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white"
           >
             Sign up
           </Link>

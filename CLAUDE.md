@@ -55,6 +55,7 @@ This file defines how Claude should behave while working on this project.
 - Keep components focused and reusable.
 - Prefer server-safe and modern Next.js App Router patterns.
 - Keep styling clean and consistent with Tailwind CSS.
+- Theme support: Loopawear supports both light and dark mode. Any new or changed UI must remain readable and polished in both themes. Add appropriate `dark:` classes for new Tailwind styling and avoid light-only or dark-only unreadable states. Run the TypeScript check (`npx tsc --noEmit`) after UI changes.
 - Avoid duplication whenever reasonably possible.
 - Do not leave dead code behind.
 - Do not add placeholder logic unless explicitly asked.
