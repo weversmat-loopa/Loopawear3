@@ -15,6 +15,7 @@ interface DesignEditFormProps {
   initialPrompt: string;
   initialProductType: string | null;
   initialStyle: string | null;
+  initialPriceCents: number | null;
 }
 
 export default function DesignEditForm({
@@ -23,6 +24,7 @@ export default function DesignEditForm({
   initialPrompt,
   initialProductType,
   initialStyle,
+  initialPriceCents,
 }: DesignEditFormProps) {
   const [productType, setProductType] = useState<ProductType>(
     (initialProductType as ProductType) ?? null
@@ -113,6 +115,31 @@ export default function DesignEditForm({
             </button>
           ))}
         </div>
+      </div>
+
+      <div>
+        <label
+          htmlFor="price_euros"
+          className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+        >
+          Price (€)
+        </label>
+        <input
+          id="price_euros"
+          name="price_euros"
+          type="text"
+          inputMode="decimal"
+          defaultValue={
+            initialPriceCents !== null
+              ? (initialPriceCents / 100).toFixed(2)
+              : ""
+          }
+          placeholder="e.g. 29.99 — leave empty to skip"
+          className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+        />
+        <p className="mt-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+          Set a price for when checkout launches. Optional — does not affect publishing.
+        </p>
       </div>
 
       <button

@@ -16,6 +16,7 @@ export type MarketplaceDesign = {
   created_at: string;
   creator_id: string | null;
   creator_name: string | null;
+  price_cents: number | null;
 };
 
 interface MarketplaceBrowseProps {
@@ -166,9 +167,16 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                     <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
                   )}
                   <div className="flex flex-col gap-1 p-4">
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                      {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
-                    </p>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                        {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
+                      </p>
+                      {design.price_cents !== null && (
+                        <span className="shrink-0 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                          €{(design.price_cents / 100).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                     {design.creator_name && (
                       <p className="text-xs text-zinc-500">
                         by {design.creator_name}

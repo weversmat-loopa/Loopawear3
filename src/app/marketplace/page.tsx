@@ -20,7 +20,7 @@ export default async function MarketplacePage({ searchParams }: Props) {
 
   const { data: designsRaw } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id")
+    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id, price_cents")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(100);
@@ -50,6 +50,7 @@ export default async function MarketplacePage({ searchParams }: Props) {
     ...d,
     creator_id: d.creator_id ?? null,
     creator_name: creatorNames[d.creator_id] ?? null,
+    price_cents: d.price_cents ?? null,
   }));
 
   const params = await searchParams;

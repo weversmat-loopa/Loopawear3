@@ -37,7 +37,7 @@ export default async function AdminReviewPage({
 
   const { data: pendingRaw } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, image_url, creator_id, created_at")
+    .select("id, title, prompt, product_type, image_url, creator_id, created_at, price_cents")
     .eq("status", "pending_review")
     .order("created_at", { ascending: true })
     .limit(100);
@@ -113,12 +113,19 @@ export default async function AdminReviewPage({
                     {/* Content */}
                     <div className="flex flex-1 flex-col gap-3 p-4">
                       <div>
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                          {design.title ??
-                            (design.product_type
-                              ? `${design.product_type} Design`
-                              : "Design")}
-                        </p>
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                            {design.title ??
+                              (design.product_type
+                                ? `${design.product_type} Design`
+                                : "Design")}
+                          </p>
+                          {design.price_cents !== null && (
+                            <span className="shrink-0 rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                              €{(design.price_cents / 100).toFixed(2)}
+                            </span>
+                          )}
+                        </div>
                         <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                           by {creatorName}
                         </p>

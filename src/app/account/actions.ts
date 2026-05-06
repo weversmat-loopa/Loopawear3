@@ -92,6 +92,7 @@ export async function updateDesign(formData: FormData) {
   const prompt = String(formData.get("prompt") ?? "").trim();
   const productType = String(formData.get("product_type") ?? "").trim() || null;
   const style = String(formData.get("style") ?? "").trim() || null;
+  const priceEurosRaw = String(formData.get("price_euros") ?? "").trim();
 
   if (!prompt) {
     redirect(
@@ -99,9 +100,20 @@ export async function updateDesign(formData: FormData) {
     );
   }
 
+  let priceCents: number | null = null;
+  if (priceEurosRaw !== "") {
+    const parsed = parseFloat(priceEurosRaw);
+    if (isNaN(parsed) || parsed < 0) {
+      redirect(
+        `/account/designs/${designId}?error=${encodeURIComponent("Price must be a valid positive amount (e.g. 29.99).")}`
+      );
+    }
+    priceCents = Math.round(parsed * 100);
+  }
+
   const { error } = await supabase
     .from("designs")
-    .update({ title, prompt, product_type: productType, style })
+    .update({ title, prompt, product_type: productType, style, price_cents: priceCents })
     .eq("id", designId)
     .eq("creator_id", user.id);
 

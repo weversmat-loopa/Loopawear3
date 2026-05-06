@@ -42,7 +42,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id")
+    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id, price_cents")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -151,6 +151,14 @@ export default async function DesignPage({ params }: Props) {
 
             {/* Structured details */}
             <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-200 pt-6 text-sm dark:border-zinc-800">
+              {design.price_cents !== null && (
+                <>
+                  <dt className="text-zinc-500 dark:text-zinc-400">Price</dt>
+                  <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+                    €{(design.price_cents / 100).toFixed(2)}
+                  </dd>
+                </>
+              )}
               {design.style && (
                 <>
                   <dt className="text-zinc-500 dark:text-zinc-400">Style</dt>
@@ -163,6 +171,19 @@ export default async function DesignPage({ params }: Props) {
 
             <div className="mt-auto pt-8">
               <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
+                {design.price_cents !== null && (
+                  <div className="mb-3">
+                    <button
+                      disabled
+                      className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 px-5 py-2.5 text-sm font-semibold text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
+                    >
+                      Checkout coming soon
+                    </button>
+                    <p className="mt-1.5 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                      Purchase will be available in a future update.
+                    </p>
+                  </div>
+                )}
                 <Link
                   href={studioHref}
                   className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
