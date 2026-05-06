@@ -6,46 +6,54 @@ export const maxDuration = 300;
 
 fal.config({ credentials: process.env.FAL_KEY });
 
+// Style modifiers are additive — they shape mood/composition on top of the user's
+// prompt, not replace it. Keep them broad so they layer well with any subject.
 const STYLE_KEYWORDS: Record<string, string> = {
-  Minimal: "clean minimal lines, flat design, limited color palette",
-  Bold: "bold shapes, high contrast, strong graphic composition",
-  Vintage: "retro vintage aesthetic, worn texture, faded palette",
-  Abstract: "abstract geometric shapes, non-representational, artistic",
-  Graphic: "graphic illustration, sharp lines, vector-art style",
+  Minimal: "minimal composition, clean negative space, simple forms, understated",
+  Bold: "bold shapes, high contrast, strong visual impact, striking",
+  Vintage: "retro vintage aesthetic, worn texture, nostalgic feel",
+  Abstract: "abstract composition, geometric shapes, non-representational, artistic",
+  Graphic: "graphic illustration style, sharp lines, vector aesthetic",
 };
 
 const COLOR_PALETTE_KEYWORDS: Record<string, string> = {
   Monochrome: "strictly monochrome, single ink color, black and white only",
-  "Two-tone": "exactly two colors, two-tone color scheme, duotone",
-  "Full color": "full color illustration, rich vibrant color palette",
+  "Two-tone": "exactly two colors, two-tone, duotone",
+  "Full color": "full color, rich vibrant color palette",
 };
 
 function buildGenerationPrompt(
   userPrompt: string,
-  _productType: string | null,
+  productType: string | null,
   style: string | null,
   colorPalette: string | null
 ): string {
   const parts: string[] = [];
 
-  // Establish output format first so the model generates a graphic design, not a photo
-  parts.push(
-    "Flat graphic illustration, t-shirt print design, isolated on a plain white background, sharp clean artwork, no gradients, print-ready."
-  );
+  // User's prompt is the primary creative direction — always first.
+  parts.push(userPrompt.trim());
 
+  // Style and color are additive layers on top of the user's intent.
   if (style && STYLE_KEYWORDS[style]) {
-    parts.push(STYLE_KEYWORDS[style] + ".");
+    parts.push(STYLE_KEYWORDS[style]);
   }
 
   if (colorPalette && COLOR_PALETTE_KEYWORDS[colorPalette]) {
-    parts.push(COLOR_PALETTE_KEYWORDS[colorPalette] + ".");
+    parts.push(COLOR_PALETTE_KEYWORDS[colorPalette]);
   }
 
-  parts.push(userPrompt.trim() + ".");
+  // Soft product context: shapes composition expectations without dictating art style.
+  if (productType) {
+    parts.push(`suitable for ${productType.toLowerCase()} printing`);
+  }
 
-  parts.push("No people. No human figures. No faces.");
+  // Quality guidance describes the output standard, not the visual style.
+  parts.push("high detail, sharp focus, clean composition, print-ready artwork");
 
-  return parts.join(" ");
+  // Flux/schnell does not accept negative_prompt — embed exclusions in positive prompt.
+  parts.push("no blur, no watermark, no distorted text, no artifacts, no low quality");
+
+  return parts.join(", ");
 }
 
 type Params = { id: string };
