@@ -1,19 +1,65 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 const QUANTITIES = [1, 2, 3, 4, 5] as const;
 
 interface ProductOptionsProps {
   priceCents: number;
+  designId: string;
+  isAuthenticated: boolean;
 }
 
-export default function ProductOptions({ priceCents }: ProductOptionsProps) {
+export default function ProductOptions({
+  priceCents,
+  designId,
+  isAuthenticated,
+}: ProductOptionsProps) {
   const [size, setSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const totalCents = priceCents * quantity;
+  const canCheckout = !!size && !loading;
+
+  async function handleCheckout() {
+    if (!canCheckout) return;
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ design_id: designId, size, quantity }),
+      });
+
+      const data = await res.json() as { url?: string; error?: string };
+
+      if (!res.ok) {
+        if (data.error === "design_not_found") {
+          setError("This design is no longer available.");
+        } else if (data.error === "design_not_priced") {
+          setError("This design doesn't have a price set yet.");
+        } else {
+          setError("Something went wrong. Please try again.");
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        // Keep loading=true — page is navigating away
+      }
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
@@ -70,15 +116,36 @@ export default function ProductOptions({ priceCents }: ProductOptionsProps) {
             €{(totalCents / 100).toFixed(2)}
           </p>
         </div>
-        <button
-          disabled
-          className="mt-3 inline-flex w-full cursor-not-allowed items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 px-5 py-2.5 text-sm font-semibold text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
-        >
-          Checkout coming soon
-        </button>
-        <p className="mt-1.5 text-center text-xs text-zinc-400 dark:text-zinc-500">
-          Purchase will be available in a future update.
-        </p>
+
+        {!isAuthenticated ? (
+          <Link
+            href={`/login?redirect=/marketplace/${designId}`}
+            className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+          >
+            Sign in to buy
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={handleCheckout}
+            disabled={!canCheckout}
+            className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+              canCheckout
+                ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
+            }`}
+          >
+            {loading
+              ? "Redirecting to checkout…"
+              : !size
+              ? "Select a size to continue"
+              : `Buy now — €${(totalCents / 100).toFixed(2)}`}
+          </button>
+        )}
+
+        {error && (
+          <p className="mt-2 text-center text-xs text-red-500">{error}</p>
+        )}
       </div>
     </div>
   );

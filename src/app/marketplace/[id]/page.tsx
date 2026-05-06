@@ -41,6 +41,10 @@ export default async function DesignPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { data: design } = await supabase
     .from("designs")
     .select("id, title, prompt, product_type, style, image_url, created_at, creator_id, price_cents")
@@ -172,7 +176,11 @@ export default async function DesignPage({ params }: Props) {
 
             <div className="mt-auto pt-8">
               {design.price_cents !== null && (
-                <ProductOptions priceCents={design.price_cents} />
+                <ProductOptions
+                  priceCents={design.price_cents}
+                  designId={design.id}
+                  isAuthenticated={!!user}
+                />
               )}
               <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
                 <Link

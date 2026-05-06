@@ -8,6 +8,16 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+type OrderAgg = {
+  amount_total_cents: number;
+  creator_earnings_cents: number;
+  quantity: number;
+};
+
+function formatEuros(cents: number): string {
+  return `€${(cents / 100).toFixed(2)}`;
+}
+
 type DesignRow = {
   id: string;
   title: string | null;
@@ -109,12 +119,24 @@ export default async function CreatorDashboardPage() {
     .eq("creator_id", user.id)
     .eq("status", "pending_review");
 
+  const { data: ordersRaw } = await supabase
+    .from("orders")
+    .select("amount_total_cents, creator_earnings_cents, quantity")
+    .eq("creator_id", user.id)
+    .in("status", ["paid", "fulfillment_pending", "shipped"]);
+
   const { data: recentRaw } = await supabase
     .from("designs")
     .select("id, title, prompt, product_type, image_url, image_status, status")
     .eq("creator_id", user.id)
     .order("created_at", { ascending: false })
     .limit(4);
+
+  const orders: OrderAgg[] = ordersRaw ?? [];
+  const totalSalesCents = orders.reduce((sum, o) => sum + o.amount_total_cents, 0);
+  const totalEarnedCents = orders.reduce((sum, o) => sum + o.creator_earnings_cents, 0);
+  const orderCount = orders.length;
+  const itemsSold = orders.reduce((sum, o) => sum + o.quantity, 0);
 
   const recentDesigns: DesignRow[] = recentRaw ?? [];
   const published = publishedCount ?? 0;
@@ -276,26 +298,25 @@ export default async function CreatorDashboardPage() {
           )}
         </section>
 
-        {/* Sales — placeholder, not connected */}
+        {/* Sales — connected to real orders */}
         <section className="mt-10">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+            <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
             <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
               Sales
             </h2>
-            <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500">
-              Coming soon
-            </span>
           </div>
-          <p className="mt-1 text-sm text-zinc-400 dark:text-zinc-500">
-            Sales tracking will activate once checkout is connected.
-          </p>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <StatCard label="Total sales" value="€0.00" muted />
-            <StatCard label="Orders" value={0} muted />
-            <StatCard label="Items sold" value={0} muted />
-            <StatCard label="Pending payout" value="€0.00" muted />
+            <StatCard label="Total sales" value={formatEuros(totalSalesCents)} />
+            <StatCard label="Orders" value={orderCount} />
+            <StatCard label="Items sold" value={itemsSold} />
+            <StatCard label="Pending payout" value={formatEuros(totalEarnedCents)} muted />
           </div>
+          {orderCount === 0 && (
+            <p className="mt-3 text-sm text-zinc-400 dark:text-zinc-500">
+              No sales yet. Sales will appear here once buyers complete checkout.
+            </p>
+          )}
         </section>
 
         {/* Quick links */}

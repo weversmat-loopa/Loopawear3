@@ -276,6 +276,20 @@ export async function deleteDesign(formData: FormData) {
     redirect(`/account?error=${encodeURIComponent("Design not found.")}`);
   }
 
+  // Designs with existing orders cannot be deleted — orders reference this row
+  const { count: orderCount } = await supabase
+    .from("orders")
+    .select("*", { count: "exact", head: true })
+    .eq("design_id", designId);
+
+  if ((orderCount ?? 0) > 0) {
+    redirect(
+      `/account/designs/${designId}?error=${encodeURIComponent(
+        "This design has existing orders and cannot be deleted."
+      )}`
+    );
+  }
+
   const { error } = await supabase
     .from("designs")
     .delete()
