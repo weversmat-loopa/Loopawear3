@@ -71,3 +71,74 @@ export async function rejectDesign(formData: FormData) {
 
   redirect("/admin/review");
 }
+
+export async function markFulfillmentPending(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  if (!orderId) {
+    redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
+  }
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ status: "fulfillment_pending" })
+    .eq("id", orderId)
+    .eq("status", "paid");
+
+  if (error) {
+    redirect(
+      `/admin/orders?error=${encodeURIComponent("Could not update order. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/orders?success=${encodeURIComponent("Order marked as in fulfillment.")}`);
+}
+
+export async function markShipped(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  if (!orderId) {
+    redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
+  }
+
+  const trackingNumber = String(formData.get("trackingNumber") ?? "").trim() || null;
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ status: "shipped", tracking_number: trackingNumber })
+    .eq("id", orderId)
+    .eq("status", "fulfillment_pending");
+
+  if (error) {
+    redirect(
+      `/admin/orders?error=${encodeURIComponent("Could not update order. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/orders?success=${encodeURIComponent("Order marked as shipped.")}`);
+}
+
+export async function cancelOrder(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  if (!orderId) {
+    redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
+  }
+
+  const { error } = await supabase
+    .from("orders")
+    .update({ status: "cancelled" })
+    .eq("id", orderId)
+    .neq("status", "cancelled");
+
+  if (error) {
+    redirect(
+      `/admin/orders?error=${encodeURIComponent("Could not cancel order. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/orders?success=${encodeURIComponent("Order cancelled.")}`);
+}
