@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import ProductOptions from "./ProductOptions";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -170,20 +171,10 @@ export default async function DesignPage({ params }: Props) {
             </dl>
 
             <div className="mt-auto pt-8">
+              {design.price_cents !== null && (
+                <ProductOptions priceCents={design.price_cents} />
+              )}
               <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
-                {design.price_cents !== null && (
-                  <div className="mb-3">
-                    <button
-                      disabled
-                      className="inline-flex w-full cursor-not-allowed items-center justify-center rounded-full border border-zinc-200 bg-zinc-50 px-5 py-2.5 text-sm font-semibold text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
-                    >
-                      Checkout coming soon
-                    </button>
-                    <p className="mt-1.5 text-center text-xs text-zinc-400 dark:text-zinc-500">
-                      Purchase will be available in a future update.
-                    </p>
-                  </div>
-                )}
                 <Link
                   href={studioHref}
                   className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
