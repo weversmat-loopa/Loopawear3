@@ -28,6 +28,11 @@ function buildGenerationPrompt(
 ): string {
   const parts: string[] = [];
 
+  // Establish output format first so the model generates a graphic design, not a photo
+  parts.push(
+    "Flat graphic illustration, t-shirt print design, isolated on a plain white background, sharp clean artwork, no gradients, print-ready."
+  );
+
   if (style && STYLE_KEYWORDS[style]) {
     parts.push(STYLE_KEYWORDS[style] + ".");
   }
@@ -121,11 +126,12 @@ export async function POST(
   );
 
   try {
-    const result = await fal.run("fal-ai/flux/dev", {
+    const result = await fal.run("fal-ai/flux/schnell", {
       input: {
         prompt,
         image_size: "square_hd",
         num_images: 1,
+        num_inference_steps: 8,
       },
     });
 
@@ -158,7 +164,9 @@ export async function POST(
         .from("design-images")
         .getPublicUrl(storagePath);
 
-      imageUrl = publicUrl;
+      // Append a timestamp so the CDN never serves a stale cached version
+      // after regeneration. The underlying storage path stays stable.
+      imageUrl = `${publicUrl}?t=${Date.now()}`;
     } catch {
       await Promise.all([
         supabase
