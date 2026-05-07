@@ -20,14 +20,18 @@ export async function submitForReview(formData: FormData) {
     );
   }
 
-  const { error } = await supabase
+  // Use .select() + row count check so we surface RLS blocks or
+  // a stale status (the design isn't actually in "draft") as an
+  // error instead of falsely claiming success.
+  const { data, error } = await supabase
     .from("designs")
     .update({ status: "pending_review" })
     .eq("id", designId)
     .eq("creator_id", user.id)
-    .eq("status", "draft");
+    .eq("status", "draft")
+    .select("id");
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     redirect(
       `/account?error=${encodeURIComponent("Could not submit design for review. Please try again.")}`
     );
