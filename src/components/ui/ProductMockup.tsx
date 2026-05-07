@@ -7,6 +7,8 @@
  * their mockups are added.
  */
 
+import Image from "next/image";
+
 interface ProductMockupProps {
   imageUrl: string | null;
   productType: string | null;
@@ -25,6 +27,12 @@ const TSHIRT_PRINT_AREA: React.CSSProperties = {
   width: "30%",
   height: "30%",
 };
+
+// Sizes hint covers the two usage contexts: marketplace card thumbnails
+// (~1/4 to 1/2 of viewport) and design detail hero (~50% of viewport,
+// capped near 384px in the lg split layout).
+const MOCKUP_SIZES =
+  "(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw";
 
 export default function ProductMockup({
   imageUrl,
@@ -48,13 +56,13 @@ export default function ProductMockup({
     // No mockup for this product type — fall back to raw artwork
     return (
       <div className={wrapperClass}>
-        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-        <img
+        <Image
           src={imageUrl}
           alt={alt}
-          className="block h-full w-full object-cover"
+          fill
+          sizes={MOCKUP_SIZES}
           loading={loading}
-          decoding="async"
+          className="object-cover"
         />
       </div>
     );
@@ -63,24 +71,27 @@ export default function ProductMockup({
   // T-shirt: layer design over the chest of the t-shirt mockup
   return (
     <div className={`${wrapperClass} bg-zinc-50 dark:bg-zinc-800`}>
-      {/* eslint-disable-next-line @next/next/no-img-element -- local static SVG asset */}
-      <img
+      <Image
         src="/mockups/tshirt-white.svg"
         alt=""
         aria-hidden
-        className="absolute inset-0 h-full w-full"
+        fill
+        // The mockup SVG is a tiny local asset; skip the optimizer rather
+        // than enabling dangerouslyAllowSVG globally for one file.
+        unoptimized
         loading={loading}
-        decoding="async"
+        className="object-contain"
       />
-      {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-      <img
-        src={imageUrl}
-        alt={alt}
-        className="absolute object-cover"
-        style={TSHIRT_PRINT_AREA}
-        loading={loading}
-        decoding="async"
-      />
+      <div className="absolute" style={TSHIRT_PRINT_AREA}>
+        <Image
+          src={imageUrl}
+          alt={alt}
+          fill
+          sizes={MOCKUP_SIZES}
+          loading={loading}
+          className="object-cover"
+        />
+      </div>
     </div>
   );
 }

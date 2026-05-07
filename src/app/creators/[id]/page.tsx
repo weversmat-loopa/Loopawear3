@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
@@ -99,18 +100,17 @@ export default async function CreatorPage({ params }: Props) {
                       className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                     >
                       {design.image_url ? (
-                        <div className="aspect-square w-full overflow-hidden">
-                          {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-                          <img
+                        <div className="relative aspect-square w-full overflow-hidden">
+                          <Image
                             src={design.image_url}
                             alt={
                               design.product_type
                                 ? `${design.product_type} design`
                                 : "Design"
                             }
-                            className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                            loading="lazy"
-                            decoding="async"
+                            fill
+                            sizes="(min-width: 1280px) 256px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
                           />
                         </div>
                       ) : (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
@@ -97,15 +98,14 @@ export default async function AdminReviewPage({
                 >
                   <div className="flex">
                     {/* Thumbnail */}
-                    <div className="aspect-square w-24 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                    <div className="relative aspect-square w-24 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                       {design.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen
-                        <img
+                        <Image
                           src={design.image_url}
                           alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          sizes="96px"
+                          className="object-cover"
                         />
                       ) : null}
                     </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import Input from "@/components/ui/Input";
@@ -238,18 +239,17 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+                      className="relative block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
                       tabIndex={-1}
                       aria-hidden
                     >
                       {design.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen
-                        <img
+                        <Image
                           src={design.image_url}
                           alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          sizes="80px"
+                          className="object-cover"
                         />
                       ) : null}
                     </Link>
@@ -365,18 +365,17 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                   <div className="flex">
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+                      className="relative block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
                       tabIndex={-1}
                       aria-hidden
                     >
                       {design.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen
-                        <img
+                        <Image
                           src={design.image_url}
                           alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          sizes="80px"
+                          className="object-cover"
                         />
                       ) : null}
                     </Link>
@@ -457,18 +456,17 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                     {/* Thumbnail */}
                     <Link
                       href={`/account/designs/${design.id}`}
-                      className="block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
+                      className="relative block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800"
                       tabIndex={-1}
                       aria-hidden
                     >
                       {design.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen
-                        <img
+                        <Image
                           src={design.image_url}
                           alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          sizes="80px"
+                          className="object-cover"
                         />
                       ) : null}
                     </Link>

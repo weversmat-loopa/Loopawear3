@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
@@ -227,15 +228,14 @@ export default async function CreatorDashboardPage() {
                     className="flex transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
                   >
                     {/* Thumbnail */}
-                    <div className="aspect-square w-14 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                    <div className="relative aspect-square w-14 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800">
                       {design.image_url ? (
-                        // eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen
-                        <img
+                        <Image
                           src={design.image_url}
                           alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          decoding="async"
+                          fill
+                          sizes="56px"
+                          className="object-cover"
                         />
                       ) : null}
                     </div>

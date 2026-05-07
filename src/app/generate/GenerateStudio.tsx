@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { saveDraft } from "./actions";
@@ -176,13 +177,13 @@ export default function GenerateStudio({
       </div>
     ) : saveState.status === "generated" ? (
       <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-        <img
+        <Image
           src={saveState.imageUrl}
           alt={productType ? `${productType} design` : "Generated design"}
+          width={1024}
+          height={1024}
+          sizes="(min-width: 1024px) 480px, 100vw"
           className="block h-auto w-full"
-          loading="lazy"
-          decoding="async"
         />
         <div className="flex items-center justify-between border-t border-zinc-100 bg-white px-5 py-3.5 dark:border-zinc-800 dark:bg-zinc-900">
           <div className="flex items-center gap-5">

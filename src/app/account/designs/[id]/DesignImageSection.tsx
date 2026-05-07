@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -75,12 +76,13 @@ export default function DesignImageSection({
     return (
       <div>
         <div className="relative overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
-          {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-          <img
+          <Image
             src={imageUrl}
             alt={productType ? `${productType} design` : "Generated design"}
+            width={1024}
+            height={1024}
+            sizes="(min-width: 768px) 480px, 100vw"
             className="block h-auto w-full opacity-25"
-            decoding="async"
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
             <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
@@ -113,13 +115,13 @@ export default function DesignImageSection({
   const imageArea =
     imageStatus === "ready" && imageUrl ? (
       <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
-        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-        <img
+        <Image
           src={imageUrl}
           alt={productType ? `${productType} design` : "Generated design"}
+          width={1024}
+          height={1024}
+          sizes="(min-width: 768px) 480px, 100vw"
           className="block h-auto w-full"
-          loading="lazy"
-          decoding="async"
         />
       </div>
     ) : serverGenerating ? (
