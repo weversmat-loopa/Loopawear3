@@ -22,6 +22,62 @@ const COLOR_PALETTE_KEYWORDS: Record<string, string> = {
   "Full color": "full color, rich vibrant color palette",
 };
 
+/**
+ * Server-side prompt safety check using OpenAI's free Moderation API.
+ *
+ * Returns:
+ *   - { allowed: true } when the prompt passes
+ *   - { allowed: false, reason: "flagged" } when the prompt is rejected
+ *   - { allowed: false, reason: "unavailable" } when the moderation
+ *     service itself errors out
+ *
+ * We fail-closed on unavailability — letting prompts through unscreened
+ * because a third-party API is down would defeat the purpose of having
+ * the check at all.
+ */
+async function moderatePrompt(
+  prompt: string
+): Promise<
+  { allowed: true } | { allowed: false; reason: "flagged" | "unavailable" }
+> {
+  try {
+    const res = await fetch("https://api.openai.com/v1/moderations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "omni-moderation-latest",
+        input: prompt,
+      }),
+    });
+    if (!res.ok) {
+      console.error(
+        "[moderation] upstream non-OK response:",
+        res.status,
+        await res.text().catch(() => "")
+      );
+      return { allowed: false, reason: "unavailable" };
+    }
+    const data = (await res.json()) as {
+      results?: Array<{ flagged: boolean }>;
+    };
+    const result = data.results?.[0];
+    if (!result) {
+      console.error("[moderation] empty results array");
+      return { allowed: false, reason: "unavailable" };
+    }
+    if (result.flagged) {
+      return { allowed: false, reason: "flagged" };
+    }
+    return { allowed: true };
+  } catch (err) {
+    console.error("[moderation] threw:", err);
+    return { allowed: false, reason: "unavailable" };
+  }
+}
+
 function buildGenerationPrompt(
   userPrompt: string,
   productType: string | null,
@@ -62,7 +118,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<Params> }
 ) {
-  if (!process.env.FAL_KEY) {
+  if (!process.env.FAL_KEY || !process.env.OPENAI_API_KEY) {
     return NextResponse.json({ error: "configuration_error" }, { status: 500 });
   }
 
@@ -94,6 +150,20 @@ export async function POST(
 
   if (!design.prompt.trim()) {
     return NextResponse.json({ error: "invalid_design" }, { status: 422 });
+  }
+
+  // Screen the prompt before claiming a generation slot or spending a
+  // credit. A rejected prompt costs the user nothing and pollutes no
+  // DB state. Fail-closed if the moderation service is unavailable.
+  const moderation = await moderatePrompt(design.prompt);
+  if (!moderation.allowed) {
+    if (moderation.reason === "flagged") {
+      return NextResponse.json({ error: "prompt_rejected" }, { status: 400 });
+    }
+    return NextResponse.json(
+      { error: "moderation_unavailable" },
+      { status: 503 }
+    );
   }
 
   // Atomically claim the generation slot — only succeeds if not already generating.

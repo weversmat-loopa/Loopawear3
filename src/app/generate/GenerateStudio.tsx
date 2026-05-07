@@ -18,6 +18,7 @@ type SaveState =
   | { status: "generating"; id: string }
   | { status: "generated"; id: string; imageUrl: string }
   | { status: "generate_failed"; id: string }
+  | { status: "prompt_rejected"; id: string }
   | { status: "credits_exhausted" }
   | { status: "auth_required" }
   | { status: "save_failed" };
@@ -89,6 +90,8 @@ export default function GenerateStudio({
         const errBody = await res.json().catch(() => ({})) as { error?: string };
         if (errBody.error === "credits_exhausted") {
           setSaveState({ status: "credits_exhausted" });
+        } else if (errBody.error === "prompt_rejected") {
+          setSaveState({ status: "prompt_rejected", id });
         } else {
           setSaveState({ status: "generate_failed", id });
         }
@@ -151,6 +154,7 @@ export default function GenerateStudio({
     if (saveState.status === "generating") return "Generating…";
     if (saveState.status === "generated") return "Regenerate";
     if (saveState.status === "generate_failed") return "Retry";
+    if (saveState.status === "prompt_rejected") return "Try again";
     return "Generate";
   }
 
@@ -212,6 +216,16 @@ export default function GenerateStudio({
             New design
           </button>
         </div>
+      </div>
+    ) : saveState.status === "prompt_rejected" ? (
+      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
+        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Prompt couldn&apos;t be processed
+        </p>
+        <p className="max-w-xs text-xs text-zinc-400">
+          Your prompt was flagged by our content safety check. Please revise
+          the wording and try again.
+        </p>
       </div>
     ) : saveState.status === "generate_failed" ? (
       <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
