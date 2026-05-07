@@ -13,9 +13,10 @@ const links = [
 
 interface NavbarProps {
   user: User | null;
+  isAdmin?: boolean;
 }
 
-export default function Navbar({ user }: NavbarProps) {
+export default function Navbar({ user, isAdmin = false }: NavbarProps) {
   const pathname = usePathname();
 
   return (
@@ -49,6 +50,18 @@ export default function Navbar({ user }: NavbarProps) {
 
           {user ? (
             <>
+              {isAdmin && (
+                <Link
+                  href="/admin/review"
+                  className={`text-sm font-medium transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 ${
+                    pathname.startsWith("/admin")
+                      ? "text-zinc-900 dark:text-zinc-100"
+                      : "text-zinc-400 dark:text-zinc-500"
+                  }`}
+                >
+                  Admin
+                </Link>
+              )}
               <Link
                 href="/account"
                 className={`text-sm font-medium transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 ${

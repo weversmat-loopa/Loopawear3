@@ -130,6 +130,10 @@ export async function updateDesign(formData: FormData) {
 
 // DEV ONLY — remove when real image generation is wired up
 export async function devMarkGenerationReady(formData: FormData) {
+  if (process.env.NODE_ENV !== "development") {
+    redirect("/account");
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -156,6 +160,10 @@ export async function devMarkGenerationReady(formData: FormData) {
 
 // DEV ONLY — remove when real image generation is wired up
 export async function devMarkGenerationFailed(formData: FormData) {
+  if (process.env.NODE_ENV !== "development") {
+    redirect("/account");
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -182,6 +190,10 @@ export async function devMarkGenerationFailed(formData: FormData) {
 
 // DEV ONLY — remove when real image generation is wired up
 export async function devSetTestImageUrl(formData: FormData) {
+  if (process.env.NODE_ENV !== "development") {
+    redirect("/account");
+  }
+
   const supabase = await createClient();
   const {
     data: { user },
@@ -220,6 +232,10 @@ export async function devSetTestImageUrl(formData: FormData) {
 
 // DEV ONLY — remove when real image generation is wired up
 export async function devClearImageUrl(formData: FormData) {
+  if (process.env.NODE_ENV !== "development") {
+    redirect("/account");
+  }
+
   const supabase = await createClient();
   const {
     data: { user },

@@ -45,6 +45,16 @@ export default async function RootLayout({
     data: { user },
   } = await supabase.auth.getUser();
 
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    isAdmin = profile?.role === "admin";
+  }
+
   return (
     <html
       lang="en"
@@ -60,7 +70,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <Navbar user={user} />
+        <Navbar user={user} isAdmin={isAdmin} />
         {children}
         <Footer />
       </body>
