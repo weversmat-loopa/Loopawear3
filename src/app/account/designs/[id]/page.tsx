@@ -9,10 +9,6 @@ import {
   submitForReview,
   unpublishDesign,
   deleteDesign,
-  devMarkGenerationReady,
-  devMarkGenerationFailed,
-  devSetTestImageUrl,
-  devClearImageUrl,
 } from "@/app/account/actions";
 
 type Props = {
@@ -159,66 +155,6 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               refineHref={refineHref}
             />
           </div>
-
-          {process.env.NODE_ENV === "development" && design.image_status === "generating" && (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3 dark:border-zinc-700">
-              <p className="text-xs text-zinc-400">
-                Dev — simulate generation result
-              </p>
-              <div className="mt-2.5 flex gap-2">
-                <form action={devMarkGenerationReady}>
-                  <input type="hidden" name="designId" value={design.id} />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-                  >
-                    Mark ready
-                  </button>
-                </form>
-                <form action={devMarkGenerationFailed}>
-                  <input type="hidden" name="designId" value={design.id} />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-                  >
-                    Mark failed
-                  </button>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {process.env.NODE_ENV === "development" && design.image_status !== "generating" && (
-            <div className="mt-5 rounded-xl border border-dashed border-zinc-300 px-4 py-3 dark:border-zinc-700">
-              <p className="text-xs text-zinc-400">Dev — test image URL</p>
-              <form action={devSetTestImageUrl} className="mt-2.5 flex gap-2">
-                <input type="hidden" name="designId" value={design.id} />
-                <input
-                  name="image_url"
-                  type="url"
-                  placeholder="https://..."
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 outline-none placeholder:text-zinc-400 focus:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder:text-zinc-500"
-                />
-                <button
-                  type="submit"
-                  className="shrink-0 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900"
-                >
-                  Set
-                </button>
-              </form>
-              {design.image_url && (
-                <form action={devClearImageUrl} className="mt-2">
-                  <input type="hidden" name="designId" value={design.id} />
-                  <button
-                    type="submit"
-                    className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-                  >
-                    Clear image URL
-                  </button>
-                </form>
-              )}
-            </div>
-          )}
 
           <div className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800">
             <div className="flex items-center gap-2">
