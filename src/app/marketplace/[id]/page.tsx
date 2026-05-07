@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import ProductOptions from "./ProductOptions";
+import ProductMockup from "@/components/ui/ProductMockup";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -104,24 +105,18 @@ export default async function DesignPage({ params }: Props) {
         <div className="mt-10 lg:grid lg:grid-cols-2 lg:gap-12">
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
-            {design.image_url ? (
-              <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
-                {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-                <img
-                  src={design.image_url}
-                  alt={
-                    design.product_type
-                      ? `${design.product_type} design`
-                      : "Design"
-                  }
-                  className="block h-auto w-full"
-                  loading="eager"
-                  decoding="async"
-                />
-              </div>
-            ) : (
-              <div className="aspect-square w-full rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800" />
-            )}
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
+              <ProductMockup
+                imageUrl={design.image_url}
+                productType={design.product_type}
+                alt={
+                  design.product_type
+                    ? `${design.product_type} design`
+                    : "Design"
+                }
+                loading="eager"
+              />
+            </div>
           </div>
 
           {/* Info */}
@@ -223,24 +218,17 @@ export default async function DesignPage({ params }: Props) {
                     href={`/marketplace/${related.id}`}
                     className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                   >
-                    {related.image_url ? (
-                      <div className="aspect-square w-full overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-                        <img
-                          src={related.image_url}
-                          alt={
-                            related.product_type
-                              ? `${related.product_type} design`
-                              : "Design"
-                          }
-                          className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                    ) : (
-                      <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
-                    )}
+                    <ProductMockup
+                      imageUrl={related.image_url}
+                      productType={related.product_type}
+                      alt={
+                        related.product_type
+                          ? `${related.product_type} design`
+                          : "Design"
+                      }
+                      loading="lazy"
+                      className="transition-transform duration-300 group-hover:scale-[1.02]"
+                    />
                     <div className="p-3">
                       <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
                         {related.title ?? (related.product_type ? `${related.product_type} Design` : "Design")}

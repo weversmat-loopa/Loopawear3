@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { PRODUCT_FILTERS } from "./filters";
 import type { ProductFilter } from "./filters";
+import ProductMockup from "@/components/ui/ProductMockup";
 
 export type MarketplaceDesign = {
   id: string;
@@ -148,24 +149,17 @@ export default function MarketplaceBrowse({ designs, initialFilter = null }: Mar
                   href={`/marketplace/${design.id}`}
                   className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                 >
-                  {design.image_url ? (
-                    <div className="aspect-square w-full overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- remotePatterns cannot be configured until AI provider is chosen */}
-                      <img
-                        src={design.image_url}
-                        alt={
-                          design.product_type
-                            ? `${design.product_type} design`
-                            : "Design"
-                        }
-                        className="block h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  ) : (
-                    <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
-                  )}
+                  <ProductMockup
+                    imageUrl={design.image_url}
+                    productType={design.product_type}
+                    alt={
+                      design.product_type
+                        ? `${design.product_type} design`
+                        : "Design"
+                    }
+                    loading="lazy"
+                    className="transition-transform duration-300 group-hover:scale-[1.02]"
+                  />
                   <div className="flex flex-col gap-1 p-4">
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">

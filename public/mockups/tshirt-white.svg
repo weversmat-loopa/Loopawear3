@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+  <!-- T-shirt body and sleeves -->
+  <path
+    d="M 130 80 L 80 110 L 35 195 L 95 235 L 95 380 L 305 380 L 305 235 L 365 195 L 320 110 L 270 80 C 258 105 230 115 200 115 C 170 115 142 105 130 80 Z"
+    fill="#FAFAFA"
+    stroke="#E4E4E7"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+  />
+  <!-- Subtle collar shadow for depth -->
+  <path
+    d="M 155 85 C 170 108 200 116 200 116 C 200 116 230 108 245 85 C 230 100 215 106 200 106 C 185 106 170 100 155 85 Z"
+    fill="#E4E4E7"
+    opacity="0.5"
+  />
+  <!-- Sleeve seams -->
+  <path d="M 95 115 L 95 230" stroke="#E4E4E7" stroke-width="1" fill="none" opacity="0.6" />
+  <path d="M 305 115 L 305 230" stroke="#E4E4E7" stroke-width="1" fill="none" opacity="0.6" />
+</svg>
