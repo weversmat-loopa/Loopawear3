@@ -34,13 +34,14 @@ export async function approveDesign(formData: FormData) {
     redirect(`/admin/review?error=${encodeURIComponent("Invalid design.")}`);
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("designs")
     .update({ status: "published" })
     .eq("id", designId)
-    .eq("status", "pending_review");
+    .eq("status", "pending_review")
+    .select("id");
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     redirect(
       `/admin/review?error=${encodeURIComponent("Could not approve design. Please try again.")}`
     );
@@ -57,13 +58,14 @@ export async function rejectDesign(formData: FormData) {
     redirect(`/admin/review?error=${encodeURIComponent("Invalid design.")}`);
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("designs")
     .update({ status: "draft" })
     .eq("id", designId)
-    .eq("status", "pending_review");
+    .eq("status", "pending_review")
+    .select("id");
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     redirect(
       `/admin/review?error=${encodeURIComponent("Could not reject design. Please try again.")}`
     );
@@ -80,13 +82,14 @@ export async function markFulfillmentPending(formData: FormData) {
     redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("orders")
     .update({ status: "fulfillment_pending" })
     .eq("id", orderId)
-    .eq("status", "paid");
+    .eq("status", "paid")
+    .select("id");
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     redirect(
       `/admin/orders?error=${encodeURIComponent("Could not update order. Please try again.")}`
     );
@@ -105,13 +108,14 @@ export async function markShipped(formData: FormData) {
 
   const trackingNumber = String(formData.get("trackingNumber") ?? "").trim() || null;
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("orders")
     .update({ status: "shipped", tracking_number: trackingNumber })
     .eq("id", orderId)
-    .eq("status", "fulfillment_pending");
+    .eq("status", "fulfillment_pending")
+    .select("id");
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     redirect(
       `/admin/orders?error=${encodeURIComponent("Could not update order. Please try again.")}`
     );

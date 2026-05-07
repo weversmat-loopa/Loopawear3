@@ -59,14 +59,15 @@ export async function unpublishDesign(formData: FormData) {
     );
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("designs")
     .update({ status: "draft" })
     .eq("id", designId)
     .eq("creator_id", user.id)
-    .eq("status", "published");
+    .eq("status", "published")
+    .select("id");
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     redirect(
       `/account?error=${encodeURIComponent("Could not unpublish design. Please try again.")}`
     );
