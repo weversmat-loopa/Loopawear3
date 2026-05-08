@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
-import { createClient } from "@/utils/supabase/server";
 import MarketplaceBrowse from "./MarketplaceBrowse";
-import type { MarketplaceDesign } from "./MarketplaceBrowse";
-import { PRODUCT_FILTERS } from "./filters";
-import type { ProductFilter } from "./filters";
+import { fetchDesigns } from "./queries";
+import {
+  isProductFilter,
+  isSortOption,
+  type ProductFilter,
+  type SortOption,
+} from "./filters";
 
 export const metadata: Metadata = {
   title: "Marketplace",
@@ -12,53 +15,34 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams?: Promise<{ type?: string }>;
+  searchParams?: Promise<{ q?: string; type?: string; sort?: string }>;
 };
 
 export default async function MarketplacePage({ searchParams }: Props) {
-  const supabase = await createClient();
+  const params = (await searchParams) ?? {};
 
-  const { data: designsRaw } = await supabase
-    .from("designs")
-    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id, price_cents")
-    .eq("status", "published")
-    .order("created_at", { ascending: false })
-    .limit(100);
+  const q = params.q?.trim() ?? "";
+  const type: ProductFilter = isProductFilter(params.type)
+    ? params.type
+    : null;
+  const sort: SortOption = isSortOption(params.sort) ? params.sort : "newest";
 
-  const designsData = designsRaw ?? [];
+  // The page always fetches the first page of results; the "Load more"
+  // button on the client extends the list via /api/marketplace.
+  const { designs, nextCursor } = await fetchDesigns({
+    q,
+    type,
+    sort,
+    cursor: null,
+  });
 
-  const creatorIds = [
-    ...new Set(
-      designsData
-        .map((d) => d.creator_id)
-        .filter((id): id is string => Boolean(id))
-    ),
-  ];
-
-  let creatorNames: Record<string, string | null> = {};
-  if (creatorIds.length > 0) {
-    const { data: profiles } = await supabase
-      .from("public_profiles")
-      .select("id, display_name")
-      .in("id", creatorIds);
-    creatorNames = Object.fromEntries(
-      (profiles ?? []).map((p) => [p.id, p.display_name ?? null])
-    );
-  }
-
-  const designs: MarketplaceDesign[] = designsData.map((d) => ({
-    ...d,
-    creator_id: d.creator_id ?? null,
-    creator_name: creatorNames[d.creator_id] ?? null,
-    price_cents: d.price_cents ?? null,
-  }));
-
-  const params = await searchParams;
-  const typeParam = params?.type ?? null;
-  const initialFilter: ProductFilter =
-    PRODUCT_FILTERS.includes(typeParam as (typeof PRODUCT_FILTERS)[number])
-      ? (typeParam as ProductFilter)
-      : null;
-
-  return <MarketplaceBrowse designs={designs} initialFilter={initialFilter} />;
+  return (
+    <MarketplaceBrowse
+      initialDesigns={designs}
+      initialCursor={nextCursor}
+      initialFilter={type}
+      initialQuery={q}
+      initialSort={sort}
+    />
+  );
 }
