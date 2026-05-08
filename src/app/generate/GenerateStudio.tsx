@@ -9,6 +9,15 @@ const PRODUCT_TYPES = ["T-shirt", "Hoodie", "Sweatshirt", "Tote bag"] as const;
 const STYLE_MOODS = ["Minimal", "Bold", "Vintage", "Abstract", "Graphic"] as const;
 const COLOR_PALETTES = ["Monochrome", "Two-tone", "Full color"] as const;
 
+const EXAMPLE_PROMPTS = [
+  "A vintage sunset over mountains",
+  "Minimal Japanese wave pattern",
+  "Retro space astronaut",
+  "Abstract geometric shapes",
+  "Neon cyberpunk cityscape",
+  "Cute cartoon bear",
+] as const;
+
 type ProductType = (typeof PRODUCT_TYPES)[number] | null;
 type StyleMood = (typeof STYLE_MOODS)[number] | null;
 type ColorPalette = (typeof COLOR_PALETTES)[number] | null;
@@ -57,6 +66,13 @@ export default function GenerateStudio({
   );
   const [designId, setDesignId] = useState<string | null>(initialDesignId);
   const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
+  // Tracks whether the user has typed in the textarea (vs. picked a
+  // chip or arrived with a pre-filled initial prompt). Drives the
+  // visibility of the example chips: shown only while the user is
+  // still in "discovery mode".
+  const [userHasTypedPrompt, setUserHasTypedPrompt] = useState(
+    initialPrompt.length > 0
+  );
 
   const isWorking =
     saveState.status === "saving" || saveState.status === "generating";
@@ -75,6 +91,7 @@ export default function GenerateStudio({
     setColorPalette(null);
     setDesignId(null);
     setSaveState({ status: "idle" });
+    setUserHasTypedPrompt(false);
   }
 
   async function handleGenerate(id: string) {
@@ -302,11 +319,34 @@ export default function GenerateStudio({
                   value={prompt}
                   onChange={(e) => {
                     setPrompt(e.target.value);
+                    setUserHasTypedPrompt(true);
                     resetSaveState();
                   }}
                   placeholder="Describe what you want to create..."
                   className="mt-2.5 w-full resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
                 />
+                {!userHasTypedPrompt && (
+                  <div className="mt-3">
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                      Try one of these to get started:
+                    </p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {EXAMPLE_PROMPTS.map((example) => (
+                        <button
+                          key={example}
+                          type="button"
+                          onClick={() => {
+                            setPrompt(example);
+                            resetSaveState();
+                          }}
+                          className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-white hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+                        >
+                          {example}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
