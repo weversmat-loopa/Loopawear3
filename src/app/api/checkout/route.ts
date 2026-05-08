@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid_size" }, { status: 400 });
   }
   const qty = Number(quantity);
-  if (!Number.isInteger(qty) || qty < 1 || qty > 5) {
+  if (!Number.isInteger(qty) || qty < 1 || qty > 99) {
     return NextResponse.json({ error: "invalid_quantity" }, { status: 400 });
   }
 
