@@ -56,11 +56,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
-  // Metadata is the contract set at checkout session creation time
+  // Metadata is the contract set at checkout session creation time.
+  // buyer_id is intentionally optional — guest checkouts arrive with
+  // an empty buyer_id and produce orders with buyer_id = null.
   const meta = session.metadata ?? {};
   const { design_id, buyer_id, creator_id, size, quantity, unit_price_cents } = meta;
 
-  if (!design_id || !buyer_id || !size || !quantity || !unit_price_cents) {
+  if (!design_id || !size || !quantity || !unit_price_cents) {
     console.error("[stripe-webhook] Incomplete metadata for session", session.id, meta);
     return NextResponse.json({ received: true });
   }
@@ -86,7 +88,7 @@ export async function POST(req: NextRequest) {
   const creator_earnings_cents = amount_total_cents - platform_fee_cents;
 
   const { error } = await supabase.from("orders").insert({
-    buyer_id,
+    buyer_id: buyer_id || null,
     design_id,
     creator_id: creator_id || null,
     quantity: parseInt(quantity, 10),

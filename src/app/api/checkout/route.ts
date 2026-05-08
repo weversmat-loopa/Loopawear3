@@ -20,13 +20,12 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = await createClient();
+  // user is optional here — guest checkout is supported. When the user
+  // is signed in we still want to associate the order with their
+  // account; otherwise the order is created with buyer_id = null.
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  if (!user) {
-    return NextResponse.json({ error: "auth_required" }, { status: 401 });
-  }
 
   const body = await req.json().catch(() => ({})) as Record<string, unknown>;
   const { design_id, size, quantity } = body;
@@ -89,13 +88,16 @@ export async function POST(req: NextRequest) {
     consent_collection: { terms_of_service: "required" },
     metadata: {
       design_id: design.id,
-      buyer_id: user.id,
+      buyer_id: user?.id ?? "",
       creator_id: design.creator_id ?? "",
       size,
       quantity: String(qty),
       unit_price_cents: String(design.price_cents),
     },
-    customer_email: user.email ?? undefined,
+    // Pre-fill email when signed in; for guests, Stripe Checkout will
+    // collect it during the session and surface it on the resulting
+    // session.customer_details.email.
+    customer_email: user?.email ?? undefined,
     success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/marketplace/${design.id}`,
   });

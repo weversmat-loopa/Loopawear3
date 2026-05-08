@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Link from "next/link";
 
 const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 const MIN_QUANTITY = 1;
@@ -20,13 +19,11 @@ const SIZE_GUIDE = [
 interface ProductOptionsProps {
   priceCents: number;
   designId: string;
-  isAuthenticated: boolean;
 }
 
 export default function ProductOptions({
   priceCents,
   designId,
-  isAuthenticated,
 }: ProductOptionsProps) {
   const [size, setSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(MIN_QUANTITY);
@@ -183,31 +180,22 @@ export default function ProductOptions({
           </p>
         </div>
 
-        {!isAuthenticated ? (
-          <Link
-            href={`/login?redirect=/marketplace/${designId}`}
-            className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-          >
-            Sign in to buy
-          </Link>
-        ) : (
-          <button
-            type="button"
-            onClick={handleCheckout}
-            disabled={!canCheckout}
-            className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
-              canCheckout
-                ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-                : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
-            }`}
-          >
-            {loading
-              ? "Redirecting to checkout…"
-              : !size
-              ? "Select a size to continue"
-              : `Buy now — €${(totalCents / 100).toFixed(2)}`}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleCheckout}
+          disabled={!canCheckout}
+          className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+            canCheckout
+              ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
+          }`}
+        >
+          {loading
+            ? "Redirecting to checkout…"
+            : !size
+            ? "Select a size to continue"
+            : `Buy now — €${(totalCents / 100).toFixed(2)}`}
+        </button>
 
         {error && (
           <p className="mt-2 text-center text-xs text-red-500">{error}</p>

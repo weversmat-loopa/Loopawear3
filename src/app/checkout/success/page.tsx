@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
+import { createServiceClient } from "@/utils/supabase/service";
 import ProductMockup from "@/components/ui/ProductMockup";
 
 export const metadata: Metadata = {
@@ -40,13 +41,23 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
     image_url: string | null;
   } | null = null;
 
-  if (sessionId && user) {
-    const { data: orderData } = await supabase
+  if (sessionId) {
+    // Use the service-role client so guest checkouts (where the buyer
+    // has no auth session) can still load their order on the success
+    // page. The Stripe session_id is unguessable and serves as the
+    // access token here. For authenticated users we additionally
+    // constrain by buyer_id as defense against URL-leak attacks.
+    const serviceSupabase = createServiceClient();
+
+    let orderQuery = serviceSupabase
       .from("orders")
       .select("id, design_id, size, quantity, amount_total_cents")
-      .eq("stripe_session_id", sessionId)
-      .eq("buyer_id", user.id)
-      .maybeSingle();
+      .eq("stripe_session_id", sessionId);
+    if (user) {
+      orderQuery = orderQuery.eq("buyer_id", user.id);
+    }
+
+    const { data: orderData } = await orderQuery.maybeSingle();
     order = orderData ?? null;
 
     if (order?.design_id) {
