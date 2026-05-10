@@ -95,11 +95,13 @@ export async function POST(req: NextRequest) {
       },
     ],
     shipping_address_collection: { allowed_countries: EU27 },
-    // Show a "I agree to the Terms of Service" checkbox in Checkout.
-    // The link target is the Terms of Service URL configured in
-    // Stripe Dashboard → Settings → Public Details. That must be set
-    // to https://<your-domain>/terms for this to render.
-    consent_collection: { terms_of_service: "required" },
+    // TODO before going live: re-enable the Terms-of-Service consent
+    // checkbox. Requires setting Stripe Dashboard → Settings → Public
+    // Details → Terms of Service URL to https://<your-domain>/terms,
+    // then adding back:
+    //   consent_collection: { terms_of_service: "required" },
+    // Without that URL set, including consent_collection makes
+    // sessions.create() throw and breaks all checkouts.
     metadata: {
       design_id: design.id,
       buyer_id: user?.id ?? "",
