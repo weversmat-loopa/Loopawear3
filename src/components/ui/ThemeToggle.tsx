@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
+
+function readTheme(): Theme {
+  const current = document.documentElement.getAttribute("data-theme");
+  return current === "dark" ? "dark" : "light";
+}
 
 function applyTheme(theme: Theme) {
   if (theme === "dark") {
@@ -15,21 +20,43 @@ function applyTheme(theme: Theme) {
   } catch {}
 }
 
-export default function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme | null>(null);
+// Tiny in-module pub/sub so useSyncExternalStore can re-render when
+// applyTheme mutates the DOM. The data-theme attribute itself doesn't
+// fire change events, so we notify subscribers explicitly from toggle().
+const themeListeners = new Set<() => void>();
+function subscribeToTheme(listener: () => void): () => void {
+  themeListeners.add(listener);
+  return () => {
+    themeListeners.delete(listener);
+  };
+}
+function notifyThemeChange() {
+  for (const listener of themeListeners) listener();
+}
 
-  useEffect(() => {
-    const current = document.documentElement.getAttribute("data-theme");
-    setTheme(current === "dark" ? "dark" : "light");
-  }, []);
+export default function ThemeToggle() {
+  // The third argument (server snapshot) is what's returned during SSR
+  // *and* during the first client render of the hydrated tree. Returning
+  // null here means the server and client first render both produce the
+  // placeholder branch below — no hydration mismatch. After hydration,
+  // useSyncExternalStore switches to the client snapshot (readTheme),
+  // which runs synchronously during render. No setState-in-effect.
+  const theme = useSyncExternalStore<Theme | null>(
+    subscribeToTheme,
+    readTheme,
+    () => null,
+  );
 
   function toggle() {
+    if (theme === null) return;
     const next: Theme = theme === "dark" ? "light" : "dark";
-    setTheme(next);
     applyTheme(next);
+    notifyThemeChange();
   }
 
-  // Render a same-size placeholder before mount to avoid hydration mismatch
+  // Render a same-size placeholder during SSR/hydration to avoid layout
+  // shift and to keep the server output identical to the client's first
+  // render (preventing hydration mismatch warnings).
   if (theme === null) {
     return (
       <div
