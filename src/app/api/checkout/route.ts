@@ -41,12 +41,22 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid_quantity" }, { status: 400 });
   }
 
-  const { data: design } = await supabase
+  const { data: design, error: designError } = await supabase
     .from("designs")
     .select("id, title, product_type, image_url, price_cents, creator_id")
     .eq("id", design_id)
     .eq("status", "published")
     .maybeSingle();
+
+  if (designError) {
+    console.error("[checkout] Design lookup error:", {
+      isGuest: !user,
+      designId: design_id,
+      message: designError.message,
+      code: designError.code,
+    });
+    return NextResponse.json({ error: "design_not_found" }, { status: 404 });
+  }
 
   if (!design) {
     return NextResponse.json({ error: "design_not_found" }, { status: 404 });
@@ -65,7 +75,11 @@ export async function POST(req: NextRequest) {
 
   const origin = req.nextUrl.origin;
 
-  const session = await stripe.checkout.sessions.create({
+  // Build the session params with customer_email omitted entirely for
+  // guests — explicit omission rather than relying on the SDK to strip
+  // undefined removes a class of "did Stripe see undefined as a string"
+  // questions when debugging guest-only failures.
+  const sessionParams: Stripe.Checkout.SessionCreateParams = {
     mode: "payment",
     line_items: [
       {
@@ -94,13 +108,37 @@ export async function POST(req: NextRequest) {
       quantity: String(qty),
       unit_price_cents: String(design.price_cents),
     },
-    // Pre-fill email when signed in; for guests, Stripe Checkout will
-    // collect it during the session and surface it on the resulting
-    // session.customer_details.email.
-    customer_email: user?.email ?? undefined,
     success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${origin}/marketplace/${design.id}`,
-  });
+  };
+
+  // Pre-fill email only when signed in. For guests, Stripe Checkout
+  // collects it during the session.
+  if (user?.email) {
+    sessionParams.customer_email = user.email;
+  }
+
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create(sessionParams);
+  } catch (err) {
+    // Surface the actual Stripe error in logs — this is the most
+    // common failure point and was previously falling through to a
+    // generic 500 with no diagnostic information.
+    const isStripeErr = err instanceof Stripe.errors.StripeError;
+    console.error("[checkout] Stripe session creation failed:", {
+      isGuest: !user,
+      hasEmail: !!user?.email,
+      designId: design.id,
+      qty,
+      size,
+      type: isStripeErr ? err.type : "unknown",
+      code: isStripeErr ? err.code : undefined,
+      param: isStripeErr ? err.param : undefined,
+      message: err instanceof Error ? err.message : String(err),
+    });
+    return NextResponse.json({ error: "stripe_error" }, { status: 500 });
+  }
 
   return NextResponse.json({ url: session.url });
 }

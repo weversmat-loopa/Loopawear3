@@ -114,7 +114,16 @@ export async function POST(req: NextRequest) {
   });
 
   if (error) {
-    console.error("[stripe-webhook] Failed to insert order:", error);
+    // Include enough context to distinguish guest-checkout failures
+    // (where buyer_id is empty) from auth-checkout failures.
+    console.error("[stripe-webhook] Failed to insert order:", {
+      sessionId: session.id,
+      isGuest: !buyer_id,
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+    });
     // Return 500 so Stripe retries delivery
     return NextResponse.json({ error: "database_error" }, { status: 500 });
   }
