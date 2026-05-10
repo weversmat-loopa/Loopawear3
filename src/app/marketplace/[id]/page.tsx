@@ -38,6 +38,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+type RelatedDesign = {
+  id: string;
+  title: string | null;
+  product_type: string | null;
+  image_url: string | null;
+  prompt: string;
+};
+
+function RelatedDesignCard({ item }: { item: RelatedDesign }) {
+  return (
+    <Link
+      href={`/marketplace/${item.id}`}
+      className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
+    >
+      <ProductMockup
+        imageUrl={item.image_url}
+        productType={item.product_type}
+        alt={item.product_type ? `${item.product_type} design` : "Design"}
+        loading="lazy"
+        className="transition-transform duration-300 group-hover:scale-[1.02]"
+      />
+      <div className="p-3">
+        <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+          {item.title ??
+            (item.product_type ? `${item.product_type} Design` : "Design")}
+        </p>
+        <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">
+          {item.prompt}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
 export default async function DesignPage({ params }: Props) {
   const { id } = await params;
   const supabase = await createClient();
@@ -64,13 +98,7 @@ export default async function DesignPage({ params }: Props) {
   }
 
   // Fetch up to 3 other published designs by the same creator
-  let moreByCreator: {
-    id: string;
-    title: string | null;
-    product_type: string | null;
-    image_url: string | null;
-    prompt: string;
-  }[] = [];
+  let moreByCreator: RelatedDesign[] = [];
   if (design.creator_id) {
     const { data: more } = await supabase
       .from("designs")
@@ -81,6 +109,30 @@ export default async function DesignPage({ params }: Props) {
       .order("created_at", { ascending: false })
       .limit(3);
     moreByCreator = more ?? [];
+  }
+
+  // Fetch up to 4 designs that share the same style or product_type,
+  // excluding the current design and anything already shown in the
+  // "More by this creator" section so the two rows don't overlap. If
+  // the design has neither a style nor a product_type, there's no
+  // similarity signal — skip the query and the section won't render.
+  let similarDesigns: RelatedDesign[] = [];
+  const similarConditions: string[] = [];
+  if (design.style) similarConditions.push(`style.eq.${design.style}`);
+  if (design.product_type)
+    similarConditions.push(`product_type.eq.${design.product_type}`);
+
+  if (similarConditions.length > 0) {
+    const excludeIds = [design.id, ...moreByCreator.map((d) => d.id)];
+    const { data: similar } = await supabase
+      .from("designs")
+      .select("id, title, product_type, image_url, prompt")
+      .eq("status", "published")
+      .or(similarConditions.join(","))
+      .not("id", "in", `(${excludeIds.join(",")})`)
+      .order("created_at", { ascending: false })
+      .limit(4);
+    similarDesigns = similar ?? [];
   }
 
   const studioParams = new URLSearchParams({ prompt: design.prompt });
@@ -209,30 +261,26 @@ export default async function DesignPage({ params }: Props) {
             <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
               {moreByCreator.map((related) => (
                 <li key={related.id}>
-                  <Link
-                    href={`/marketplace/${related.id}`}
-                    className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
-                  >
-                    <ProductMockup
-                      imageUrl={related.image_url}
-                      productType={related.product_type}
-                      alt={
-                        related.product_type
-                          ? `${related.product_type} design`
-                          : "Design"
-                      }
-                      loading="lazy"
-                      className="transition-transform duration-300 group-hover:scale-[1.02]"
-                    />
-                    <div className="p-3">
-                      <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
-                        {related.title ?? (related.product_type ? `${related.product_type} Design` : "Design")}
-                      </p>
-                      <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">
-                        {related.prompt}
-                      </p>
-                    </div>
-                  </Link>
+                  <RelatedDesignCard item={related} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Similar designs */}
+        {similarDesigns.length > 0 && (
+          <div className="mt-16 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+            <div className="flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
+              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Similar designs
+              </h2>
+            </div>
+            <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {similarDesigns.map((related) => (
+                <li key={related.id}>
+                  <RelatedDesignCard item={related} />
                 </li>
               ))}
             </ul>
