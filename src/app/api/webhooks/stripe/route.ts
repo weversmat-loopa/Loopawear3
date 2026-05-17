@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServiceClient } from "@/utils/supabase/service";
+import { getSiteUrl, getUserEmail, sendEmail } from "@/lib/email/send";
+import {
+  newSaleEmail,
+  orderConfirmationEmail,
+} from "@/lib/email/templates";
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
@@ -87,46 +92,118 @@ export async function POST(req: NextRequest) {
   const platform_fee_cents = Math.round(amount_total_cents * 0.15);
   const creator_earnings_cents = amount_total_cents - platform_fee_cents;
 
-  const { error } = await supabase.from("orders").insert({
-    buyer_id: buyer_id || null,
-    design_id,
-    creator_id: creator_id || null,
-    quantity: parseInt(quantity, 10),
-    size,
-    unit_price_cents: parseInt(unit_price_cents, 10),
-    amount_total_cents,
-    currency: session.currency ?? "eur",
-    platform_fee_cents,
-    creator_earnings_cents,
-    stripe_session_id: session.id,
-    stripe_payment_intent_id:
-      typeof session.payment_intent === "string"
-        ? session.payment_intent
-        : null,
-    shipping_name: shipping.name,
-    shipping_line1: addr.line1,
-    shipping_line2: addr.line2 ?? null,
-    shipping_city: addr.city,
-    shipping_state: addr.state ?? null,
-    shipping_postal_code: addr.postal_code,
-    shipping_country: addr.country,
-    status: "paid",
-  });
+  // Select the inserted row so we have its id (used in the order URL
+  // sent to the buyer) and the canonical size/quantity/totals.
+  const { data: insertedOrder, error } = await supabase
+    .from("orders")
+    .insert({
+      buyer_id: buyer_id || null,
+      design_id,
+      creator_id: creator_id || null,
+      quantity: parseInt(quantity, 10),
+      size,
+      unit_price_cents: parseInt(unit_price_cents, 10),
+      amount_total_cents,
+      currency: session.currency ?? "eur",
+      platform_fee_cents,
+      creator_earnings_cents,
+      stripe_session_id: session.id,
+      stripe_payment_intent_id:
+        typeof session.payment_intent === "string"
+          ? session.payment_intent
+          : null,
+      shipping_name: shipping.name,
+      shipping_line1: addr.line1,
+      shipping_line2: addr.line2 ?? null,
+      shipping_city: addr.city,
+      shipping_state: addr.state ?? null,
+      shipping_postal_code: addr.postal_code,
+      shipping_country: addr.country,
+      status: "paid",
+    })
+    .select(
+      "id, size, quantity, amount_total_cents, creator_earnings_cents"
+    )
+    .single();
 
-  if (error) {
+  if (error || !insertedOrder) {
     // Include enough context to distinguish guest-checkout failures
     // (where buyer_id is empty) from auth-checkout failures.
     console.error("[stripe-webhook] Failed to insert order:", {
       sessionId: session.id,
       isGuest: !buyer_id,
-      message: error.message,
-      code: error.code,
-      details: error.details,
-      hint: error.hint,
+      message: error?.message,
+      code: error?.code,
+      details: error?.details,
+      hint: error?.hint,
     });
     // Return 500 so Stripe retries delivery
     return NextResponse.json({ error: "database_error" }, { status: 500 });
   }
+
+  // Notifications — fired after the order is durably persisted. Failures
+  // in send/lookup are swallowed inside sendEmail/getUserEmail so a
+  // Resend outage can't cause Stripe to retry the webhook.
+  const { data: designInfo } = await supabase
+    .from("designs")
+    .select("title, product_type")
+    .eq("id", design_id)
+    .maybeSingle();
+
+  const designTitle =
+    designInfo?.title ??
+    (designInfo?.product_type
+      ? `${designInfo.product_type} Design`
+      : "Design");
+
+  const siteUrl = getSiteUrl();
+  const buyerEmail =
+    session.customer_details?.email ?? session.customer_email ?? null;
+
+  const emailTasks: Promise<unknown>[] = [];
+
+  if (creator_id) {
+    emailTasks.push(
+      (async () => {
+        const creatorEmail = await getUserEmail(creator_id);
+        if (!creatorEmail) return;
+        await sendEmail({
+          to: creatorEmail,
+          ...newSaleEmail({
+            designTitle,
+            size: insertedOrder.size,
+            quantity: insertedOrder.quantity,
+            earningsCents: insertedOrder.creator_earnings_cents,
+            dashboardUrl: `${siteUrl}/account/creator`,
+          }),
+        });
+      })()
+    );
+  }
+
+  if (buyerEmail) {
+    // Guest buyers (buyer_id empty) have no /account/orders page to
+    // link to, so we omit the order URL for them — Stripe's automatic
+    // receipt is still sent separately.
+    const orderUrl = buyer_id
+      ? `${siteUrl}/account/orders/${insertedOrder.id}`
+      : null;
+    emailTasks.push(
+      sendEmail({
+        to: buyerEmail,
+        ...orderConfirmationEmail({
+          designTitle,
+          size: insertedOrder.size,
+          quantity: insertedOrder.quantity,
+          totalCents: insertedOrder.amount_total_cents,
+          orderId: insertedOrder.id,
+          orderUrl,
+        }),
+      })
+    );
+  }
+
+  await Promise.all(emailTasks);
 
   return NextResponse.json({ received: true });
 }

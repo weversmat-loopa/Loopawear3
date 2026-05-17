@@ -2,6 +2,11 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { getSiteUrl, getUserEmail, sendEmail } from "@/lib/email/send";
+import {
+  designApprovedEmail,
+  designRejectedEmail,
+} from "@/lib/email/templates";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -34,17 +39,42 @@ export async function approveDesign(formData: FormData) {
     redirect(`/admin/review?error=${encodeURIComponent("Invalid design.")}`);
   }
 
+  // Select enough columns to compose the notification email without a
+  // second round trip. title and product_type drive the display name;
+  // creator_id is the recipient.
   const { data, error } = await supabase
     .from("designs")
     .update({ status: "published" })
     .eq("id", designId)
     .eq("status", "pending_review")
-    .select("id");
+    .select("id, title, product_type, creator_id");
 
   if (error || !data || data.length === 0) {
     redirect(
       `/admin/review?error=${encodeURIComponent("Could not approve design. Please try again.")}`
     );
+  }
+
+  // Notify the creator. Awaited before redirect so the email is
+  // actually sent before the serverless function returns. sendEmail
+  // swallows its own errors, so this can't fail the admin action.
+  const updated = data[0];
+  if (updated.creator_id) {
+    const email = await getUserEmail(updated.creator_id);
+    if (email) {
+      const designTitle =
+        updated.title ??
+        (updated.product_type
+          ? `${updated.product_type} Design`
+          : "Design");
+      await sendEmail({
+        to: email,
+        ...designApprovedEmail({
+          designTitle,
+          designUrl: `${getSiteUrl()}/marketplace/${updated.id}`,
+        }),
+      });
+    }
   }
 
   redirect("/admin/review");
@@ -63,12 +93,31 @@ export async function rejectDesign(formData: FormData) {
     .update({ status: "draft" })
     .eq("id", designId)
     .eq("status", "pending_review")
-    .select("id");
+    .select("id, title, product_type, creator_id");
 
   if (error || !data || data.length === 0) {
     redirect(
       `/admin/review?error=${encodeURIComponent("Could not reject design. Please try again.")}`
     );
+  }
+
+  const updated = data[0];
+  if (updated.creator_id) {
+    const email = await getUserEmail(updated.creator_id);
+    if (email) {
+      const designTitle =
+        updated.title ??
+        (updated.product_type
+          ? `${updated.product_type} Design`
+          : "Design");
+      await sendEmail({
+        to: email,
+        ...designRejectedEmail({
+          designTitle,
+          workspaceUrl: `${getSiteUrl()}/account/designs/${updated.id}`,
+        }),
+      });
+    }
   }
 
   redirect("/admin/review");
