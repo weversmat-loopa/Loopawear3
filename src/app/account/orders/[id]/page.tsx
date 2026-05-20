@@ -18,6 +18,8 @@ const STATUS_LABELS: Record<string, string> = {
   fulfillment_pending: "Preparing",
   shipped: "Shipped",
   cancelled: "Cancelled",
+  refunded: "Refunded",
+  disputed: "Under review",
 };
 
 const STATUS_CLASSES: Record<string, string> = {
@@ -28,6 +30,10 @@ const STATUS_CLASSES: Record<string, string> = {
     "border-green-200 bg-green-50 text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-400",
   cancelled:
     "border-zinc-200 bg-zinc-100 text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400",
+  refunded:
+    "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800 dark:bg-orange-950 dark:text-orange-400",
+  disputed:
+    "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400",
 };
 
 function formatDate(iso: string) {

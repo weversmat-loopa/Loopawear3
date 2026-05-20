@@ -7,6 +7,8 @@ import {
   orderConfirmationEmail,
 } from "@/lib/email/templates";
 
+type ServiceClient = ReturnType<typeof createServiceClient>;
+
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
     console.error("[stripe-webhook] Missing Stripe configuration");
@@ -38,17 +40,43 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "invalid_signature" }, { status: 400 });
   }
 
-  if (event.type !== "checkout.session.completed") {
-    return NextResponse.json({ received: true });
+  const supabase = createServiceClient();
+
+  switch (event.type) {
+    case "checkout.session.completed":
+      return handleCheckoutCompleted(
+        supabase,
+        event.data.object as Stripe.Checkout.Session
+      );
+    case "charge.refunded":
+      return handleChargeRefunded(
+        supabase,
+        event.data.object as Stripe.Charge
+      );
+    case "charge.dispute.created":
+      return handleDisputeCreated(
+        supabase,
+        event.data.object as Stripe.Dispute
+      );
+    case "charge.dispute.closed":
+      return handleDisputeClosed(
+        supabase,
+        event.data.object as Stripe.Dispute
+      );
+    default:
+      return NextResponse.json({ received: true });
   }
+}
 
-  const session = event.data.object as Stripe.Checkout.Session;
+// ---------- Event handlers ----------
 
+async function handleCheckoutCompleted(
+  supabase: ServiceClient,
+  session: Stripe.Checkout.Session
+): Promise<NextResponse> {
   if (session.payment_status !== "paid") {
     return NextResponse.json({ received: true });
   }
-
-  const supabase = createServiceClient();
 
   // Idempotency — Stripe can deliver the same event more than once
   const { data: existing } = await supabase
@@ -206,4 +234,169 @@ export async function POST(req: NextRequest) {
   await Promise.all(emailTasks);
 
   return NextResponse.json({ received: true });
+}
+
+async function handleChargeRefunded(
+  supabase: ServiceClient,
+  charge: Stripe.Charge
+): Promise<NextResponse> {
+  const paymentIntentId = extractPaymentIntentId(charge.payment_intent);
+  if (!paymentIntentId) {
+    console.warn(
+      "[stripe-webhook] charge.refunded missing payment_intent:",
+      charge.id
+    );
+    return NextResponse.json({ received: true });
+  }
+
+  // Mark refunded unconditionally — this covers both full and partial
+  // refunds. If you start supporting partial refunds with a different
+  // semantic, branch on charge.refunded vs amount_refunded < amount.
+  const { data, error } = await supabase
+    .from("orders")
+    .update({ status: "refunded" })
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .select("id");
+
+  if (error) {
+    console.error("[stripe-webhook] Failed to mark order refunded:", {
+      paymentIntentId,
+      message: error.message,
+      code: error.code,
+    });
+    return NextResponse.json({ error: "database_error" }, { status: 500 });
+  }
+  if (!data || data.length === 0) {
+    console.warn(
+      "[stripe-webhook] charge.refunded: no order found for payment_intent",
+      paymentIntentId
+    );
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+async function handleDisputeCreated(
+  supabase: ServiceClient,
+  dispute: Stripe.Dispute
+): Promise<NextResponse> {
+  const paymentIntentId = extractPaymentIntentId(dispute.payment_intent);
+  if (!paymentIntentId) {
+    console.warn(
+      "[stripe-webhook] charge.dispute.created missing payment_intent:",
+      dispute.id
+    );
+    return NextResponse.json({ received: true });
+  }
+
+  const { data, error } = await supabase
+    .from("orders")
+    .update({ status: "disputed" })
+    .eq("stripe_payment_intent_id", paymentIntentId)
+    .select("id");
+
+  if (error) {
+    console.error("[stripe-webhook] Failed to mark order disputed:", {
+      paymentIntentId,
+      message: error.message,
+      code: error.code,
+    });
+    return NextResponse.json({ error: "database_error" }, { status: 500 });
+  }
+  if (!data || data.length === 0) {
+    console.warn(
+      "[stripe-webhook] charge.dispute.created: no order found for payment_intent",
+      paymentIntentId
+    );
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+async function handleDisputeClosed(
+  supabase: ServiceClient,
+  dispute: Stripe.Dispute
+): Promise<NextResponse> {
+  const paymentIntentId = extractPaymentIntentId(dispute.payment_intent);
+  if (!paymentIntentId) {
+    console.warn(
+      "[stripe-webhook] charge.dispute.closed missing payment_intent:",
+      dispute.id
+    );
+    return NextResponse.json({ received: true });
+  }
+
+  if (dispute.status === "won") {
+    // Only revert to 'paid' if the order is still in 'disputed'. If an
+    // admin manually changed status during the dispute (e.g. marked
+    // shipped), respect their state — they know more than we do.
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ status: "paid" })
+      .eq("stripe_payment_intent_id", paymentIntentId)
+      .eq("status", "disputed")
+      .select("id");
+
+    if (error) {
+      console.error("[stripe-webhook] Failed to revert order to paid:", {
+        paymentIntentId,
+        message: error.message,
+      });
+      return NextResponse.json({ error: "database_error" }, { status: 500 });
+    }
+    if (!data || data.length === 0) {
+      console.info(
+        "[stripe-webhook] dispute.closed (won): no order in 'disputed' status for payment_intent",
+        paymentIntentId
+      );
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  if (dispute.status === "lost") {
+    // Funds were returned to the customer — force refunded regardless
+    // of the order's current status. Money is gone, status must reflect.
+    const { data, error } = await supabase
+      .from("orders")
+      .update({ status: "refunded" })
+      .eq("stripe_payment_intent_id", paymentIntentId)
+      .select("id");
+
+    if (error) {
+      console.error("[stripe-webhook] Failed to mark order refunded after lost dispute:", {
+        paymentIntentId,
+        message: error.message,
+      });
+      return NextResponse.json({ error: "database_error" }, { status: 500 });
+    }
+    if (!data || data.length === 0) {
+      console.warn(
+        "[stripe-webhook] dispute.closed (lost): no order found for payment_intent",
+        paymentIntentId
+      );
+    }
+    return NextResponse.json({ received: true });
+  }
+
+  // Other terminal statuses (warning_closed, etc.) have no financial
+  // impact on us — acknowledge but do nothing.
+  console.info(
+    "[stripe-webhook] dispute.closed with non-win/lost status, skipping:",
+    { paymentIntentId, status: dispute.status }
+  );
+  return NextResponse.json({ received: true });
+}
+
+// ---------- Helpers ----------
+
+/**
+ * Stripe's `payment_intent` field on Charge/Dispute objects is either
+ * the id string (typical for webhook payloads) or an expanded
+ * PaymentIntent object. Normalise to the id, or null if absent.
+ */
+function extractPaymentIntentId(
+  value: string | Stripe.PaymentIntent | null | undefined
+): string | null {
+  if (!value) return null;
+  return typeof value === "string" ? value : value.id;
 }
