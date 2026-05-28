@@ -1,16 +1,6 @@
-/**
- * Terms of Service — placeholder content for Loopawear (Belgium).
- *
- * BEFORE LAUNCH:
- * 1. Have a Belgian lawyer review and amend.
- * 2. Replace every [BRACKETED] placeholder with real company details.
- * 3. Update the "Last updated" date when the wording changes.
- * 4. Confirm jurisdiction/venue clauses and dispute-resolution language.
- * 5. Reflect any changes here in /refunds and /privacy where they overlap.
- */
-
 import type { Metadata } from "next";
 import Link from "next/link";
+import { businessInfo } from "@/lib/legal/businessInfo";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
@@ -39,19 +29,19 @@ export default function TermsPage() {
             These Terms govern your use of Loopawear, an online marketplace and
             AI-assisted design studio operated by{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [ENTITY_NAME]
+              {businessInfo.entityName}
             </span>
             , a company registered in Belgium under enterprise number{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [KBO_NUMBER]
+              {businessInfo.kboNumber}
             </span>
             , VAT{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [BE_VAT_NUMBER]
+              {businessInfo.vatNumber}
             </span>
             , registered office at{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [REGISTERED_ADDRESS]
+              {businessInfo.registeredAddress}
             </span>{" "}
             (&ldquo;Loopawear&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;). By
             creating an account or placing an order you accept these Terms.
@@ -118,7 +108,7 @@ export default function TermsPage() {
             85% accrues to the creator&apos;s pending balance. Payouts are made
             on the schedule and minimums set out at{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [PAYOUT_TERMS_LINK]
+              {businessInfo.payoutTermsUrl}
             </span>
             . All prices on the marketplace are in EUR and include VAT where
             applicable.
@@ -188,7 +178,7 @@ export default function TermsPage() {
             These Terms are governed by Belgian law. The competent courts are
             those of{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [JURISDICTION_CITY]
+              {businessInfo.jurisdictionCity}
             </span>
             , without prejudice to consumers&apos; mandatory rights to bring
             proceedings in their own jurisdiction. EU residents may also use
@@ -225,10 +215,10 @@ export default function TermsPage() {
           <p>
             Questions about these Terms? Reach us at{" "}
             <a
-              href="mailto:[CONTACT_EMAIL]"
+              href={`mailto:${businessInfo.contactEmail}`}
               className="text-zinc-900 underline underline-offset-2 hover:text-violet-600 dark:text-zinc-100"
             >
-              [CONTACT_EMAIL]
+              {businessInfo.contactEmail}
             </a>
             .
           </p>

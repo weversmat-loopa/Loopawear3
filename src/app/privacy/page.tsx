@@ -1,19 +1,5 @@
-/**
- * Privacy Policy — placeholder content for Loopawear (Belgium, GDPR).
- *
- * BEFORE LAUNCH:
- * 1. Have a Belgian privacy practitioner / DPO review and amend.
- * 2. Replace every [BRACKETED] placeholder with real company details
- *    (controller identity, DPO contact, retention specifics, sub-processors).
- * 3. Confirm the legal bases listed match how the product actually works.
- * 4. If you appoint a DPO, list contact here.
- * 5. Keep the sub-processor list in sync with reality (Stripe, fal.ai,
- *    Supabase, Vercel, Resend, etc.). Sub-processor changes should be
- *    notified to users in advance.
- * 6. Update the "Last updated" date when the wording changes.
- */
-
 import type { Metadata } from "next";
+import { businessInfo } from "@/lib/legal/businessInfo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -42,26 +28,26 @@ export default function PrivacyPage() {
             The controller of your personal data within the meaning of
             Regulation (EU) 2016/679 (&ldquo;GDPR&rdquo;) is{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [ENTITY_NAME]
+              {businessInfo.entityName}
             </span>
             , registered office at{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [REGISTERED_ADDRESS]
+              {businessInfo.registeredAddress}
             </span>
             , Belgium, KBO/BCE{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [KBO_NUMBER]
+              {businessInfo.kboNumber}
             </span>
             . Privacy enquiries:{" "}
             <a
-              href="mailto:[PRIVACY_EMAIL]"
+              href={`mailto:${businessInfo.privacyEmail}`}
               className="text-zinc-900 underline underline-offset-2 hover:text-violet-600 dark:text-zinc-100"
             >
-              [PRIVACY_EMAIL]
+              {businessInfo.privacyEmail}
             </a>
             . Data Protection Officer:{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [DPO_NAME_OR_NOT_APPOINTED]
+              {businessInfo.dpoStatement}
             </span>
             .
           </p>
@@ -140,12 +126,12 @@ export default function PrivacyPage() {
             processors on our instructions. Current sub-processors include:
             Supabase (database and auth, hosted in the EU),{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [FAL_REGION]
+              {businessInfo.falRegion}
             </span>{" "}
             (fal.ai, AI image generation), Stripe Payments Europe, Limited
             (payments), Vercel (hosting), and{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [EMAIL_PROVIDER]
+              {businessInfo.emailProvider}
             </span>{" "}
             (transactional email). Some of these providers may transfer data
             outside the EEA; in such cases transfers are covered by Standard
@@ -178,10 +164,10 @@ export default function PrivacyPage() {
             time where processing is based on consent. To exercise any of
             these, contact{" "}
             <a
-              href="mailto:[PRIVACY_EMAIL]"
+              href={`mailto:${businessInfo.privacyEmail}`}
               className="text-zinc-900 underline underline-offset-2 hover:text-violet-600 dark:text-zinc-100"
             >
-              [PRIVACY_EMAIL]
+              {businessInfo.privacyEmail}
             </a>
             . If you believe our processing infringes the GDPR, you have the
             right to lodge a complaint with the Belgian Data Protection

@@ -1,21 +1,5 @@
-/**
- * Imprint — placeholder content for Loopawear (Belgium).
- *
- * BEFORE LAUNCH:
- * 1. Replace every [BRACKETED] placeholder with real, current company info.
- * 2. Confirm the legal name matches the form on file at the KBO/BCE.
- * 3. Verify the VAT number is active and matches.
- * 4. Verify the listed director(s).
- * 5. Confirm hosting / sub-processor lines reflect reality (currently
- *    Vercel for app hosting, Supabase for data/auth/storage).
- * 6. Update the "Last updated" date when any of the above changes.
- *
- * Belgium does not require a German-style Impressum, but EU e-commerce
- * rules (Directive 2000/31/EC, Article 5) require the same identification
- * data to be made available to recipients. This page satisfies that.
- */
-
 import type { Metadata } from "next";
+import { businessInfo } from "@/lib/legal/businessInfo";
 
 export const metadata: Metadata = {
   title: "Imprint",
@@ -44,46 +28,46 @@ export default function ImprintPage() {
           <dl className="mt-3 grid grid-cols-1 gap-y-2 sm:grid-cols-[10rem_1fr] sm:gap-x-6">
             <dt className="text-zinc-500 dark:text-zinc-400">Legal name</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
-              [ENTITY_NAME]
+              {businessInfo.entityName}
             </dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">Legal form</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
-              [LEGAL_FORM, e.g. BV / SRL]
+              {businessInfo.legalForm}
             </dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">
               Registered office
             </dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
-              [REGISTERED_ADDRESS]
+              {businessInfo.registeredAddress}
             </dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">KBO / BCE</dt>
-            <dd className="text-zinc-900 dark:text-zinc-100">[KBO_NUMBER]</dd>
+            <dd className="text-zinc-900 dark:text-zinc-100">{businessInfo.kboNumber}</dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">VAT</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
-              [BE_VAT_NUMBER]
+              {businessInfo.vatNumber}
             </dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">Director(s)</dt>
             <dd className="text-zinc-900 dark:text-zinc-100">
-              [DIRECTOR_NAMES]
+              {businessInfo.directorNames}
             </dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">Email</dt>
             <dd>
               <a
-                href="mailto:[CONTACT_EMAIL]"
+                href={`mailto:${businessInfo.contactEmail}`}
                 className="text-zinc-900 underline underline-offset-2 hover:text-violet-600 dark:text-zinc-100"
               >
-                [CONTACT_EMAIL]
+                {businessInfo.contactEmail}
               </a>
             </dd>
 
             <dt className="text-zinc-500 dark:text-zinc-400">Phone</dt>
-            <dd className="text-zinc-900 dark:text-zinc-100">[PHONE]</dd>
+            <dd className="text-zinc-900 dark:text-zinc-100">{businessInfo.phone}</dd>
           </dl>
         </section>
 
@@ -98,7 +82,7 @@ export default function ImprintPage() {
             Payoh North #07-04, Singapore 318992). AI image generation is
             provided by{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [FAL_LEGAL_ENTITY]
+              {businessInfo.falLegalEntity}
             </span>
             . Payment processing is provided by Stripe Payments Europe,
             Limited, 25/28 North Wall Quay, Dublin 1, Ireland.

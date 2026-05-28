@@ -1,19 +1,6 @@
-/**
- * Refund & Return Policy — placeholder content for Loopawear (Belgium).
- *
- * BEFORE LAUNCH:
- * 1. Have a Belgian lawyer confirm the print-on-demand exemption wording is
- *    correctly invoked and disclosed *before* the order (Art. VI.53 §3 CDE).
- * 2. Replace every [BRACKETED] placeholder.
- * 3. Confirm the claim window for defective items aligns with what
- *    fulfilment/customer-service can actually deliver.
- * 4. Mirror any changes here in /terms (Section 7) and on the product page
- *    (the buyer must be told about the no-withdrawal exemption *before*
- *    they pay).
- */
-
 import type { Metadata } from "next";
 import Link from "next/link";
+import { businessInfo } from "@/lib/legal/businessInfo";
 
 export const metadata: Metadata = {
   title: "Refund & Return Policy",
@@ -76,10 +63,10 @@ export default function RefundsPage() {
           <p>
             Email{" "}
             <a
-              href="mailto:[SUPPORT_EMAIL]"
+              href={`mailto:${businessInfo.supportEmail}`}
               className="text-zinc-900 underline underline-offset-2 hover:text-violet-600 dark:text-zinc-100"
             >
-              [SUPPORT_EMAIL]
+              {businessInfo.supportEmail}
             </a>{" "}
             within 14 days of delivery, including your order number and at
             least one clear photograph of the issue. We will respond within
@@ -108,7 +95,7 @@ export default function RefundsPage() {
           <p>
             If you contact us within{" "}
             <span className="font-medium text-zinc-900 dark:text-zinc-100">
-              [CANCELLATION_WINDOW_HOURS]
+              {businessInfo.cancellationWindowHours}
             </span>{" "}
             hours of placing an order and the item has not yet entered
             production, we will use commercially reasonable efforts to cancel
