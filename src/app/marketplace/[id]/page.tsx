@@ -48,23 +48,22 @@ type RelatedDesign = {
 
 function RelatedDesignCard({ item }: { item: RelatedDesign }) {
   return (
-    <Link
-      href={`/marketplace/${item.id}`}
-      className="group relative block overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 transition-all duration-300 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-violet-500/30 dark:hover:shadow-[0_0_24px_rgba(139,92,246,0.12)]"
-    >
-      <ProductMockup
-        imageUrl={item.image_url}
-        productType={item.product_type}
-        alt={item.product_type ? `${item.product_type} design` : "Design"}
-        loading="lazy"
-        className="transition-transform duration-500 group-hover:scale-[1.03]"
-      />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/60 to-transparent p-3">
-        <p className="text-xs font-semibold leading-tight text-white">
+    <Link href={`/marketplace/${item.id}`} className="group flex flex-col">
+      <div className="overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+        <ProductMockup
+          imageUrl={item.image_url}
+          productType={item.product_type}
+          alt={item.product_type ? `${item.product_type} design` : "Design"}
+          loading="lazy"
+          className="transition-transform duration-300 group-hover:scale-[1.02]"
+        />
+      </div>
+      <div className="mt-3">
+        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
           {item.title ??
             (item.product_type ? `${item.product_type} Design` : "Design")}
         </p>
-        <p className="mt-0.5 line-clamp-1 text-xs text-zinc-400">
+        <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
           {item.prompt}
         </p>
       </div>
@@ -139,7 +138,7 @@ export default async function DesignPage({ params }: Props) {
       <div className="mx-auto w-full max-w-4xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-600 dark:hover:text-zinc-400"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           ← Marketplace
         </Link>
@@ -147,7 +146,7 @@ export default async function DesignPage({ params }: Props) {
         <div className="mt-10 lg:grid lg:grid-cols-2 lg:gap-16">
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800">
+            <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
               <ProductMockup
                 imageUrl={design.image_url}
                 productType={design.product_type}
@@ -164,51 +163,46 @@ export default async function DesignPage({ params }: Props) {
           {/* Info */}
           <div className="mt-8 flex flex-col lg:mt-0">
             {design.product_type && (
-              <div>
-                <Link
-                  href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
-                  className="rounded-full border border-violet-500/20 bg-violet-500/5 px-2.5 py-0.5 text-xs text-violet-500 transition-all duration-300 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-400 dark:border-violet-500/20 dark:bg-violet-500/5 dark:text-violet-400"
-                >
-                  {design.product_type}
-                </Link>
-              </div>
+              <p className="text-xs uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                {design.product_type}
+              </p>
             )}
 
-            <h1 className="mt-5 text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
               {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
             {creatorName && (
               <Link
                 href={`/creators/${design.creator_id}`}
-                className="mt-2 text-sm text-zinc-500 transition-colors hover:text-violet-500 dark:text-zinc-500 dark:hover:text-violet-400"
+                className="mt-2 text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               >
                 by {creatorName}
               </Link>
             )}
 
-            <p className="mt-6 text-sm leading-relaxed text-zinc-500 dark:text-zinc-500">
+            {design.price_cents !== null && (
+              <p className="mt-5 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                €{(design.price_cents / 100).toFixed(2)}
+              </p>
+            )}
+
+            <p className="mt-5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
               &ldquo;{design.prompt}&rdquo;
             </p>
 
-            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 border-t border-zinc-100 pt-6 text-sm dark:border-zinc-800/60">
-              {design.price_cents !== null && (
-                <>
-                  <dt className="text-zinc-500 dark:text-zinc-500">Price</dt>
-                  <dd className="text-lg font-bold text-zinc-900 dark:text-white">
-                    €{(design.price_cents / 100).toFixed(2)}
-                  </dd>
-                </>
-              )}
-              {design.style && (
-                <>
-                  <dt className="text-zinc-500 dark:text-zinc-500">Style</dt>
+            {design.style && (
+              <dl className="mt-5 border-t border-zinc-100 pt-5 text-sm dark:border-zinc-800">
+                <div className="flex gap-6">
+                  <dt className="text-zinc-500 dark:text-zinc-400">Style</dt>
                   <dd className="text-zinc-700 dark:text-zinc-300">{design.style}</dd>
-                </>
-              )}
-              <dt className="text-zinc-500 dark:text-zinc-500">Published</dt>
-              <dd className="text-zinc-700 dark:text-zinc-300">{formatDate(design.created_at)}</dd>
-            </dl>
+                </div>
+                <div className="mt-2 flex gap-6">
+                  <dt className="text-zinc-500 dark:text-zinc-400">Published</dt>
+                  <dd className="text-zinc-700 dark:text-zinc-300">{formatDate(design.created_at)}</dd>
+                </div>
+              </dl>
+            )}
 
             <div className="mt-auto pt-8">
               {design.price_cents !== null && (
@@ -217,14 +211,14 @@ export default async function DesignPage({ params }: Props) {
                   designId={design.id}
                 />
               )}
-              <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800/60">
+              <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
                 <Link
                   href={studioHref}
-                  className="inline-flex w-full items-center justify-center rounded-full border border-zinc-200 px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all duration-300 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-zinc-200 px-5 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
                 >
                   Create something similar →
                 </Link>
-                <p className="mt-2 text-center text-xs text-zinc-400 dark:text-zinc-600">
+                <p className="mt-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
                   Opens the studio with this prompt pre-filled.
                 </p>
               </div>
@@ -234,24 +228,21 @@ export default async function DesignPage({ params }: Props) {
 
         {/* More by this creator */}
         {moreByCreator.length > 0 && (
-          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800/60">
-            <div className="flex items-baseline justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
-                  More by {creatorName ?? "this creator"}
-                </h2>
-              </div>
+          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800">
+            <div className="mb-6 flex items-baseline justify-between gap-4">
+              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+                More by {creatorName ?? "this creator"}
+              </h2>
               {design.creator_id && (
                 <Link
                   href={`/creators/${design.creator_id}`}
-                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-600 dark:hover:text-zinc-400"
+                  className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
                 >
                   See all →
                 </Link>
               )}
             </div>
-            <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
               {moreByCreator.map((related) => (
                 <li key={related.id}>
                   <RelatedDesignCard item={related} />
@@ -263,14 +254,11 @@ export default async function DesignPage({ params }: Props) {
 
         {/* Similar designs */}
         {similarDesigns.length > 0 && (
-          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800/60">
-            <div className="flex items-center gap-2">
-              <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
-                Similar designs
-              </h2>
-            </div>
-            <ul className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800">
+            <h2 className="mb-6 text-base font-bold text-zinc-900 dark:text-zinc-100">
+              Similar designs
+            </h2>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
               {similarDesigns.map((related) => (
                 <li key={related.id}>
                   <RelatedDesignCard item={related} />

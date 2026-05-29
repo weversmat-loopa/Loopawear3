@@ -60,7 +60,7 @@ export default function ThemeToggle() {
   if (theme === null) {
     return (
       <div
-        className="h-8 w-8 rounded-full border border-zinc-700"
+        className="h-8 w-8 rounded-full border border-zinc-200 dark:border-zinc-700"
         aria-hidden
       />
     );
@@ -71,7 +71,7 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-      className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-700 text-zinc-400 transition-all duration-300 hover:border-zinc-500 hover:text-zinc-100"
+      className="flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
     >
       {theme === "dark" ? <SunIcon /> : <MoonIcon />}
     </button>
