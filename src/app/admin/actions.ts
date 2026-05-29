@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { createServiceClient } from "@/utils/supabase/service";
 import { getSiteUrl, getUserEmail, sendEmail } from "@/lib/email/send";
 import {
   designApprovedEmail,
@@ -28,7 +29,16 @@ async function requireAdmin() {
     redirect("/");
   }
 
-  return { supabase };
+  // Use the service-role client for the actual mutations. The user
+  // client above is only for verifying the caller is an admin. Order
+  // rows belonging to guests (buyer_id = null) are not visible/updatable
+  // under the RLS policies bound to the user client, so admin actions on
+  // guest orders would silently match zero rows and surface as
+  // "Could not update order." The admin identity is already verified, so
+  // bypassing RLS here is safe.
+  const service = createServiceClient();
+
+  return { supabase, service };
 }
 
 export async function approveDesign(formData: FormData) {
@@ -124,14 +134,14 @@ export async function rejectDesign(formData: FormData) {
 }
 
 export async function markFulfillmentPending(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  const { service } = await requireAdmin();
 
   const orderId = String(formData.get("orderId") ?? "").trim();
   if (!orderId) {
     redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await service
     .from("orders")
     .update({ status: "fulfillment_pending" })
     .eq("id", orderId)
@@ -148,7 +158,7 @@ export async function markFulfillmentPending(formData: FormData) {
 }
 
 export async function markShipped(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  const { service } = await requireAdmin();
 
   const orderId = String(formData.get("orderId") ?? "").trim();
   if (!orderId) {
@@ -157,7 +167,7 @@ export async function markShipped(formData: FormData) {
 
   const trackingNumber = String(formData.get("trackingNumber") ?? "").trim() || null;
 
-  const { data, error } = await supabase
+  const { data, error } = await service
     .from("orders")
     .update({ status: "shipped", tracking_number: trackingNumber })
     .eq("id", orderId)
@@ -174,14 +184,14 @@ export async function markShipped(formData: FormData) {
 }
 
 export async function cancelOrder(formData: FormData) {
-  const { supabase } = await requireAdmin();
+  const { service } = await requireAdmin();
 
   const orderId = String(formData.get("orderId") ?? "").trim();
   if (!orderId) {
     redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
   }
 
-  const { error } = await supabase
+  const { error } = await service
     .from("orders")
     .update({ status: "cancelled" })
     .eq("id", orderId)

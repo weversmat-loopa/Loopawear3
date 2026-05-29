@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { createServiceClient } from "@/utils/supabase/service";
 import { markFulfillmentPending, markShipped, cancelOrder } from "../actions";
 
 export const metadata: Metadata = {
@@ -54,7 +55,14 @@ export default async function AdminOrdersPage({
 
   if (profile?.role !== "admin") notFound();
 
-  const { data: ordersRaw } = await supabase
+  // Read orders with the service-role client. Guest orders have
+  // buyer_id = null and are not returned by the RLS policies bound to the
+  // user client (which scope rows to buyer_id = auth.uid()), so logged-in
+  // buyer orders showed up here but guest orders did not. The admin role
+  // is already verified above, so bypassing RLS for this read is safe.
+  const service = createServiceClient();
+
+  const { data: ordersRaw } = await service
     .from("orders")
     .select(
       "id, design_id, creator_id, size, quantity, amount_total_cents, creator_earnings_cents, status, tracking_number, shipping_name, shipping_line1, shipping_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country, created_at"

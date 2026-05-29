@@ -6,9 +6,11 @@ import { createServiceClient } from "@/utils/supabase/service";
  * Required env:
  *   RESEND_API_KEY  — from https://resend.com/api-keys
  * Optional env:
- *   EMAIL_FROM      — sender address. Defaults to noreply@loopawear.com.
- *                     Use onboarding@resend.dev while testing before the
- *                     loopawear.com domain is verified in Resend.
+ *   EMAIL_FROM      — sender address. RESEND_FROM is accepted as an alias
+ *                     (whichever is set wins). Defaults to
+ *                     noreply@loopawear.com. Use onboarding@resend.dev
+ *                     while testing before the loopawear.com domain is
+ *                     verified in Resend.
  *
  * IMPORTANT: all functions in this module fail silently (log + return)
  * on missing config or upstream errors. Email is a side-effect of
@@ -39,7 +41,11 @@ export async function sendEmail({
     return;
   }
 
-  const from = process.env.EMAIL_FROM ?? "noreply@loopawear.com";
+  // Accept either EMAIL_FROM (used historically by this module) or
+  // RESEND_FROM (the name configured in Vercel). Supporting both avoids
+  // silent send failures when only one of the two is set.
+  const from =
+    process.env.EMAIL_FROM ?? process.env.RESEND_FROM ?? "noreply@loopawear.com";
 
   try {
     const res = await fetch(RESEND_API_URL, {
