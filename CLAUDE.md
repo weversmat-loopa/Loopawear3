@@ -90,6 +90,15 @@ This file defines how Claude should behave while working on this project.
 
 ---
 
+## Brand name
+The official and definitive brand name is **Loopawear**. This will not change.
+
+- Do not introduce any alternative brand name (e.g. "Dropmade") into code, metadata, comments, or documentation.
+- Any previously discussed rebrand to "Dropmade" is cancelled and must not be resumed.
+- All new UI copy, metadata, email templates, and legal text must use "Loopawear".
+
+---
+
 ## Important project direction
 This project is intended to grow into a real marketplace product, not just a demo.
 
