@@ -27,9 +27,15 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
+  } catch {
+    // Supabase unreachable — treat as unauthenticated and let the request through.
+    // Protected pages will handle auth themselves; this avoids a redirect loop.
+    return response;
+  }
 
   if (
     !user &&
