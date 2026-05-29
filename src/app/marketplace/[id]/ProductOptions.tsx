@@ -6,8 +6,6 @@ const SIZES = ["S", "M", "L", "XL", "XXL"] as const;
 const MIN_QUANTITY = 1;
 const MAX_QUANTITY = 99;
 
-// Approximate unisex t-shirt measurements. Real fit varies by
-// manufacturer; the disclaimer in the modal sets buyer expectations.
 const SIZE_GUIDE = [
   { size: "S", eu: "46–48", chest: "88–94 cm", length: "68–70 cm" },
   { size: "M", eu: "48–50", chest: "94–100 cm", length: "70–72 cm" },
@@ -42,13 +40,7 @@ export default function ProductOptions({
     sizeGuideRef.current?.close();
   }
 
-  // Native <dialog> reports the dialog itself as the click target when
-  // the user clicks the backdrop region; clicks on inner content
-  // bubble with those nodes as targets, so this fires only on
-  // backdrop clicks.
-  function handleDialogBackdropClick(
-    e: React.MouseEvent<HTMLDialogElement>
-  ) {
+  function handleDialogBackdropClick(e: React.MouseEvent<HTMLDialogElement>) {
     if (e.target === sizeGuideRef.current) {
       sizeGuideRef.current.close();
     }
@@ -90,7 +82,6 @@ export default function ProductOptions({
 
       if (data.url) {
         window.location.href = data.url;
-        // Keep loading=true — page is navigating away
       }
     } catch {
       setError("Something went wrong. Please try again.");
@@ -99,18 +90,18 @@ export default function ProductOptions({
   }
 
   return (
-    <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
-      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+    <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800/60">
+      <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-600">
         Product options
       </p>
 
       <div className="mt-4">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Size</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-500">Size</p>
           <button
             type="button"
             onClick={openSizeGuide}
-            className="text-xs text-zinc-500 underline underline-offset-2 transition-colors hover:text-violet-600 dark:text-zinc-400 dark:hover:text-violet-400"
+            className="text-xs text-zinc-500 underline underline-offset-2 transition-colors hover:text-violet-600 dark:text-zinc-500 dark:hover:text-violet-400"
           >
             Size guide
           </button>
@@ -121,10 +112,10 @@ export default function ProductOptions({
               key={s}
               type="button"
               onClick={() => setSize(size === s ? null : s)}
-              className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all duration-300 ${
                 size === s
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
-                  : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+                  ? "border-violet-500/40 bg-violet-500/10 text-violet-400 dark:border-violet-500/40 dark:bg-violet-500/10 dark:text-violet-400"
+                  : "border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
               }`}
             >
               {s}
@@ -134,10 +125,10 @@ export default function ProductOptions({
       </div>
 
       <div className="mt-4">
-        <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-500">
           Quantity
         </p>
-        <div className="inline-flex items-center rounded-full border border-zinc-200 dark:border-zinc-700">
+        <div className="inline-flex items-center rounded-full border border-zinc-200 dark:border-zinc-800">
           <button
             type="button"
             onClick={() => setQuantityClamped(quantity - 1)}
@@ -156,7 +147,7 @@ export default function ProductOptions({
               setQuantityClamped(parseInt(e.target.value, 10))
             }
             aria-label="Quantity"
-            className="h-9 w-12 border-x border-zinc-200 bg-transparent text-center text-sm font-medium tabular-nums text-zinc-900 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:border-zinc-700 dark:text-zinc-100"
+            className="h-9 w-12 border-x border-zinc-200 bg-transparent text-center text-sm font-medium tabular-nums text-zinc-900 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none dark:border-zinc-800 dark:text-zinc-100"
           />
           <button
             type="button"
@@ -172,10 +163,10 @@ export default function ProductOptions({
 
       <div className="mt-6">
         <div className="flex items-baseline justify-between">
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">
+          <p className="text-xs text-zinc-400 dark:text-zinc-600">
             Total{quantity > 1 ? ` (${quantity}×)` : ""}
           </p>
-          <p className="text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+          <p className="text-xl font-bold tabular-nums text-zinc-900 dark:text-white">
             €{(totalCents / 100).toFixed(2)}
           </p>
         </div>
@@ -184,10 +175,10 @@ export default function ProductOptions({
           type="button"
           onClick={handleCheckout}
           disabled={!canCheckout}
-          className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+          className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-all duration-300 ${
             canCheckout
-              ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-              : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
+              ? "bg-violet-600 text-white hover:bg-violet-500 hover:shadow-[0_0_24px_rgba(139,92,246,0.45)]"
+              : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-600"
           }`}
         >
           {loading
@@ -202,13 +193,11 @@ export default function ProductOptions({
         )}
       </div>
 
-      {/* Size guide modal — native <dialog> for built-in backdrop, ESC,
-          and focus trap via showModal(). */}
       <dialog
         ref={sizeGuideRef}
         onClick={handleDialogBackdropClick}
         aria-labelledby="size-guide-title"
-        className="m-auto w-[calc(100vw-2rem)] max-w-md rounded-2xl bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-zinc-900/40 backdrop:backdrop-blur-sm dark:bg-zinc-900 dark:text-zinc-100"
+        className="m-auto w-[calc(100vw-2rem)] max-w-md rounded-2xl bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-zinc-950/60 backdrop:backdrop-blur-sm dark:bg-zinc-900 dark:text-zinc-100"
       >
         <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
           <h2 id="size-guide-title" className="text-base font-semibold">
@@ -258,7 +247,7 @@ export default function ProductOptions({
             ±2 cm. For the closest fit, measure a t-shirt you already own
             and compare.
           </p>
-          <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-400">
+          <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-xs text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-400">
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
               How to measure
             </p>

@@ -20,32 +20,36 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-zinc-100 bg-white/95 px-6 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/95">
+    <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-white/[0.06] bg-zinc-950/95 px-6 backdrop-blur-md">
       <Link
         href="/"
-        className="text-sm font-bold tracking-tight text-zinc-900 transition-colors hover:text-violet-600 dark:text-zinc-100"
+        className="text-base font-bold tracking-tight text-white transition-all duration-300 hover:text-violet-400"
       >
         Loopawear
       </Link>
 
       <div className="flex items-center gap-4">
-        <nav className="flex items-center gap-1">
-          {links.map(({ label, href }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`inline-flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                pathname === href || pathname.startsWith(href + "/")
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
-                  : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
+        <nav className="flex items-center gap-6">
+          {links.map(({ label, href }) => {
+            const isActive =
+              pathname === href || pathname.startsWith(href + "/");
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`border-b-2 pb-0.5 text-sm font-medium transition-all duration-300 ${
+                  isActive
+                    ? "border-violet-500 text-white"
+                    : "border-transparent text-zinc-400 hover:border-violet-500/40 hover:text-zinc-100"
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="flex items-center gap-3 border-l border-zinc-100 pl-4 dark:border-zinc-800">
+        <div className="flex items-center gap-3 border-l border-white/[0.06] pl-4">
           <ThemeToggle />
 
           {user ? (
@@ -53,10 +57,10 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
               {isAdmin && (
                 <Link
                   href="/admin/review"
-                  className={`text-sm font-medium transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 ${
+                  className={`text-sm font-medium transition-colors ${
                     pathname.startsWith("/admin")
-                      ? "text-zinc-900 dark:text-zinc-100"
-                      : "text-zinc-400 dark:text-zinc-500"
+                      ? "text-white"
+                      : "text-zinc-500 hover:text-zinc-200"
                   }`}
                 >
                   Admin
@@ -64,10 +68,10 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
               )}
               <Link
                 href="/account"
-                className={`text-sm font-medium transition-colors hover:text-zinc-900 dark:hover:text-zinc-100 ${
+                className={`text-sm font-medium transition-colors ${
                   pathname === "/account" || pathname.startsWith("/account/")
-                    ? "text-zinc-900 dark:text-zinc-100"
-                    : "text-zinc-500 dark:text-zinc-400"
+                    ? "text-white"
+                    : "text-zinc-400 hover:text-zinc-100"
                 }`}
               >
                 Account
@@ -75,7 +79,7 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-400"
+                  className="text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-400"
                 >
                   Log out
                 </button>
@@ -85,13 +89,13 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
             <>
               <Link
                 href="/login"
-                className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                className="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-100"
               >
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full border border-zinc-300 px-4 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
+                className="rounded-full border border-zinc-700 px-4 py-1.5 text-sm font-medium text-zinc-300 transition-all duration-300 hover:border-violet-500/50 hover:text-white hover:shadow-[0_0_12px_rgba(139,92,246,0.2)]"
               >
                 Sign up
               </Link>

@@ -70,7 +70,7 @@ export default async function RootLayout({
         {/* Runs synchronously before paint — prevents flash of wrong theme */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('loopawear-theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}`,
+            __html: `try{var t=localStorage.getItem('loopawear-theme');if(!t||t==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}`,
           }}
         />
       </head>

@@ -50,17 +50,17 @@ function RelatedDesignCard({ item }: { item: RelatedDesign }) {
   return (
     <Link
       href={`/marketplace/${item.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
+      className="group relative block overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 transition-all duration-300 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-violet-500/30 dark:hover:shadow-[0_0_24px_rgba(139,92,246,0.12)]"
     >
       <ProductMockup
         imageUrl={item.image_url}
         productType={item.product_type}
         alt={item.product_type ? `${item.product_type} design` : "Design"}
         loading="lazy"
-        className="transition-transform duration-300 group-hover:scale-[1.02]"
+        className="transition-transform duration-500 group-hover:scale-[1.03]"
       />
-      <div className="p-3">
-        <p className="text-xs font-medium text-zinc-900 dark:text-zinc-100">
+      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-zinc-950/95 via-zinc-950/60 to-transparent p-3">
+        <p className="text-xs font-semibold leading-tight text-white">
           {item.title ??
             (item.product_type ? `${item.product_type} Design` : "Design")}
         </p>
@@ -97,7 +97,6 @@ export default async function DesignPage({ params }: Props) {
     creatorName = profile?.display_name ?? null;
   }
 
-  // Fetch up to 3 other published designs by the same creator
   let moreByCreator: RelatedDesign[] = [];
   if (design.creator_id) {
     const { data: more } = await supabase
@@ -111,11 +110,6 @@ export default async function DesignPage({ params }: Props) {
     moreByCreator = more ?? [];
   }
 
-  // Fetch up to 4 designs that share the same style or product_type,
-  // excluding the current design and anything already shown in the
-  // "More by this creator" section so the two rows don't overlap. If
-  // the design has neither a style nor a product_type, there's no
-  // similarity signal — skip the query and the section won't render.
   let similarDesigns: RelatedDesign[] = [];
   const similarConditions: string[] = [];
   if (design.style) similarConditions.push(`style.eq.${design.style}`);
@@ -141,19 +135,19 @@ export default async function DesignPage({ params }: Props) {
   const studioHref = `/generate?${studioParams.toString()}`;
 
   return (
-    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-20">
       <div className="mx-auto w-full max-w-4xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+          className="text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-600 dark:hover:text-zinc-400"
         >
           ← Marketplace
         </Link>
 
-        <div className="mt-10 lg:grid lg:grid-cols-2 lg:gap-12">
+        <div className="mt-10 lg:grid lg:grid-cols-2 lg:gap-16">
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800">
               <ProductMockup
                 imageUrl={design.image_url}
                 productType={design.product_type}
@@ -173,47 +167,46 @@ export default async function DesignPage({ params }: Props) {
               <div>
                 <Link
                   href={`/marketplace?type=${encodeURIComponent(design.product_type)}`}
-                  className="rounded-full border border-zinc-200 px-2.5 py-0.5 text-xs text-zinc-600 transition-colors hover:border-violet-400/50 hover:text-violet-600 dark:border-zinc-700 dark:text-zinc-400"
+                  className="rounded-full border border-violet-500/20 bg-violet-500/5 px-2.5 py-0.5 text-xs text-violet-500 transition-all duration-300 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-400 dark:border-violet-500/20 dark:bg-violet-500/5 dark:text-violet-400"
                 >
                   {design.product_type}
                 </Link>
               </div>
             )}
 
-            <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h1 className="mt-5 text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
               {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
             {creatorName && (
               <Link
                 href={`/creators/${design.creator_id}`}
-                className="mt-1.5 text-sm text-zinc-500 transition-colors hover:text-violet-600"
+                className="mt-2 text-sm text-zinc-500 transition-colors hover:text-violet-500 dark:text-zinc-500 dark:hover:text-violet-400"
               >
                 by {creatorName}
               </Link>
             )}
 
-            <p className="mt-6 text-sm leading-relaxed text-zinc-500">
+            <p className="mt-6 text-sm leading-relaxed text-zinc-500 dark:text-zinc-500">
               &ldquo;{design.prompt}&rdquo;
             </p>
 
-            {/* Structured details */}
-            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 border-t border-zinc-200 pt-6 text-sm dark:border-zinc-800">
+            <dl className="mt-6 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 border-t border-zinc-100 pt-6 text-sm dark:border-zinc-800/60">
               {design.price_cents !== null && (
                 <>
-                  <dt className="text-zinc-500 dark:text-zinc-400">Price</dt>
-                  <dd className="font-medium text-zinc-900 dark:text-zinc-100">
+                  <dt className="text-zinc-500 dark:text-zinc-500">Price</dt>
+                  <dd className="text-lg font-bold text-zinc-900 dark:text-white">
                     €{(design.price_cents / 100).toFixed(2)}
                   </dd>
                 </>
               )}
               {design.style && (
                 <>
-                  <dt className="text-zinc-500 dark:text-zinc-400">Style</dt>
+                  <dt className="text-zinc-500 dark:text-zinc-500">Style</dt>
                   <dd className="text-zinc-700 dark:text-zinc-300">{design.style}</dd>
                 </>
               )}
-              <dt className="text-zinc-500 dark:text-zinc-400">Published</dt>
+              <dt className="text-zinc-500 dark:text-zinc-500">Published</dt>
               <dd className="text-zinc-700 dark:text-zinc-300">{formatDate(design.created_at)}</dd>
             </dl>
 
@@ -224,14 +217,14 @@ export default async function DesignPage({ params }: Props) {
                   designId={design.id}
                 />
               )}
-              <div className="border-t border-zinc-200 pt-6 dark:border-zinc-800">
+              <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800/60">
                 <Link
                   href={studioHref}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-zinc-200 px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all duration-300 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-white"
                 >
                   Create something similar →
                 </Link>
-                <p className="mt-2 text-center text-xs text-zinc-400">
+                <p className="mt-2 text-center text-xs text-zinc-400 dark:text-zinc-600">
                   Opens the studio with this prompt pre-filled.
                 </p>
               </div>
@@ -241,18 +234,18 @@ export default async function DesignPage({ params }: Props) {
 
         {/* More by this creator */}
         {moreByCreator.length > 0 && (
-          <div className="mt-16 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800/60">
             <div className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
                   More by {creatorName ?? "this creator"}
                 </h2>
               </div>
               {design.creator_id && (
                 <Link
                   href={`/creators/${design.creator_id}`}
-                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                  className="text-xs text-zinc-400 transition-colors hover:text-zinc-700 dark:text-zinc-600 dark:hover:text-zinc-400"
                 >
                   See all →
                 </Link>
@@ -270,10 +263,10 @@ export default async function DesignPage({ params }: Props) {
 
         {/* Similar designs */}
         {similarDesigns.length > 0 && (
-          <div className="mt-16 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800/60">
             <div className="flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
                 Similar designs
               </h2>
             </div>

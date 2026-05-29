@@ -46,7 +46,7 @@ export default function ProductMockup({
   // Empty state — design has no image yet
   if (!imageUrl) {
     return (
-      <div className={`${wrapperClass} bg-zinc-100 dark:bg-zinc-800`} aria-hidden />
+      <div className={`${wrapperClass} bg-zinc-200 dark:bg-zinc-900`} aria-hidden />
     );
   }
 
@@ -70,7 +70,7 @@ export default function ProductMockup({
 
   // T-shirt: layer design over the chest of the t-shirt mockup
   return (
-    <div className={`${wrapperClass} bg-zinc-50 dark:bg-zinc-800`}>
+    <div className={`${wrapperClass} bg-zinc-100 dark:bg-zinc-900`}>
       <Image
         src="/mockups/tshirt-white.svg"
         alt=""
