@@ -2,6 +2,46 @@
 
 import { createClient } from "@/utils/supabase/server";
 
+// ── savePlacement ─────────────────────────────────────────────────────
+// Requires this migration in Supabase before use:
+//   ALTER TABLE designs ADD COLUMN IF NOT EXISTS placement JSONB;
+
+export interface PlacementData {
+  side:        "front" | "back";
+  x:           number;
+  y:           number;
+  scale:       number;
+  rotation:    number;
+  shirtColor:  string;
+  size:        string;
+}
+
+type SavePlacementResult =
+  | { success: true; error?: never }
+  | { error: "auth_required" | "save_failed"; success?: never };
+
+export async function savePlacement(
+  designId: string,
+  placement: PlacementData,
+): Promise<SavePlacementResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "auth_required" };
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ placement })
+    .eq("id", designId)
+    .eq("creator_id", user.id);
+
+  if (error) return { error: "save_failed" };
+
+  return { success: true };
+}
+
 type SaveDraftInput = {
   prompt: string;
   productType: string | null;
