@@ -66,7 +66,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
     let canvas: FabricCanvas | null = null;
 
     const init = async () => {
-      const { Canvas, FabricImage, Rect } = await import("fabric");
+      const { Canvas, FabricImage } = await import("fabric");
       if (!canvasEl.current) return;
 
       canvas = new Canvas(canvasEl.current, {
@@ -90,18 +90,10 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
         wrapper.style.height   = `${H}px`;
       }
 
-      // ── Print-zone overlay ──────────────────────────────────────
+      // The print zone is NOT drawn on the Fabric canvas — it's a pure
+      // CSS <div> overlay (see render()). Fabric handles only the
+      // interactive design image below.
       const z = ZONES.front;
-      const printZone = new Rect({
-        left: z.x, top: z.y, width: z.w, height: z.h,
-        fill: "rgba(220,38,38,0.04)",
-        stroke: "rgba(220,38,38,0.55)",
-        strokeWidth: 1.5,
-        strokeDashArray: [7, 4],
-        selectable: false, evented: false,
-        name: "printZone",
-      });
-      canvas.add(printZone);
 
       // ── Design image ────────────────────────────────────────────
       try {
@@ -117,6 +109,12 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
           originY: "center",
           scaleX: scale,
           scaleY: scale,
+          // NOTE: this only affects empty canvas areas, not opaque pixels
+          // already baked into the source PNG. If the generated design has
+          // a solid pink/teal background, it must be exported as a
+          // transparent PNG upstream — a coloured backdrop cannot be
+          // stripped here client-side.
+          backgroundColor:    "transparent",
           cornerColor:        "#ffffff",
           cornerStrokeColor:  "#18181b",
           cornerStyle:        "circle",
@@ -176,31 +174,8 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
     };
   }, [imageUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Redraw print-zone when side changes ──────────────────────────
-  useEffect(() => {
-    const canvas = fabricRef.current;
-    if (!canvas) return;
-
-    // Remove old zone.
-    const old = canvas.getObjects().find((o) => (o as any).name === "printZone");
-    if (old) canvas.remove(old);
-
-    import("fabric").then(({ Rect }) => {
-      const z = ZONES[side];
-      const printZone = new Rect({
-        left: z.x, top: z.y, width: z.w, height: z.h,
-        fill: "rgba(220,38,38,0.04)",
-        stroke: "rgba(220,38,38,0.55)",
-        strokeWidth: 1.5,
-        strokeDashArray: [7, 4],
-        selectable: false, evented: false,
-        name: "printZone",
-      });
-      canvas.add(printZone);
-      canvas.sendObjectToBack(printZone);
-      canvas.renderAll();
-    });
-  }, [side]);
+  // The print zone is rendered as a CSS <div> from `side` state (see
+  // render()), so no canvas redraw is needed when the side changes.
 
   // ── Centre design ────────────────────────────────────────────────
   const handleCenter = useCallback(() => {
@@ -290,7 +265,23 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
             }}
           />
 
-          {/* Layer 2 — transparent Fabric canvas, stacked above the shirt.
+          {/* Layer 2 — print-zone border. Pure HTML/CSS so it always
+              renders, independent of Fabric/Turbopack canvas timing.
+              Position/size are driven directly by ZONES[side]. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute rounded-sm"
+            style={{
+              left:   ZONES[side].x,
+              top:    ZONES[side].y,
+              width:  ZONES[side].w,
+              height: ZONES[side].h,
+              border: "2px dashed rgba(220,38,38,0.6)",
+              backgroundColor: "rgba(220,38,38,0.04)",
+            }}
+          />
+
+          {/* Layer 3 — transparent Fabric canvas, stacked above the shirt.
               Fabric's wrapper div is positioned absolute/inset-0 in init(). */}
           <div className="absolute inset-0">
             <canvas ref={canvasEl} className="touch-none" />
