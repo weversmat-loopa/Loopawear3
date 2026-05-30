@@ -73,17 +73,21 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
         width: W,
         height: H,
         selection: false,
+        backgroundColor: "transparent",
       });
       fabricRef.current = canvas;
 
-      // Position Fabric's wrapper div so it overlays the shirt <img>.
+      // Fabric wraps the <canvas> in a .canvas-container div and inlines
+      // dimensions on it. We position that wrapper to fill our own
+      // absolutely-stacked layer, so the transparent canvas overlays the
+      // shirt <img> exactly. Relying on these explicit styles (rather than
+      // Fabric's defaults) is what guarantees a true W×H overlay.
       const wrapper = canvas.wrapperEl;
       if (wrapper) {
         wrapper.style.position = "absolute";
-        wrapper.style.top      = "0";
-        wrapper.style.left     = "0";
-        wrapper.style.width    = W + "px";
-        wrapper.style.height   = H + "px";
+        wrapper.style.inset    = "0";
+        wrapper.style.width    = `${W}px`;
+        wrapper.style.height   = `${H}px`;
       }
 
       // ── Print-zone overlay ──────────────────────────────────────
@@ -266,21 +270,31 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
         {/* ── Canvas ──────────────────────────────────────────── */}
         <div
           ref={containerRef}
-          className="relative mx-auto shrink-0 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+          className="relative mx-auto shrink-0 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900"
           style={{ width: W, height: H }}
         >
-          {/* White shirt SVG — CSS filter tints it for other colours. */}
+          {/* Layer 1 — shirt mockup. The SVG viewBox is 400×400 and the
+              print-zone coordinates are authored in that same space, so the
+              image is pinned top-left at the canvas width (no centering /
+              letterboxing) to keep a 1:1 mapping with the Fabric canvas. */}
           <img
             src="/mockups/tshirt-white.svg"
             alt=""
             aria-hidden
             draggable={false}
-            className="pointer-events-none absolute inset-0 h-full w-full select-none object-contain"
-            style={color !== "white" ? { filter: SHIRT_COLOURS[color].filter } : undefined}
+            className="pointer-events-none absolute left-0 top-0 select-none"
+            style={{
+              width: W,
+              height: W, // SVG is square (400×400)
+              filter: color !== "white" ? SHIRT_COLOURS[color].filter : undefined,
+            }}
           />
 
-          {/* Fabric.js canvas — Fabric wraps this in a div and positions it. */}
-          <canvas ref={canvasEl} className="touch-none" />
+          {/* Layer 2 — transparent Fabric canvas, stacked above the shirt.
+              Fabric's wrapper div is positioned absolute/inset-0 in init(). */}
+          <div className="absolute inset-0">
+            <canvas ref={canvasEl} className="touch-none" />
+          </div>
         </div>
 
         {/* ── Controls ────────────────────────────────────────── */}
