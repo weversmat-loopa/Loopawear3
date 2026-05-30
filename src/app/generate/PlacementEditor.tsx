@@ -73,7 +73,6 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
         width: W,
         height: H,
         selection: false,
-        backgroundColor: "",
       });
       fabricRef.current = canvas;
 
@@ -83,6 +82,8 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
         wrapper.style.position = "absolute";
         wrapper.style.top      = "0";
         wrapper.style.left     = "0";
+        wrapper.style.width    = W + "px";
+        wrapper.style.height   = H + "px";
       }
 
       // ── Print-zone overlay ──────────────────────────────────────
@@ -128,6 +129,9 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       }
 
       // ── Boundary clamping ───────────────────────────────────────
+      // Use delta-based correction: shift obj.left/top by the amount
+      // the bounding box overflows the zone. This works regardless of
+      // originX/Y setting or rotation angle.
       const checkBounds = () => {
         const obj = designRef.current;
         if (!obj || !canvas) return;
@@ -135,18 +139,21 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
         const z = ZONES[sideRef.current];
         const b = obj.getBoundingRect();
 
-        const out =
-          b.left              < z.x      ||
-          b.top               < z.y      ||
-          b.left + b.width    > z.x + z.w ||
-          b.top  + b.height   > z.y + z.h;
+        const overLeft   = b.left < z.x;
+        const overRight  = b.left + b.width > z.x + z.w;
+        const overTop    = b.top < z.y;
+        const overBottom = b.top + b.height > z.y + z.h;
 
+        const out = overLeft || overRight || overTop || overBottom;
         setOutOfBounds(out);
 
         if (out) {
-          const nl = Math.max(z.x + b.width  / 2, Math.min(z.x + z.w - b.width  / 2, obj.left));
-          const nt = Math.max(z.y + b.height / 2, Math.min(z.y + z.h - b.height / 2, obj.top));
-          obj.set({ left: nl, top: nt });
+          if (overLeft)        obj.left += z.x - b.left;
+          else if (overRight)  obj.left -= (b.left + b.width) - (z.x + z.w);
+          if (overTop)         obj.top  += z.y - b.top;
+          else if (overBottom) obj.top  -= (b.top + b.height) - (z.y + z.h);
+
+          obj.setCoords();
           canvas.renderAll();
         }
       };
