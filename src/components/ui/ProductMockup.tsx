@@ -27,13 +27,12 @@ interface ProductMockupProps {
   className?: string;
 }
 
-// Canvas dimensions used by PlacementEditor — coordinates in placement data
-// are expressed in this space. The SVG shirt is 400×400 (square), so both x
-// and y coordinates are divided by CANVAS_W to convert to percentages.
+// Canvas dimensions used by PlacementEditor. x coordinates are in a 400px
+// wide space; y coordinates are in a 480px tall space. The mockup wrapper is
+// square (aspect-square), so x and y are divided by their respective canvas
+// dimensions to produce correct percentage positions.
 const CANVAS_W = 400;
-// Natural width of images from fal-ai/flux/schnell (square_hd = 1024×1024).
-// Used to convert the Fabric scaleX decimal into a container-relative width%.
-const IMAGE_NATURAL_W = 1024;
+const CANVAS_H = 480;
 
 // Fallback: when no placement data is available, the design sits centred on
 // the chest region of /public/mockups/tshirt-white.svg (viewBox 0 0 400 400).
@@ -98,9 +97,9 @@ export default function ProductMockup({
   const designStyle: React.CSSProperties = validPlacement
     ? {
         position: "absolute",
-        left: `${(validPlacement.x / CANVAS_W) * 100}%`,
-        top:  `${(validPlacement.y / CANVAS_W) * 100}%`,
-        width: `${validPlacement.scale * (IMAGE_NATURAL_W / CANVAS_W) * 100}%`,
+        left:  `${(validPlacement.x / CANVAS_W) * 100}%`,
+        top:   `${(validPlacement.y / CANVAS_H) * 100}%`,
+        width: `${(validPlacement.scale * CANVAS_W) / 1024 * 100}%`,
         aspectRatio: "1",
         transform: "translate(-50%, -50%)",
       }

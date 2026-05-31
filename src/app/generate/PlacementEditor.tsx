@@ -100,8 +100,8 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       try {
         const img = await FabricImage.fromURL(imageUrl, { crossOrigin: "anonymous" });
         const scale = Math.min(
-          (z.w * 0.6) / (img.width  ?? 100),
-          (z.h * 0.6) / (img.height ?? 100),
+          (z.w * 0.35) / (img.width  ?? 100),
+          (z.h * 0.35) / (img.height ?? 100),
         );
         setSliderScale(Math.round(scale * 100));
         img.set({
