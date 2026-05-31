@@ -224,10 +224,25 @@ export async function POST(
       return NextResponse.json({ error: "no_image_url" }, { status: 500 });
     }
 
+    // Remove the background so the design is a transparent PNG that can be
+    // cleanly placed on any shirt colour in the placement editor.
+    // If rembg is unavailable or errors, we fall back to the original image
+    // — the generation is not rolled back in that case.
+    let downloadUrl = falImageUrl;
+    try {
+      const rembgResult = await fal.run("fal-ai/imageutils/rembg", {
+        input: { image_url: falImageUrl },
+      });
+      const rembgUrl = (rembgResult.data as { image?: { url?: string } })?.image?.url;
+      if (rembgUrl) downloadUrl = rembgUrl;
+    } catch (err) {
+      console.error("[rembg] background removal failed, using original:", err);
+    }
+
     // Persist to Supabase Storage so we're not dependent on temporary fal CDN URLs.
     let imageUrl: string;
     try {
-      const imageRes = await fetch(falImageUrl);
+      const imageRes = await fetch(downloadUrl);
       if (!imageRes.ok) throw new Error("download_failed");
       const imageBuffer = Buffer.from(await imageRes.arrayBuffer());
 

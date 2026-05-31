@@ -199,8 +199,8 @@ export default function GenerateStudio({
     lastImageUrl !== null;
 
   const canvas = isRegenerating ? (
-    // Show the previous image with a light overlay + corner spinner so the
-    // user keeps context while the new design is being generated.
+    // Keep the previous image visible with a dark overlay + centred spinner
+    // while the new generation runs — never blank the canvas.
     <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
       <Image
         src={lastImageUrl}
@@ -210,12 +210,9 @@ export default function GenerateStudio({
         sizes="(min-width: 1024px) 480px, 100vw"
         className="block h-auto w-full"
       />
-      <div className="absolute inset-0 bg-white/55 backdrop-blur-[1px] dark:bg-zinc-900/65" />
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm dark:bg-zinc-800/90">
-        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 dark:border-zinc-600 dark:border-t-zinc-200" />
-        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
-          Generating…
-        </span>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/45">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+        <span className="text-xs font-medium text-white/80">Generating…</span>
       </div>
     </div>
   ) : saveState.status === "generating" ? (
