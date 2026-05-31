@@ -333,7 +333,7 @@ export default function GenerateStudio({
           </p>
         </div>
 
-        <div className="flex flex-col-reverse gap-6 lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
+        <div className="flex flex-col gap-6 lg:grid lg:grid-cols-[1fr_340px] lg:gap-10">
 
           {/* Canvas */}
           <div className="lg:self-start lg:sticky lg:top-10">

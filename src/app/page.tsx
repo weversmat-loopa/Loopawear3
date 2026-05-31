@@ -34,7 +34,7 @@ export default async function Home() {
     <main className="flex flex-1 flex-col">
       {/* Hero */}
       <section className="flex flex-col items-center px-6 pb-24 pt-28 text-center md:pt-36">
-        <h1 className="max-w-4xl text-6xl font-black leading-none tracking-tight text-zinc-900 dark:text-white sm:text-7xl md:text-8xl">
+        <h1 className="max-w-4xl text-5xl font-black leading-none tracking-tight text-zinc-900 dark:text-white sm:text-7xl md:text-8xl">
           Wear what<br className="hidden sm:block" /> you imagine.
         </h1>
 
@@ -43,11 +43,11 @@ export default async function Home() {
           Keep it for yourself — or publish it to the world.
         </p>
 
-        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
-          <Button href="/generate" variant="primary">
+        <div className="mt-10 flex w-full max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+          <Button href="/generate" variant="primary" className="text-center">
             Start designing →
           </Button>
-          <Button href="/marketplace" variant="ghost">
+          <Button href="/marketplace" variant="ghost" className="text-center">
             Browse marketplace
           </Button>
         </div>
