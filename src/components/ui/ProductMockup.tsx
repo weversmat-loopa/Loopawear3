@@ -27,12 +27,17 @@ interface ProductMockupProps {
   className?: string;
 }
 
-// The shirt SVG viewBox is 400×400 (square). The mockup wrapper is also
-// aspect-square, and the SVG fills it via object-contain (no letterboxing
-// since both are square). Placement x and y are both divided by 400.
+// The PlacementEditor's Fabric canvas is 400×480. Saved x/y are in that
+// coordinate space; saved `scale` is the Fabric scaleX value — the fraction
+// of the design's natural pixel size at which it's drawn on that canvas.
 const CANVAS_W = 400;
-// Printful front print-zone width in canvas pixels (same as PlacementEditor).
-const ZONE_W = 240;
+// The shirt SVG (viewBox 0 0 400 400) is pinned top-left in the editor, so a
+// canvas y of 0..400 maps to the top..bottom of the square mockup. The mockup
+// wrapper here is aspect-square (also 400 tall), so y divides by CANVAS_H.
+const CANVAS_H = 400;
+// Natural pixel width of the generated design image (1024×1024). Needed to
+// convert Fabric scaleX into a CSS width relative to the canvas.
+const NATURAL_W = 1024;
 
 // Fallback: when no placement data is available, the design sits centred on
 // the chest region of /public/mockups/tshirt-white.svg (viewBox 0 0 400 400).
@@ -97,9 +102,13 @@ export default function ProductMockup({
   const designStyle: React.CSSProperties = validPlacement
     ? {
         position: "absolute",
+        // Fabric stores the design with originX/Y "center", so x/y are the
+        // design's centre point on the canvas — pairs with translate(-50%, -50%).
         left:  `${(validPlacement.x / CANVAS_W) * 100}%`,
-        top:   `${(validPlacement.y / CANVAS_W) * 100}%`,
-        width: `${validPlacement.scale * (ZONE_W / CANVAS_W) * 100}%`,
+        top:   `${(validPlacement.y / CANVAS_H) * 100}%`,
+        // Displayed width on the canvas = scale × natural width; as a fraction
+        // of the mockup that's (scale × 1024 / 400). e.g. 0.08 → 20.5%.
+        width: `${(validPlacement.scale * NATURAL_W / CANVAS_W) * 100}%`,
         aspectRatio: "1",
         transform: "translate(-50%, -50%)",
       }
