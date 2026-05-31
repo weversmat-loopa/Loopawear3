@@ -81,6 +81,11 @@ export default function GenerateStudio({
   const [userHasTypedPrompt, setUserHasTypedPrompt] = useState(
     initialPrompt.length > 0
   );
+  // Persists the last successfully generated image URL so it can be shown
+  // as a dim overlay while a new generation is in progress.
+  const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
+  // Drives the opacity fade-in when a new image arrives.
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const isWorking =
     saveState.status === "saving" || saveState.status === "generating";
@@ -103,6 +108,7 @@ export default function GenerateStudio({
   }
 
   async function handleGenerate(id: string) {
+    setImgLoaded(false);
     setSaveState({ status: "generating", id });
 
     try {
@@ -128,6 +134,7 @@ export default function GenerateStudio({
         imageUrl?: string;
       };
       if (body.imageUrl) {
+        setLastImageUrl(body.imageUrl);
         setSaveState({ status: "generated", id, imageUrl: body.imageUrl });
       } else {
         setSaveState({ status: "generate_failed", id });
@@ -186,104 +193,130 @@ export default function GenerateStudio({
 
   // --- Canvas ---
 
-  const canvas =
-    saveState.status === "generating" ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-        <div className="flex flex-col items-center gap-4">
-          <div className="relative flex h-10 w-10 items-center justify-center">
-            <div className="absolute inset-0 animate-ping rounded-full bg-zinc-200 dark:bg-zinc-700" />
-            <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 dark:border-zinc-700 dark:border-t-zinc-300" />
-          </div>
-          <div className="space-y-1 text-center">
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Generating your design…</p>
-            <p className="text-xs text-zinc-400">This may take a moment.</p>
-          </div>
+  // True when re-generating and there is a previous image to keep visible.
+  const isRegenerating =
+    (saveState.status === "saving" || saveState.status === "generating") &&
+    lastImageUrl !== null;
+
+  const canvas = isRegenerating ? (
+    // Show the previous image with a light overlay + corner spinner so the
+    // user keeps context while the new design is being generated.
+    <div className="relative overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+      <Image
+        src={lastImageUrl}
+        alt={productType ? `${productType} design` : "Previous design"}
+        width={1024}
+        height={1024}
+        sizes="(min-width: 1024px) 480px, 100vw"
+        className="block h-auto w-full"
+      />
+      <div className="absolute inset-0 bg-white/55 backdrop-blur-[1px] dark:bg-zinc-900/65" />
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-sm dark:bg-zinc-800/90">
+        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 dark:border-zinc-600 dark:border-t-zinc-200" />
+        <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+          Generating…
+        </span>
+      </div>
+    </div>
+  ) : saveState.status === "generating" ? (
+    // First-time generation — no previous image available.
+    <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative flex h-10 w-10 items-center justify-center">
+          <div className="absolute inset-0 animate-ping rounded-full bg-zinc-200 dark:bg-zinc-700" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 dark:border-zinc-700 dark:border-t-zinc-300" />
+        </div>
+        <div className="space-y-1 text-center">
+          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Generating your design…</p>
+          <p className="text-xs text-zinc-400">This may take a moment.</p>
         </div>
       </div>
-    ) : saveState.status === "generated" ? (
-      <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-        <Image
-          src={saveState.imageUrl}
-          alt={productType ? `${productType} design` : "Generated design"}
-          width={1024}
-          height={1024}
-          sizes="(min-width: 1024px) 480px, 100vw"
-          className="block h-auto w-full"
-        />
-        <div className="flex items-center justify-between border-t border-zinc-100 bg-white px-5 py-3.5 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="flex items-center gap-5">
-            <Link
-              href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-              className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
-            >
-              Open workspace →
-            </Link>
-            <a
-              href={saveState.imageUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
-            >
-              Full size ↗
-            </a>
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
-            >
-              Download ↓
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={resetForm}
-            className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
-          >
-            New design
-          </button>
-        </div>
-      </div>
-    ) : saveState.status === "prompt_rejected" ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
-        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Prompt couldn&apos;t be processed
-        </p>
-        <p className="max-w-xs text-xs text-zinc-400">
-          Your prompt was flagged by our content safety check. Please revise
-          the wording and try again.
-        </p>
-      </div>
-    ) : saveState.status === "generate_failed" ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
-        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Generation failed</p>
-        <p className="text-xs text-zinc-400">Something went wrong. You can try again.</p>
-        <div className="mt-2 flex flex-wrap justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => handleGenerate(saveState.id)}
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
-          >
-            Retry
-          </button>
+    </div>
+  ) : saveState.status === "generated" ? (
+    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+      <Image
+        src={saveState.imageUrl}
+        alt={productType ? `${productType} design` : "Generated design"}
+        width={1024}
+        height={1024}
+        sizes="(min-width: 1024px) 480px, 100vw"
+        onLoad={() => setImgLoaded(true)}
+        className={`block h-auto w-full transition-opacity duration-500 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+      />
+      <div className="flex items-center justify-between border-t border-zinc-100 bg-white px-5 py-3.5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-5">
           <Link
             href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-            className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
+            className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
           >
             Open workspace →
           </Link>
+          <a
+            href={saveState.imageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+          >
+            Full size ↗
+          </a>
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+          >
+            Download ↓
+          </button>
         </div>
+        <button
+          type="button"
+          onClick={resetForm}
+          className="text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+        >
+          New design
+        </button>
       </div>
-    ) : creditsExhausted ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
-        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">No generation credits remaining</p>
-        <p className="text-xs text-zinc-400">You&apos;ve used all your available credits.</p>
+    </div>
+  ) : saveState.status === "prompt_rejected" ? (
+    <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
+      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+        Prompt couldn&apos;t be processed
+      </p>
+      <p className="max-w-xs text-xs text-zinc-400">
+        Your prompt was flagged by our content safety check. Please revise
+        the wording and try again.
+      </p>
+    </div>
+  ) : saveState.status === "generate_failed" ? (
+    <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
+      <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Generation failed</p>
+      <p className="text-xs text-zinc-400">Something went wrong. You can try again.</p>
+      <div className="mt-2 flex flex-wrap justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => handleGenerate(saveState.id)}
+          className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
+        >
+          Retry
+        </button>
+        <Link
+          href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
+          className="rounded-full border border-zinc-300 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
+        >
+          Open workspace →
+        </Link>
       </div>
-    ) : (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
-        <p className="text-sm font-medium text-zinc-400">Your design will appear here</p>
-        <p className="text-xs text-zinc-400 dark:text-zinc-600">Describe your vision and click Generate</p>
-      </div>
-    );
+    </div>
+  ) : creditsExhausted ? (
+    <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
+      <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">No generation credits remaining</p>
+      <p className="text-xs text-zinc-400">You&apos;ve used all your available credits.</p>
+    </div>
+  ) : (
+    <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+      <p className="text-sm font-medium text-zinc-400">Your design will appear here</p>
+      <p className="text-xs text-zinc-400 dark:text-zinc-600">Describe your vision and click Generate</p>
+    </div>
+  );
 
   return (
     <main className="flex flex-1 flex-col px-6 py-14 md:py-18">
