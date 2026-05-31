@@ -20,6 +20,8 @@ import type { ProductFilter, SortOption } from "./filters";
 
 export const PAGE_SIZE = 12;
 
+export type DesignPlacement = { x: number; y: number; scale: number } | null;
+
 export type MarketplaceDesign = {
   id: string;
   title: string | null;
@@ -27,6 +29,7 @@ export type MarketplaceDesign = {
   product_type: string | null;
   style: string | null;
   image_url: string | null;
+  placement: DesignPlacement;
   created_at: string;
   creator_id: string | null;
   creator_name: string | null;
@@ -70,7 +73,7 @@ export async function fetchDesigns({
   let query = supabase
     .from("designs")
     .select(
-      "id, title, prompt, product_type, style, image_url, created_at, creator_id, price_cents"
+      "id, title, prompt, product_type, style, image_url, placement, created_at, creator_id, price_cents"
     )
     .eq("status", "published");
 
@@ -149,12 +152,23 @@ export async function fetchDesigns({
     );
   }
 
-  const designs: MarketplaceDesign[] = items.map((d) => ({
-    ...d,
-    creator_id: d.creator_id ?? null,
-    creator_name: d.creator_id ? (creatorNames[d.creator_id] ?? null) : null,
-    price_cents: d.price_cents ?? null,
-  }));
+  const designs: MarketplaceDesign[] = items.map((d) => {
+    const raw = d.placement as { x?: unknown; y?: unknown; scale?: unknown } | null;
+    const placement: DesignPlacement =
+      raw &&
+      typeof raw.x === "number" &&
+      typeof raw.y === "number" &&
+      typeof raw.scale === "number"
+        ? { x: raw.x, y: raw.y, scale: raw.scale }
+        : null;
+    return {
+      ...d,
+      placement,
+      creator_id: d.creator_id ?? null,
+      creator_name: d.creator_id ? (creatorNames[d.creator_id] ?? null) : null,
+      price_cents: d.price_cents ?? null,
+    };
+  });
 
   let nextCursor: string | null = null;
   if (hasMore && items.length > 0) {

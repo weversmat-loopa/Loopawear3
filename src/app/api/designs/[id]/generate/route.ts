@@ -123,8 +123,9 @@ export async function POST(
   }
 
   const { id } = await params;
-  const body = await req.json().catch(() => ({})) as { colorPalette?: string };
+  const body = await req.json().catch(() => ({})) as { colorPalette?: string; removeBackground?: boolean };
   const colorPalette = typeof body.colorPalette === "string" ? body.colorPalette : null;
+  const removeBackground = body.removeBackground === true;
 
   const supabase = await createClient();
 
@@ -224,19 +225,21 @@ export async function POST(
       return NextResponse.json({ error: "no_image_url" }, { status: 500 });
     }
 
-    // Remove the background so the design is a transparent PNG that can be
-    // cleanly placed on any shirt colour in the placement editor.
-    // If rembg is unavailable or errors, we fall back to the original image
-    // — the generation is not rolled back in that case.
+    // Optionally remove the background so the design is a transparent PNG
+    // for clean placement on any shirt colour. Only runs when the client
+    // explicitly requests it (removeBackground: true in the request body).
+    // Falls back to the original image on any rembg error.
     let downloadUrl = falImageUrl;
-    try {
-      const rembgResult = await fal.run("fal-ai/imageutils/rembg", {
-        input: { image_url: falImageUrl },
-      });
-      const rembgUrl = (rembgResult.data as { image?: { url?: string } })?.image?.url;
-      if (rembgUrl) downloadUrl = rembgUrl;
-    } catch (err) {
-      console.error("[rembg] background removal failed, using original:", err);
+    if (removeBackground) {
+      try {
+        const rembgResult = await fal.run("fal-ai/imageutils/rembg", {
+          input: { image_url: falImageUrl },
+        });
+        const rembgUrl = (rembgResult.data as { image?: { url?: string } })?.image?.url;
+        if (rembgUrl) downloadUrl = rembgUrl;
+      } catch (err) {
+        console.error("[rembg] background removal failed, using original:", err);
+      }
     }
 
     // Persist to Supabase Storage so we're not dependent on temporary fal CDN URLs.

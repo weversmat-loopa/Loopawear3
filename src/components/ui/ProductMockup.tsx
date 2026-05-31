@@ -9,18 +9,34 @@
 
 import Image from "next/image";
 
+interface PlacementProps {
+  x: number;
+  y: number;
+  scale: number;
+}
+
 interface ProductMockupProps {
   imageUrl: string | null;
   productType: string | null;
   alt: string;
+  /** Saved placement data from the PlacementEditor (x, y in canvas px; scale as Fabric decimal). */
+  placement?: PlacementProps | null;
   /** Hint to the browser about resource priority. Defaults to "lazy". */
   loading?: "lazy" | "eager";
   /** Optional classes applied to the outer wrapper (e.g. hover transforms). */
   className?: string;
 }
 
-// Print area expressed as percentages of the wrapper, aligned to the chest
-// region of /public/mockups/tshirt-white.svg (viewBox 0 0 400 400).
+// Canvas dimensions used by PlacementEditor — coordinates in placement data
+// are expressed in this space. The SVG shirt is 400×400 (square), so both x
+// and y coordinates are divided by CANVAS_W to convert to percentages.
+const CANVAS_W = 400;
+// Natural width of images from fal-ai/flux/schnell (square_hd = 1024×1024).
+// Used to convert the Fabric scaleX decimal into a container-relative width%.
+const IMAGE_NATURAL_W = 1024;
+
+// Fallback: when no placement data is available, the design sits centred on
+// the chest region of /public/mockups/tshirt-white.svg (viewBox 0 0 400 400).
 const TSHIRT_PRINT_AREA: React.CSSProperties = {
   left: "35%",
   top: "41%",
@@ -38,6 +54,7 @@ export default function ProductMockup({
   imageUrl,
   productType,
   alt,
+  placement = null,
   loading = "lazy",
   className,
 }: ProductMockupProps) {
@@ -68,7 +85,27 @@ export default function ProductMockup({
     );
   }
 
-  // T-shirt: layer design over the chest of the t-shirt mockup
+  // T-shirt: layer design over the chest of the t-shirt mockup.
+  // When placement data is present, honour the x/y/scale from the PlacementEditor.
+  const validPlacement =
+    placement &&
+    typeof placement.x === "number" &&
+    typeof placement.y === "number" &&
+    typeof placement.scale === "number"
+      ? placement
+      : null;
+
+  const designStyle: React.CSSProperties = validPlacement
+    ? {
+        position: "absolute",
+        left: `${(validPlacement.x / CANVAS_W) * 100}%`,
+        top:  `${(validPlacement.y / CANVAS_W) * 100}%`,
+        width: `${validPlacement.scale * (IMAGE_NATURAL_W / CANVAS_W) * 100}%`,
+        aspectRatio: "1",
+        transform: "translate(-50%, -50%)",
+      }
+    : { position: "absolute", ...TSHIRT_PRINT_AREA };
+
   return (
     <div className={`${wrapperClass} bg-zinc-50 dark:bg-zinc-800`}>
       <Image
@@ -76,20 +113,18 @@ export default function ProductMockup({
         alt=""
         aria-hidden
         fill
-        // The mockup SVG is a tiny local asset; skip the optimizer rather
-        // than enabling dangerouslyAllowSVG globally for one file.
         unoptimized
         loading={loading}
         className="object-contain"
       />
-      <div className="absolute" style={TSHIRT_PRINT_AREA}>
+      <div style={designStyle}>
         <Image
           src={imageUrl}
           alt={alt}
           fill
           sizes={MOCKUP_SIZES}
           loading={loading}
-          className="object-cover"
+          className="object-contain"
         />
       </div>
     </div>

@@ -80,10 +80,11 @@ export default function GenerateStudio({
     ? (initialColorPalette as ColorPalette)
     : null;
 
-  const [designId,  setDesignId]  = useState<string | null>(initialDesignId);
-  const [saveState, setSaveState] = useState<SaveState>({ status: "idle" });
-  const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
-  const [imgLoaded,    setImgLoaded]    = useState(false);
+  const [designId,         setDesignId]         = useState<string | null>(initialDesignId);
+  const [saveState,        setSaveState]        = useState<SaveState>({ status: "idle" });
+  const [removeBackground, setRemoveBackground] = useState(true);
+  const [lastImageUrl,     setLastImageUrl]     = useState<string | null>(null);
+  const [imgLoaded,        setImgLoaded]        = useState(false);
 
   const isWorking =
     saveState.status === "saving" || saveState.status === "generating";
@@ -111,7 +112,7 @@ export default function GenerateStudio({
       const res = await fetch(`/api/designs/${id}/generate`, {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ colorPalette }),
+        body:    JSON.stringify({ colorPalette, removeBackground }),
       });
 
       if (!res.ok) {
@@ -332,6 +333,30 @@ export default function GenerateStudio({
                   Something went wrong saving your draft. Please try again.
                 </p>
               )}
+
+              {/* Background toggle */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Remove background
+                </span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={removeBackground}
+                  onClick={() => setRemoveBackground((v) => !v)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none ${
+                    removeBackground
+                      ? "bg-zinc-900 dark:bg-white"
+                      : "bg-zinc-200 dark:bg-zinc-700"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform dark:bg-zinc-900 ${
+                      removeBackground ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+              </div>
 
               {/* Generate button */}
               <button

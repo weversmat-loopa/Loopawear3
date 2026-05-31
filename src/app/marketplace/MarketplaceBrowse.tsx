@@ -234,6 +234,7 @@ export default function MarketplaceBrowse({
                       <ProductMockup
                         imageUrl={design.image_url}
                         productType={design.product_type}
+                        placement={design.placement}
                         alt={
                           design.product_type
                             ? `${design.product_type} design`

@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import DesignEditForm from "./DesignEditForm";
 import DesignImageSection from "./DesignImageSection";
+import PlacementEditorWrapper from "./PlacementEditorWrapper";
 import ConfirmForm from "@/components/ui/ConfirmForm";
 import {
   submitForReview,
@@ -155,6 +156,13 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               refineHref={refineHref}
             />
           </div>
+
+          {design.image_status === "ready" && design.image_url && (
+            <PlacementEditorWrapper
+              imageUrl={design.image_url}
+              designId={design.id}
+            />
+          )}
 
           <div className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800">
             <div className="flex items-center gap-2">

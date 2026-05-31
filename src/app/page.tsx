@@ -15,6 +15,7 @@ type FeaturedDesign = {
   title: string | null;
   product_type: string | null;
   image_url: string | null;
+  placement: { x: number; y: number; scale: number } | null;
   price_cents: number | null;
 };
 
@@ -62,12 +63,24 @@ export default async function Home() {
 
   const { data: featuredRaw } = await supabase
     .from("designs")
-    .select("id, title, product_type, image_url, price_cents")
+    .select("id, title, product_type, image_url, placement, price_cents")
     .eq("status", "published")
     .order("created_at", { ascending: false })
     .limit(8);
 
-  const featured: FeaturedDesign[] = featuredRaw ?? [];
+  const featured: FeaturedDesign[] = (featuredRaw ?? []).map((d) => {
+    const raw = d.placement as { x?: unknown; y?: unknown; scale?: unknown } | null;
+    return {
+      ...d,
+      placement:
+        raw &&
+        typeof raw.x === "number" &&
+        typeof raw.y === "number" &&
+        typeof raw.scale === "number"
+          ? { x: raw.x, y: raw.y, scale: raw.scale }
+          : null,
+    };
+  });
 
   return (
     <main className="flex flex-1 flex-col">
@@ -171,6 +184,7 @@ export default async function Home() {
                       <ProductMockup
                         imageUrl={design.image_url}
                         productType={design.product_type}
+                        placement={design.placement}
                         alt={
                           design.product_type
                             ? `${design.product_type} design`

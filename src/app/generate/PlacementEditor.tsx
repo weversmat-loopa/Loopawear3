@@ -54,6 +54,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
   const [side,        setSide]        = useState<Side>("front");
   const [color,       setColor]       = useState<ShirtColor>("white");
   const [size,        setSize]        = useState("M");
+  const [sliderScale, setSliderScale] = useState(60);
   const [outOfBounds, setOutOfBounds] = useState(false);
   const [saveStatus,  setSaveStatus]  = useState<"idle"|"saving"|"saved"|"error">("idle");
 
@@ -102,6 +103,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
           (z.w * 0.6) / (img.width  ?? 100),
           (z.h * 0.6) / (img.height ?? 100),
         );
+        setSliderScale(Math.round(scale * 100));
         img.set({
           left: z.x + z.w / 2,
           top:  z.y + z.h / 2,
@@ -161,7 +163,11 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       };
 
       canvas.on("object:moving",  checkBounds);
-      canvas.on("object:scaling", checkBounds);
+      canvas.on("object:scaling", () => {
+        checkBounds();
+        const o = designRef.current;
+        if (o) setSliderScale(Math.round((o.scaleX ?? 1) * 100));
+      });
       canvas.on("object:rotating", () => setOutOfBounds(false));
     };
 
@@ -187,6 +193,25 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
     canvas.renderAll();
     setOutOfBounds(false);
   }, [side]);
+
+  // ── Scale slider ────────────────────────────────────────────────
+  function handleScaleChange(pct: number) {
+    const canvas = fabricRef.current;
+    const obj    = designRef.current;
+    if (!canvas || !obj) return;
+    setSliderScale(pct);
+    obj.set({ scaleX: pct / 100, scaleY: pct / 100 });
+    obj.setCoords();
+    canvas.renderAll();
+    const z = ZONES[sideRef.current];
+    const b = obj.getBoundingRect();
+    setOutOfBounds(
+      b.left < z.x ||
+      b.left + b.width  > z.x + z.w ||
+      b.top  < z.y ||
+      b.top  + b.height > z.y + z.h
+    );
+  }
 
   // ── Save placement ───────────────────────────────────────────────
   const handleSave = async () => {
@@ -314,10 +339,31 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
             </div>
           </div>
 
-          {/* Size */}
+          {/* Design size slider */}
+          <div>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-xs font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                Size
+              </p>
+              <span className="text-xs tabular-nums text-zinc-400 dark:text-zinc-500">
+                {sliderScale}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={10}
+              max={200}
+              step={5}
+              value={sliderScale}
+              onChange={(e) => handleScaleChange(Number(e.target.value))}
+              className="w-full accent-zinc-900 dark:accent-white"
+            />
+          </div>
+
+          {/* Garment size */}
           <div>
             <p className="mb-3 text-xs font-medium uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              Size
+              Garment
             </p>
             <div className="flex flex-wrap gap-2">
               {SIZES.map((s) => (
