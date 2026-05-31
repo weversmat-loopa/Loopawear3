@@ -27,12 +27,12 @@ interface ProductMockupProps {
   className?: string;
 }
 
-// Canvas dimensions used by PlacementEditor. x coordinates are in a 400px
-// wide space; y coordinates are in a 480px tall space. The mockup wrapper is
-// square (aspect-square), so x and y are divided by their respective canvas
-// dimensions to produce correct percentage positions.
+// The shirt SVG viewBox is 400×400 (square). The mockup wrapper is also
+// aspect-square, and the SVG fills it via object-contain (no letterboxing
+// since both are square). Placement x and y are both divided by 400.
 const CANVAS_W = 400;
-const CANVAS_H = 480;
+// Printful front print-zone width in canvas pixels (same as PlacementEditor).
+const ZONE_W = 240;
 
 // Fallback: when no placement data is available, the design sits centred on
 // the chest region of /public/mockups/tshirt-white.svg (viewBox 0 0 400 400).
@@ -98,8 +98,8 @@ export default function ProductMockup({
     ? {
         position: "absolute",
         left:  `${(validPlacement.x / CANVAS_W) * 100}%`,
-        top:   `${(validPlacement.y / CANVAS_H) * 100}%`,
-        width: `${(validPlacement.scale * CANVAS_W) / 1024 * 100}%`,
+        top:   `${(validPlacement.y / CANVAS_W) * 100}%`,
+        width: `${validPlacement.scale * (ZONE_W / CANVAS_W) * 100}%`,
         aspectRatio: "1",
         transform: "translate(-50%, -50%)",
       }
