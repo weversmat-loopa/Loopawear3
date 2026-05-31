@@ -46,15 +46,18 @@ interface Props {
 export default function PlacementEditor({ imageUrl, designId }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasEl     = useRef<HTMLCanvasElement>(null);
-  const fabricRef    = useRef<FabricCanvas | null>(null);
-  const designRef    = useRef<FabricImageT | null>(null);
+  const fabricRef       = useRef<FabricCanvas | null>(null);
+  const designRef       = useRef<FabricImageT | null>(null);
+  // Natural pixel width of the loaded design image. Needed to convert between
+  // Fabric scaleX (fraction of natural size) and slider % (fraction of zone width).
+  const imgNaturalWRef  = useRef<number>(1024);
   // Ref keeps the closure in the Fabric event handler up-to-date.
-  const sideRef      = useRef<Side>("front");
+  const sideRef         = useRef<Side>("front");
 
   const [side,        setSide]        = useState<Side>("front");
   const [color,       setColor]       = useState<ShirtColor>("white");
   const [size,        setSize]        = useState("M");
-  const [sliderScale, setSliderScale] = useState(60);
+  const [sliderScale, setSliderScale] = useState(35);
   const [outOfBounds, setOutOfBounds] = useState(false);
   const [saveStatus,  setSaveStatus]  = useState<"idle"|"saving"|"saved"|"error">("idle");
 
@@ -99,11 +102,14 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       // ── Design image ────────────────────────────────────────────
       try {
         const img = await FabricImage.fromURL(imageUrl, { crossOrigin: "anonymous" });
+        const naturalW = img.width ?? 1024;
+        imgNaturalWRef.current = naturalW;
         const scale = Math.min(
-          (z.w * 0.35) / (img.width  ?? 100),
-          (z.h * 0.35) / (img.height ?? 100),
+          (z.w * 0.35) / naturalW,
+          (z.h * 0.35) / (img.height ?? 1024),
         );
-        setSliderScale(Math.round(scale * 100));
+        // Slider unit: % of print-zone width. Derive from Fabric scale.
+        setSliderScale(Math.round(scale * naturalW / z.w * 100));
         img.set({
           left: z.x + z.w / 2,
           top:  z.y + z.h / 2,
@@ -166,7 +172,12 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       canvas.on("object:scaling", () => {
         checkBounds();
         const o = designRef.current;
-        if (o) setSliderScale(Math.round((o.scaleX ?? 1) * 100));
+        if (o) {
+          const pct = Math.round(
+            (o.scaleX ?? 1) * imgNaturalWRef.current / ZONES[sideRef.current].w * 100
+          );
+          setSliderScale(pct);
+        }
       });
       canvas.on("object:rotating", () => setOutOfBounds(false));
     };
@@ -200,7 +211,9 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
     const obj    = designRef.current;
     if (!canvas || !obj) return;
     setSliderScale(pct);
-    obj.set({ scaleX: pct / 100, scaleY: pct / 100 });
+    // Convert slider % (fraction of zone width) → Fabric scale (fraction of natural size).
+    const fabricScale = (pct / 100) * (ZONES[sideRef.current].w / imgNaturalWRef.current);
+    obj.set({ scaleX: fabricScale, scaleY: fabricScale });
     obj.setCoords();
     canvas.renderAll();
     const z = ZONES[sideRef.current];
@@ -351,9 +364,9 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
             </div>
             <input
               type="range"
-              min={10}
-              max={200}
-              step={5}
+              min={5}
+              max={100}
+              step={1}
               value={sliderScale}
               onChange={(e) => handleScaleChange(Number(e.target.value))}
               className="w-full accent-zinc-900 dark:accent-white"
