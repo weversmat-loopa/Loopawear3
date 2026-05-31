@@ -3,6 +3,7 @@ import AuthCard from "@/components/layout/AuthCard";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import PageShell from "@/components/layout/PageShell";
+import SocialAuthButtons from "@/components/ui/SocialAuthButtons";
 import { signIn } from "@/lib/auth/actions";
 
 type LoginPageProps = {
@@ -18,7 +19,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <PageShell>
       <AuthCard title="Log in" description="Welcome back to Loopawear">
-        <form action={signIn} className="mt-8 flex flex-col gap-4">
+        <div className="mt-8">
+          <SocialAuthButtons />
+        </div>
+        <form action={signIn} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="email"

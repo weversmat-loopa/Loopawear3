@@ -61,6 +61,44 @@ export async function requestPasswordReset(formData: FormData) {
   redirect("/forgot-password?sent=1");
 }
 
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-8lsdx.vercel.app";
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${siteUrl}/auth/callback` },
+  });
+
+  if (error || !data.url) {
+    redirect(
+      `/login?error=${encodeURIComponent(error?.message ?? "Could not start Google sign-in.")}`
+    );
+  }
+
+  redirect(data.url);
+}
+
+export async function signInWithApple() {
+  const supabase = await createClient();
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-8lsdx.vercel.app";
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "apple",
+    options: { redirectTo: `${siteUrl}/auth/callback` },
+  });
+
+  if (error || !data.url) {
+    redirect(
+      `/login?error=${encodeURIComponent(error?.message ?? "Could not start Apple sign-in.")}`
+    );
+  }
+
+  redirect(data.url);
+}
+
 export async function updatePassword(formData: FormData) {
   const supabase = await createClient();
 
