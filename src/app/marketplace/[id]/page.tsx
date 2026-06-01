@@ -77,7 +77,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, image_url, created_at, creator_id, price_cents")
+    .select("id, title, prompt, product_type, style, image_url, placement, created_at, creator_id, price_cents")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -150,6 +150,7 @@ export default async function DesignPage({ params }: Props) {
               <ProductMockup
                 imageUrl={design.image_url}
                 productType={design.product_type}
+                placement={design.placement as { x: number; y: number; scale: number } | null}
                 alt={
                   design.product_type
                     ? `${design.product_type} design`
