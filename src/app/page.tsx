@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import ProductMockup from "@/components/ui/ProductMockup";
 import { createClient } from "@/utils/supabase/server";
@@ -64,11 +65,25 @@ export default async function Home() {
     <main className="flex flex-1 flex-col">
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
-      <section className="relative flex min-h-[88vh] flex-col justify-end bg-zinc-950 px-6 pb-20 pt-32 md:px-12 lg:min-h-[92vh] lg:px-20">
-        {/* Subtle top glow for depth */}
+      <section className="relative flex min-h-[88vh] flex-col justify-end overflow-hidden px-6 pb-20 pt-32 md:px-12 lg:min-h-[92vh] lg:px-20">
+        {/* Background image — object-right keeps the model in frame */}
+        <Image
+          src="/hero.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center sm:object-right"
+        />
+        {/* Left overlay — darkens the text side, fades toward the model */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_100%_45%_at_50%_0%,rgba(255,255,255,0.05),transparent)]"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/10"
+        />
+        {/* Bottom overlay — anchors the text block against the image */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent"
         />
 
         <div className="relative mx-auto w-full max-w-7xl">
