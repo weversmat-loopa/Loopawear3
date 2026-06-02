@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cancelStuckGeneration } from "@/app/account/actions";
 
@@ -13,6 +13,8 @@ interface DesignImageSectionProps {
   productType: string | null;
   colorPalette: string | null;
   refineHref: string;
+  mockupUrl: string | null;
+  mockupStatus: string | null;
 }
 
 export default function DesignImageSection({
@@ -22,6 +24,8 @@ export default function DesignImageSection({
   productType,
   colorPalette,
   refineHref,
+  mockupUrl,
+  mockupStatus,
 }: DesignImageSectionProps) {
   const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -29,6 +33,22 @@ export default function DesignImageSection({
 
   const serverGenerating = imageStatus === "generating";
   const anyGenerating = isGenerating || serverGenerating;
+
+  const [isMockupGenerating, setIsMockupGenerating] = useState(false);
+  const [mockupError, setMockupError] = useState<string | null>(null);
+  const [showMockup, setShowMockup] = useState(
+    mockupStatus === "ready" && !!mockupUrl
+  );
+
+  const serverMockupGenerating = mockupStatus === "generating";
+  const anyMockupGenerating = isMockupGenerating || serverMockupGenerating;
+
+  // Auto-switch to mockup view after successful generation (props update via router.refresh).
+  useEffect(() => {
+    if (mockupStatus === "ready" && mockupUrl) {
+      setShowMockup(true);
+    }
+  }, [mockupStatus, mockupUrl]);
 
   const canGenerate =
     !isGenerating &&
@@ -66,6 +86,33 @@ export default function DesignImageSection({
       setError("Something went wrong. Please try again.");
     } finally {
       setIsGenerating(false);
+    }
+  }
+
+  async function handleGenerateMockup() {
+    setIsMockupGenerating(true);
+    setMockupError(null);
+
+    try {
+      const res = await fetch(`/api/designs/${designId}/mockup`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setMockupError(
+          body.error === "already_generating"
+            ? "Generation already in progress."
+            : "Mockup generation failed. Please try again."
+        );
+        return;
+      }
+
+      router.refresh();
+    } catch {
+      setMockupError("Something went wrong. Please try again.");
+    } finally {
+      setIsMockupGenerating(false);
     }
   }
 
@@ -112,17 +159,47 @@ export default function DesignImageSection({
   }
 
   // Server state: ready with image
+  const hasReadyMockup = mockupStatus === "ready" && !!mockupUrl;
+
   const imageArea =
     imageStatus === "ready" && imageUrl ? (
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
-        <Image
-          src={imageUrl}
-          alt={productType ? `${productType} design` : "Generated design"}
-          width={1024}
-          height={1024}
-          sizes="(min-width: 768px) 480px, 100vw"
-          className="block h-auto w-full"
-        />
+      <div>
+        {hasReadyMockup && (
+          <div className="mb-3 flex gap-1">
+            <button
+              type="button"
+              onClick={() => setShowMockup(false)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                !showMockup
+                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              }`}
+            >
+              Design
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowMockup(true)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                showMockup
+                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              }`}
+            >
+              Mockup
+            </button>
+          </div>
+        )}
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
+          <Image
+            src={hasReadyMockup && showMockup ? mockupUrl! : imageUrl}
+            alt={productType ? `${productType} design` : "Generated design"}
+            width={1024}
+            height={1024}
+            sizes="(min-width: 768px) 480px, 100vw"
+            className="block h-auto w-full"
+          />
+        </div>
       </div>
     ) : serverGenerating ? (
       <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -220,11 +297,55 @@ export default function DesignImageSection({
     </div>
   ) : null;
 
+  const mockupSection =
+    imageStatus === "ready" ? (
+      <div className="mt-6 border-t border-zinc-100 pt-5 dark:border-zinc-800">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+          Printful mockup
+        </p>
+        {anyMockupGenerating ? (
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Generating mockup…
+            </p>
+          </div>
+        ) : mockupStatus === "ready" ? (
+          <button
+            type="button"
+            onClick={handleGenerateMockup}
+            className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
+          >
+            Regenerate mockup
+          </button>
+        ) : (
+          <div className="space-y-2">
+            <button
+              type="button"
+              onClick={handleGenerateMockup}
+              className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+            >
+              Generate Printful mockup
+            </button>
+            {mockupStatus === "failed" && !mockupError && (
+              <p className="text-xs text-zinc-400">
+                Previous attempt failed — try again.
+              </p>
+            )}
+            {mockupError && (
+              <p className="text-xs text-red-500">{mockupError}</p>
+            )}
+          </div>
+        )}
+      </div>
+    ) : null;
+
   return (
     <div>
       {imageArea}
       {actionRow && <div className="mt-4">{actionRow}</div>}
       {stuckRecoveryRow}
+      {mockupSection}
     </div>
   );
 }

@@ -64,7 +64,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, status, image_status, image_url, created_at, price_cents")
+    .select("id, title, prompt, product_type, style, status, image_status, image_url, mockup_url, mockup_status, created_at, price_cents")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -154,6 +154,8 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
               productType={design.product_type}
               colorPalette={colorPalette}
               refineHref={refineHref}
+              mockupUrl={design.mockup_url ?? null}
+              mockupStatus={design.mockup_status ?? null}
             />
           </div>
 
