@@ -25,6 +25,9 @@ interface ProductMockupProps {
   loading?: "lazy" | "eager";
   /** Optional classes applied to the outer wrapper (e.g. hover transforms). */
   className?: string;
+  /** Printful-generated mockup URL. When present and status is "ready", shown directly — no SVG overlay. */
+  mockupUrl?: string | null;
+  mockupStatus?: string | null;
 }
 
 // The PlacementEditor's Fabric canvas is 400×480. Saved x/y are in that
@@ -61,6 +64,8 @@ export default function ProductMockup({
   placement = null,
   loading = "lazy",
   className,
+  mockupUrl = null,
+  mockupStatus = null,
 }: ProductMockupProps) {
   const wrapperClass = `relative aspect-square w-full overflow-hidden ${className ?? ""}`.trim();
 
@@ -68,6 +73,23 @@ export default function ProductMockup({
   if (!imageUrl) {
     return (
       <div className={`${wrapperClass} bg-zinc-100 dark:bg-zinc-800`} aria-hidden />
+    );
+  }
+
+  // Printful mockup: already a complete product photo, no SVG overlay needed.
+  // imageUrl is guaranteed non-null past the check above.
+  if (mockupStatus === "ready" && mockupUrl) {
+    return (
+      <div className={`${wrapperClass} bg-zinc-50 dark:bg-zinc-800`}>
+        <Image
+          src={mockupUrl}
+          alt={alt}
+          fill
+          sizes={MOCKUP_SIZES}
+          loading={loading}
+          className="object-contain"
+        />
+      </div>
     );
   }
 

@@ -43,6 +43,8 @@ type RelatedDesign = {
   title: string | null;
   product_type: string | null;
   image_url: string | null;
+  mockup_url: string | null;
+  mockup_status: string | null;
   prompt: string;
 };
 
@@ -56,6 +58,8 @@ function RelatedDesignCard({ item }: { item: RelatedDesign }) {
           alt={item.product_type ? `${item.product_type} design` : "Design"}
           loading="lazy"
           className="transition-transform duration-300 group-hover:scale-[1.02]"
+          mockupUrl={item.mockup_url}
+          mockupStatus={item.mockup_status}
         />
       </div>
       <div className="mt-3">
@@ -77,7 +81,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, image_url, placement, created_at, creator_id, price_cents")
+    .select("id, title, prompt, product_type, style, image_url, mockup_url, mockup_status, placement, created_at, creator_id, price_cents")
     .eq("id", id)
     .eq("status", "published")
     .maybeSingle();
@@ -100,7 +104,7 @@ export default async function DesignPage({ params }: Props) {
   if (design.creator_id) {
     const { data: more } = await supabase
       .from("designs")
-      .select("id, title, product_type, image_url, prompt")
+      .select("id, title, product_type, image_url, mockup_url, mockup_status, prompt")
       .eq("creator_id", design.creator_id)
       .eq("status", "published")
       .neq("id", design.id)
@@ -119,7 +123,7 @@ export default async function DesignPage({ params }: Props) {
     const excludeIds = [design.id, ...moreByCreator.map((d) => d.id)];
     const { data: similar } = await supabase
       .from("designs")
-      .select("id, title, product_type, image_url, prompt")
+      .select("id, title, product_type, image_url, mockup_url, mockup_status, prompt")
       .eq("status", "published")
       .or(similarConditions.join(","))
       .not("id", "in", `(${excludeIds.join(",")})`)
@@ -157,6 +161,8 @@ export default async function DesignPage({ params }: Props) {
                     : "Design"
                 }
                 loading="eager"
+                mockupUrl={design.mockup_url ?? null}
+                mockupStatus={design.mockup_status ?? null}
               />
             </div>
           </div>

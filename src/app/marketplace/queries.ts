@@ -29,6 +29,8 @@ export type MarketplaceDesign = {
   product_type: string | null;
   style: string | null;
   image_url: string | null;
+  mockup_url: string | null;
+  mockup_status: string | null;
   placement: DesignPlacement;
   created_at: string;
   creator_id: string | null;
@@ -73,7 +75,7 @@ export async function fetchDesigns({
   let query = supabase
     .from("designs")
     .select(
-      "id, title, prompt, product_type, style, image_url, placement, created_at, creator_id, price_cents"
+      "id, title, prompt, product_type, style, image_url, mockup_url, mockup_status, placement, created_at, creator_id, price_cents"
     )
     .eq("status", "published");
 

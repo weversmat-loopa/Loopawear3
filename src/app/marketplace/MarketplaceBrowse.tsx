@@ -242,6 +242,8 @@ export default function MarketplaceBrowse({
                         }
                         loading="lazy"
                         className="transition-transform duration-300 group-hover:scale-[1.02]"
+                        mockupUrl={design.mockup_url}
+                        mockupStatus={design.mockup_status}
                       />
                     </div>
                     <div className="mt-3">
