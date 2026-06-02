@@ -205,3 +205,116 @@ export async function cancelOrder(formData: FormData) {
 
   redirect(`/admin/orders?success=${encodeURIComponent("Order cancelled.")}`);
 }
+
+// ── Design management ────────────────────────────────────────
+
+export async function archiveDesign(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/admin/designs?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("id", designId)
+    .is("archived_at", null);
+
+  if (error) {
+    redirect(
+      `/admin/designs?error=${encodeURIComponent("Could not archive design. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/designs?success=${encodeURIComponent("Design archived.")}`);
+}
+
+export async function unarchiveDesign(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  if (!designId) {
+    redirect(`/admin/designs?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({ archived_at: null })
+    .eq("id", designId)
+    .not("archived_at", "is", null);
+
+  if (error) {
+    redirect(
+      `/admin/designs?error=${encodeURIComponent("Could not unarchive design. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/designs?success=${encodeURIComponent("Design restored.")}`);
+}
+
+export async function deleteDesignPermanently(formData: FormData) {
+  const { supabase } = await requireAdmin();
+
+  const designId = String(formData.get("designId") ?? "").trim();
+  const confirm = String(formData.get("confirm") ?? "").trim();
+
+  if (!designId) {
+    redirect(`/admin/designs?error=${encodeURIComponent("Invalid design.")}`);
+  }
+
+  // Double confirmation: the form must include confirm=DELETE
+  if (confirm !== "DELETE") {
+    redirect(
+      `/admin/designs?error=${encodeURIComponent("Confirmation required. Type DELETE to permanently remove a design.")}`
+    );
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .delete()
+    .eq("id", designId)
+    .not("archived_at", "is", null); // only allow deleting archived designs
+
+  if (error) {
+    redirect(
+      `/admin/designs?error=${encodeURIComponent("Could not delete design. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/designs?success=${encodeURIComponent("Design permanently deleted.")}`);
+}
+
+// ── User management ──────────────────────────────────────────
+
+export async function updateUserCredits(formData: FormData) {
+  const { service } = await requireAdmin();
+
+  const userId = String(formData.get("userId") ?? "").trim();
+  const creditsRaw = String(formData.get("credits") ?? "").trim();
+
+  if (!userId) {
+    redirect(`/admin/users?error=${encodeURIComponent("Invalid user.")}`);
+  }
+
+  const credits = parseInt(creditsRaw, 10);
+  if (isNaN(credits) || credits < 0) {
+    redirect(
+      `/admin/users?error=${encodeURIComponent("Credits must be a non-negative number.")}`
+    );
+  }
+
+  const { error } = await service
+    .from("profiles")
+    .update({ generation_credits: credits })
+    .eq("id", userId);
+
+  if (error) {
+    redirect(
+      `/admin/users?error=${encodeURIComponent("Could not update credits. Please try again.")}`
+    );
+  }
+
+  redirect(`/admin/users?success=${encodeURIComponent("Credits updated.")}`);
+}

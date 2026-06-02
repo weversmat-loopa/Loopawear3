@@ -65,7 +65,7 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
               <>
                 {isAdmin && (
                   <Link
-                    href="/admin/review"
+                    href="/admin"
                     className={`text-sm font-medium transition-colors ${
                       pathname.startsWith("/admin")
                         ? "text-zinc-900 dark:text-white"
@@ -189,7 +189,7 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
               <>
                 {isAdmin && (
                   <Link
-                    href="/admin/review"
+                    href="/admin"
                     className={`rounded-lg px-3 py-3 text-base font-medium transition-colors ${
                       pathname.startsWith("/admin")
                         ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"

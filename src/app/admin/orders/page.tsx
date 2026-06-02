@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
 import { createServiceClient } from "@/utils/supabase/service";
 import { markFulfillmentPending, markShipped, cancelOrder } from "../actions";
 
@@ -40,26 +38,10 @@ const STATUS_CLASSES: Record<string, string> = {
 export default async function AdminOrdersPage({
   searchParams,
 }: AdminOrdersPageProps) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Admin check is handled by src/app/admin/layout.tsx.
 
-  if (!user) notFound();
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") notFound();
-
-  // Read orders with the service-role client. Guest orders have
-  // buyer_id = null and are not returned by the RLS policies bound to the
-  // user client (which scope rows to buyer_id = auth.uid()), so logged-in
-  // buyer orders showed up here but guest orders did not. The admin role
-  // is already verified above, so bypassing RLS for this read is safe.
+  // Use the service-role client so guest orders (buyer_id = null)
+  // are included — they are not returned by user-scoped RLS policies.
   const service = createServiceClient();
 
   const { data: ordersRaw } = await service

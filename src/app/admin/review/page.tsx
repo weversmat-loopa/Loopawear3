@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { approveDesign, rejectDesign } from "../actions";
 
@@ -18,23 +17,8 @@ export default async function AdminReviewPage({
   searchParams,
 }: AdminReviewPageProps) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) {
-    notFound();
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profile?.role !== "admin") {
-    notFound();
-  }
+  // Admin check is handled by src/app/admin/layout.tsx.
 
   const { data: pendingRaw } = await supabase
     .from("designs")
