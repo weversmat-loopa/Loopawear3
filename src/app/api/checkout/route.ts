@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@/utils/supabase/server";
+import { MIN_PRICE_CENTS } from "@/lib/pricing";
 
 type AllowedCountry = NonNullable<
   Stripe.Checkout.Session["shipping_address_collection"]
@@ -62,6 +63,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "design_not_found" }, { status: 404 });
   }
   if (!design.price_cents) {
+    return NextResponse.json({ error: "design_not_priced" }, { status: 422 });
+  }
+  if (design.price_cents < MIN_PRICE_CENTS) {
     return NextResponse.json({ error: "design_not_priced" }, { status: 422 });
   }
 

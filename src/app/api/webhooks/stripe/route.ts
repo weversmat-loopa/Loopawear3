@@ -6,6 +6,7 @@ import {
   newSaleEmail,
   orderConfirmationEmail,
 } from "@/lib/email/templates";
+import { calculateSplit } from "@/lib/pricing";
 
 type ServiceClient = ReturnType<typeof createServiceClient>;
 
@@ -117,8 +118,11 @@ async function handleCheckoutCompleted(
   }
 
   const amount_total_cents = session.amount_total ?? 0;
-  const platform_fee_cents = Math.round(amount_total_cents * 0.15);
-  const creator_earnings_cents = amount_total_cents - platform_fee_cents;
+  const qty = parseInt(quantity, 10);
+  const { platform_fee_cents, creator_earnings_cents } = calculateSplit(
+    amount_total_cents,
+    qty
+  );
 
   // Select the inserted row so we have its id (used in the order URL
   // sent to the buyer) and the canonical size/quantity/totals.
@@ -128,7 +132,7 @@ async function handleCheckoutCompleted(
       buyer_id: buyer_id || null,
       design_id,
       creator_id: creator_id || null,
-      quantity: parseInt(quantity, 10),
+      quantity: qty,
       size,
       unit_price_cents: parseInt(unit_price_cents, 10),
       amount_total_cents,

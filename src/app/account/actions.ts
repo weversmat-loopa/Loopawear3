@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { MIN_PRICE_CENTS } from "@/lib/pricing";
 
 export async function submitForReview(formData: FormData) {
   const supabase = await createClient();
@@ -108,9 +109,10 @@ export async function updateDesign(formData: FormData) {
   let priceCents: number | null = null;
   if (priceEurosRaw !== "") {
     const parsed = parseFloat(priceEurosRaw);
-    if (isNaN(parsed) || parsed < 0) {
+    const minEuros = (MIN_PRICE_CENTS / 100).toFixed(2);
+    if (isNaN(parsed) || Math.round(parsed * 100) < MIN_PRICE_CENTS) {
       redirect(
-        `/account/designs/${designId}?error=${encodeURIComponent("Price must be a valid positive amount (e.g. 29.99).")}`
+        `/account/designs/${designId}?error=${encodeURIComponent(`Price must be at least €${minEuros} to cover production costs.`)}`
       );
     }
     priceCents = Math.round(parsed * 100);
