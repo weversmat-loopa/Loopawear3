@@ -9,6 +9,8 @@ const PRINTFUL_API = "https://api.printful.com/v2";
 // Replace variant id when multi-colour support is added.
 const PRINTFUL_CATALOG_PRODUCT_ID = 71;
 const PRINTFUL_CATALOG_VARIANT_ID = 4017;
+// Men's Lifestyle 3 (front view) — tested against product 71.
+const PRINTFUL_MOCKUP_STYLE_ID = 758;
 
 const POLL_INTERVAL_MS = 2_000;
 const POLL_TIMEOUT_MS  = 60_000;
@@ -97,6 +99,7 @@ export async function POST(
             source: "catalog",
             catalog_product_id: PRINTFUL_CATALOG_PRODUCT_ID,
             catalog_variant_ids: [PRINTFUL_CATALOG_VARIANT_ID],
+            mockup_style_ids: [PRINTFUL_MOCKUP_STYLE_ID],
             placements: [
               {
                 placement: "front",
