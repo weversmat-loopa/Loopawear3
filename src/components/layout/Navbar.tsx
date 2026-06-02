@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { signOut } from "@/lib/auth/actions";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { DoodleStar } from "@/components/ui/Doodles";
 
 const links = [
   { label: "Marketplace", href: "/marketplace" },
@@ -28,12 +29,13 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b border-zinc-100 bg-white px-6 dark:border-zinc-800 dark:bg-zinc-950">
+      <header className="sticky top-0 z-40 flex h-14 w-full items-center justify-between border-b-2 border-ink bg-paper px-6">
         <Link
           href="/"
-          className="text-base font-bold tracking-tight text-zinc-900 transition-colors hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300"
+          className="group flex items-center gap-1.5 text-ink transition-transform hover:-translate-y-0.5"
         >
-          Loopawear
+          <DoodleStar className="h-4 w-4 text-brand-orange transition-transform group-hover:rotate-12" />
+          <span className="font-marker text-xl leading-none">Loopawear</span>
         </Link>
 
         {/* ── Desktop nav (md+) ─────────────────────────────────── */}
@@ -104,7 +106,7 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                 </Link>
                 <Link
                   href="/signup"
-                  className="rounded-full border border-zinc-900 px-4 py-1.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-900 hover:text-white dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
+                  className="sticker-sm rounded-full bg-brand-blue px-4 py-1.5 text-sm font-extrabold text-white"
                 >
                   Sign up
                 </Link>
@@ -163,7 +165,7 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
 
       {/* ── Mobile slide-down menu ────────────────────────────────── */}
       {isMenuOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-14 z-40 flex flex-col overflow-y-auto bg-white px-6 py-8 dark:bg-zinc-950 md:hidden">
+        <div className="fixed inset-x-0 bottom-0 top-14 z-40 flex flex-col overflow-y-auto bg-paper px-6 py-8 md:hidden">
           <nav className="flex flex-col gap-1">
             {links.map(({ label, href }) => {
               const isActive =
@@ -228,7 +230,7 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                 </Link>
                 <Link
                   href="/signup"
-                  className="mt-2 rounded-full border border-zinc-900 px-4 py-2.5 text-center text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-900 hover:text-white dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
+                  className="sticker-sm mt-2 rounded-full bg-brand-blue px-4 py-2.5 text-center text-base font-extrabold text-white"
                 >
                   Sign up
                 </Link>

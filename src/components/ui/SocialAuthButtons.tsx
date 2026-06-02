@@ -1,7 +1,7 @@
 import { signInWithGoogle, signInWithApple } from "@/lib/auth/actions";
 
 const btnClass =
-  "flex w-full items-center justify-center gap-3 rounded-full border border-zinc-200 bg-white py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:text-zinc-200 dark:hover:bg-zinc-800/60";
+  "flex w-full items-center justify-center gap-3 rounded-full border border-zinc-200 bg-paper py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:text-zinc-200 dark:hover:bg-zinc-800/60";
 
 export default function SocialAuthButtons() {
   return (

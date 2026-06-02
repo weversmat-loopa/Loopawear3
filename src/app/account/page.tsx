@@ -90,7 +90,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
   return (
     <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-2xl">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="font-display text-2xl text-ink sm:text-3xl">
           Your account
         </h1>
 
@@ -102,7 +102,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
         )}
 
         {/* Profile settings */}
-        <div className="mt-8 divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="mt-8 divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-paper dark:divide-zinc-800 dark:border-zinc-700 dark:bg-zinc-900">
           <div className="px-5 py-4">
             <form action={updateDisplayName}>
               <label
@@ -146,7 +146,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                   defaultValue={profile?.bio ?? ""}
                   placeholder="A short intro about you…"
                   maxLength={300}
-                  className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+                  className="w-full resize-none rounded-lg border border-zinc-200 bg-paper px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
                 />
                 <div className="mt-2 flex items-center justify-between">
                   <p className="text-xs text-zinc-400 dark:text-zinc-500">
@@ -233,7 +233,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {drafts.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <div className="flex">
                     {/* Thumbnail */}
@@ -304,7 +304,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                             >
                               <button
                                 type="submit"
-                                className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                                className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
                               >
                                 Submit for review →
                               </button>
@@ -360,7 +360,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {pendingDesigns.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <div className="flex">
                     <Link
@@ -450,7 +450,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               {publishedDesigns.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <div className="flex">
                     {/* Thumbnail */}

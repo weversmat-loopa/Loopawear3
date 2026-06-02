@@ -117,7 +117,7 @@ export default async function AdminOrdersPage({
               return (
                 <li
                   key={order.id}
-                  className="rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900"
+                  className="rounded-xl border border-zinc-200 bg-paper p-5 dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export default async function AdminOrdersPage({
                           />
                           <button
                             type="submit"
-                            className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                            className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
                           >
                             Mark fulfillment pending →
                           </button>
@@ -242,11 +242,11 @@ export default async function AdminOrdersPage({
                             type="text"
                             name="trackingNumber"
                             placeholder="Tracking number (optional)"
-                            className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:ring-zinc-500"
+                            className="rounded-lg border border-zinc-200 bg-paper px-3 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:ring-zinc-500"
                           />
                           <button
                             type="submit"
-                            className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                            className="rounded-full bg-zinc-900 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
                           >
                             Mark shipped →
                           </button>

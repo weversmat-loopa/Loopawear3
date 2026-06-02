@@ -11,10 +11,10 @@ interface ErrorPageProps {
 export default function ErrorPage({ reset }: ErrorPageProps) {
   return (
     <PageShell>
-      <p className="text-xs font-medium uppercase tracking-widest text-violet-400/70">
-        Error
+      <p className="font-marker text-2xl text-brand-orange">
+        Oops
       </p>
-      <h1 className="mt-4 bg-gradient-to-b from-zinc-900 to-zinc-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent dark:from-white dark:to-zinc-300">
+      <h1 className="mt-4 font-display text-3xl text-ink">
         Something went wrong
       </h1>
       <p className="mt-3 max-w-sm text-sm text-zinc-500">
@@ -24,19 +24,19 @@ export default function ErrorPage({ reset }: ErrorPageProps) {
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <button
           onClick={reset}
-          className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+          className="sticker-sm rounded-full bg-brand-blue px-6 py-2.5 text-sm font-extrabold text-white"
         >
           Try again
         </button>
         <Link
           href="/marketplace"
-          className="rounded-full border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-white"
+          className="sticker-sm rounded-full bg-paper px-6 py-2.5 text-sm font-extrabold text-ink"
         >
           Browse marketplace
         </Link>
         <Link
           href="/"
-          className="rounded-full border border-zinc-300 px-6 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500 dark:hover:text-white"
+          className="sticker-sm rounded-full bg-paper px-6 py-2.5 text-sm font-extrabold text-ink"
         >
           Home
         </Link>

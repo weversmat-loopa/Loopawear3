@@ -115,7 +115,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
                 <input type="hidden" name="designId" value={design.id} />
                 <button
                   type="submit"
-                  className="rounded-full bg-zinc-900 px-4 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                  className="rounded-full bg-zinc-900 px-4 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
                 >
                   Submit for review →
                 </button>

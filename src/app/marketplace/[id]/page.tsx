@@ -51,7 +51,7 @@ type RelatedDesign = {
 function RelatedDesignCard({ item }: { item: RelatedDesign }) {
   return (
     <Link href={`/marketplace/${item.id}`} className="group flex flex-col">
-      <div className="overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+      <div className="ink-card overflow-hidden rounded-lg bg-paper-2">
         <ProductMockup
           imageUrl={item.image_url}
           productType={item.product_type}
@@ -150,7 +150,7 @@ export default async function DesignPage({ params }: Props) {
         <div className="mt-10 lg:grid lg:grid-cols-2 lg:gap-16">
           {/* Image */}
           <div className="lg:sticky lg:top-10 lg:self-start">
-            <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
+            <div className="ink-card overflow-hidden rounded-xl bg-paper-2">
               <ProductMockup
                 imageUrl={design.image_url}
                 productType={design.product_type}
@@ -170,12 +170,12 @@ export default async function DesignPage({ params }: Props) {
           {/* Info */}
           <div className="mt-8 flex flex-col lg:mt-0">
             {design.product_type && (
-              <p className="text-xs uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              <p className="font-hand text-xl font-bold text-brand-blue">
                 {design.product_type}
               </p>
             )}
 
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h1 className="mt-1 font-display text-3xl text-ink">
               {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
             </h1>
 
@@ -221,7 +221,7 @@ export default async function DesignPage({ params }: Props) {
               <div className="border-t border-zinc-100 pt-6 dark:border-zinc-800">
                 <Link
                   href={studioHref}
-                  className="inline-flex w-full items-center justify-center rounded-full border border-zinc-200 px-5 py-2.5 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
+                  className="sticker-sm inline-flex w-full items-center justify-center rounded-full bg-paper px-5 py-2.5 text-sm font-extrabold text-ink"
                 >
                   Create something similar →
                 </Link>

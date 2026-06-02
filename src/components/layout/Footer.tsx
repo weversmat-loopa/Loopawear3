@@ -9,10 +9,11 @@ const LEGAL_LINKS = [
 
 export default function Footer() {
   return (
-    <footer className="border-t border-zinc-100 bg-white px-6 py-5 dark:border-zinc-800 dark:bg-zinc-950">
+    <footer className="border-t-2 border-ink bg-paper px-6 py-5">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 text-center md:flex-row md:justify-between md:text-left">
-        <p className="text-xs text-zinc-400 dark:text-zinc-500">
-          © {new Date().getFullYear()} Loopawear &mdash; AI-powered apparel marketplace
+        <p className="text-xs text-zinc-500">
+          <span className="font-marker text-sm text-ink">Loopawear</span>
+          {" "}&mdash; AI-powered apparel marketplace · © {new Date().getFullYear()}
         </p>
         <nav
           aria-label="Legal"

@@ -235,10 +235,13 @@ export default function GenerateStudio({
       <div className="mx-auto w-full max-w-6xl">
 
         <div className="mb-12">
-          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
+          <span className="mb-2 inline-flex -rotate-1 items-center gap-2 rounded-full border-2 border-ink bg-brand-yellow px-3 py-0.5 font-hand text-base font-bold text-ink">
+            ✦ Make something one-of-a-kind
+          </span>
+          <h1 className="font-display text-3xl text-ink sm:text-4xl">
             Design Studio
           </h1>
-          <p className="mt-2 text-base text-zinc-400 dark:text-zinc-500">
+          <p className="mt-2 font-hand text-xl text-zinc-500">
             Type a prompt, hit Generate. Your design is ready in seconds.
           </p>
         </div>
@@ -250,7 +253,7 @@ export default function GenerateStudio({
             <div className="flex flex-col gap-7">
 
               {/* Prompt textarea */}
-              <div className="rounded-2xl border border-zinc-200 transition-colors focus-within:border-zinc-400 dark:border-zinc-800 dark:focus-within:border-zinc-600">
+              <div className="rounded-2xl border-2 border-ink bg-paper transition-shadow focus-within:shadow-[3px_3px_0_0_var(--ink)] dark:bg-zinc-900">
                 <textarea
                   id="prompt"
                   name="prompt"
@@ -301,7 +304,7 @@ export default function GenerateStudio({
                       }}
                       className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                         productType === type
-                          ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                          ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                           : "border-zinc-200 text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
                       }`}
                     >
@@ -346,12 +349,12 @@ export default function GenerateStudio({
                   onClick={() => setRemoveBackground((v) => !v)}
                   className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors focus-visible:outline-none ${
                     removeBackground
-                      ? "bg-zinc-900 dark:bg-white"
+                      ? "bg-zinc-900 dark:bg-paper"
                       : "bg-zinc-200 dark:bg-zinc-700"
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform dark:bg-zinc-900 ${
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-paper shadow transition-transform dark:bg-zinc-900 ${
                       removeBackground ? "translate-x-5" : "translate-x-0"
                     }`}
                   />
@@ -362,7 +365,7 @@ export default function GenerateStudio({
               <button
                 type="submit"
                 disabled={!prompt.trim() || isWorking || creditsExhausted || authRequired}
-                className="w-full rounded-2xl bg-zinc-900 py-4 text-base font-bold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                className="sticker w-full rounded-2xl bg-brand-orange py-4 text-base font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {generateButtonLabel()}
               </button>

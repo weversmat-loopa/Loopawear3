@@ -67,11 +67,11 @@ export default async function CreatorPage({ params }: Props) {
         {/* Creator header */}
         <div className="mt-10 border-b border-zinc-200 pb-10 dark:border-zinc-800">
           <div className="flex items-center gap-5">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-zinc-900 ring-1 ring-zinc-200 text-2xl font-bold text-white dark:bg-white dark:text-zinc-900 dark:ring-zinc-700">
+            <div className="ink-card flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-brand-blue font-display text-2xl text-white">
               {displayName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+              <h1 className="font-display text-3xl text-ink">
                 {displayName}
               </h1>
               <p className="mt-1 text-sm text-zinc-500">
@@ -97,7 +97,7 @@ export default async function CreatorPage({ params }: Props) {
                   <li key={design.id}>
                     <Link
                       href={`/marketplace/${design.id}`}
-                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
+                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-paper shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
                     >
                       {design.image_url ? (
                         <div className="relative aspect-square w-full overflow-hidden">

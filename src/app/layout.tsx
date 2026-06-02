@@ -1,18 +1,43 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Nunito,
+  Archivo_Black,
+  Permanent_Marker,
+  Caveat,
+} from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { createClient } from "@/utils/supabase/server";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Body text
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Display / brand headings
+const archivoBlack = Archivo_Black({
+  variable: "--font-archivo",
+  weight: "400",
   subsets: ["latin"],
+  display: "swap",
+});
+
+// Marker brand moments
+const permanentMarker = Permanent_Marker({
+  variable: "--font-marker",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Handwritten accents
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -64,7 +89,7 @@ export default async function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${nunito.variable} ${archivoBlack.variable} ${permanentMarker.variable} ${caveat.variable} h-full antialiased`}
     >
       <head>
         {/* Runs synchronously before paint — prevents flash of wrong theme */}

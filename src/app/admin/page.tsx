@@ -15,24 +15,20 @@ type StatCardProps = {
 function StatCard({ label, value, sub, accent }: StatCardProps) {
   return (
     <div
-      className={`rounded-xl border p-5 ${
-        accent
-          ? "border-zinc-900 bg-zinc-900 dark:border-zinc-100 dark:bg-zinc-100"
-          : "border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+      className={`ink-card rounded-xl p-5 ${
+        accent ? "bg-brand-orange" : "bg-paper"
       }`}
     >
       <p
         className={`text-xs font-semibold uppercase tracking-widest ${
-          accent
-            ? "text-zinc-400 dark:text-zinc-600"
-            : "text-zinc-400 dark:text-zinc-500"
+          accent ? "text-white/80" : "text-zinc-400 dark:text-zinc-500"
         }`}
       >
         {label}
       </p>
       <p
-        className={`mt-2 text-3xl font-bold tabular-nums tracking-tight ${
-          accent ? "text-white dark:text-zinc-900" : "text-zinc-900 dark:text-zinc-100"
+        className={`mt-2 font-display text-3xl tabular-nums ${
+          accent ? "text-white" : "text-ink"
         }`}
       >
         {value}
@@ -40,7 +36,7 @@ function StatCard({ label, value, sub, accent }: StatCardProps) {
       {sub && (
         <p
           className={`mt-1 text-xs ${
-            accent ? "text-zinc-400 dark:text-zinc-600" : "text-zinc-400 dark:text-zinc-500"
+            accent ? "text-white/70" : "text-zinc-400 dark:text-zinc-500"
           }`}
         >
           {sub}

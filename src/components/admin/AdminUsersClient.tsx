@@ -46,12 +46,12 @@ function CreditsForm({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         min={0}
-        className="w-20 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-center text-sm tabular-nums text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:ring-zinc-500"
+        className="w-20 rounded-lg border border-zinc-200 bg-paper px-2 py-1 text-center text-sm tabular-nums text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:ring-zinc-500"
         autoFocus
       />
       <button
         type="submit"
-        className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+        className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
       >
         Save
       </button>
@@ -110,7 +110,7 @@ export default function AdminUsersClient({ users, error, success }: Props) {
             placeholder="Search by name, email or role…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:ring-zinc-500"
+            className="w-full max-w-sm rounded-xl border border-zinc-200 bg-paper px-4 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:ring-zinc-500"
           />
         </div>
 
@@ -133,7 +133,7 @@ export default function AdminUsersClient({ users, error, success }: Props) {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-zinc-100 bg-white dark:divide-zinc-800 dark:bg-zinc-900">
+            <tbody className="divide-y divide-zinc-100 bg-paper dark:divide-zinc-800 dark:bg-zinc-900">
               {filtered.length === 0 && (
                 <tr>
                   <td colSpan={4} className="px-4 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500">

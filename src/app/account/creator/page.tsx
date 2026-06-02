@@ -39,7 +39,7 @@ function StatCard({
   muted?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-zinc-900">
+    <div className="rounded-xl border border-zinc-200 bg-paper px-4 py-4 dark:border-zinc-700 dark:bg-zinc-900">
       <p
         className={`text-xs font-medium uppercase tracking-wider ${
           muted
@@ -74,7 +74,7 @@ function QuickLink({
   return (
     <Link
       href={href}
-      className="group rounded-xl border border-zinc-200 bg-white px-4 py-4 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
+      className="group rounded-xl border border-zinc-200 bg-paper px-4 py-4 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-zinc-600 dark:hover:bg-zinc-800"
     >
       <p className="text-sm font-medium text-zinc-900 transition-colors group-hover:text-violet-600 dark:text-zinc-100">
         {label} →
@@ -164,7 +164,7 @@ export default async function CreatorDashboardPage() {
         </p>
 
         {/* Profile summary */}
-        <div className="mt-8 rounded-2xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900">
+        <div className="mt-8 rounded-2xl border border-zinc-200 bg-paper px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900">
           <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             Creator
           </p>
@@ -221,7 +221,7 @@ export default async function CreatorDashboardPage() {
               {recentDesigns.map((design) => (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <Link
                     href={`/account/designs/${design.id}`}

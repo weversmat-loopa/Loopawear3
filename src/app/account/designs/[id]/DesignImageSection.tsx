@@ -171,7 +171,7 @@ export default function DesignImageSection({
               onClick={() => setShowMockup(false)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 !showMockup
-                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               }`}
             >
@@ -182,7 +182,7 @@ export default function DesignImageSection({
               onClick={() => setShowMockup(true)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 showMockup
-                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
                   : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               }`}
             >
@@ -218,11 +218,11 @@ export default function DesignImageSection({
         </div>
       </div>
     ) : imageStatus === "ready" && !imageUrl ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900">
         <p className="text-sm text-zinc-400">Image unavailable</p>
       </div>
     ) : (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="flex aspect-square w-full items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900">
         <p className="text-sm text-zinc-400">No image generated yet</p>
       </div>
     );
@@ -254,7 +254,7 @@ export default function DesignImageSection({
           type="button"
           onClick={handleGenerate}
           disabled={!canGenerate}
-          className={`rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors dark:bg-white dark:text-zinc-900 ${
+          className={`rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors dark:bg-zinc-100 dark:text-zinc-900 ${
             canGenerate ? "hover:bg-zinc-700 dark:hover:bg-zinc-100" : "cursor-not-allowed opacity-40"
           }`}
         >
@@ -323,7 +323,7 @@ export default function DesignImageSection({
             <button
               type="button"
               onClick={handleGenerateMockup}
-              className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
             >
               Generate Printful mockup
             </button>

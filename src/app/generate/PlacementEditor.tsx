@@ -270,7 +270,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
             onClick={() => setSide(s)}
             className={`rounded-full border px-5 py-1.5 text-sm font-medium capitalize transition-colors ${
               side === s
-                ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                 : "border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
             }`}
           >
@@ -386,7 +386,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
                   onClick={() => setSize(s)}
                   className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
                     size === s
-                      ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                      ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                       : "border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
                   }`}
                 >
@@ -418,7 +418,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
               type="button"
               onClick={handleSave}
               disabled={saveStatus === "saving"}
-              className="w-full rounded-full bg-zinc-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              className="w-full rounded-full bg-zinc-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
             >
               {saveStatus === "saving"
                 ? "Saving…"

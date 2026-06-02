@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 interface ButtonProps {
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "ghost" | "blue" | "orange" | "green";
   fullWidth?: boolean;
   children: React.ReactNode;
   className?: string;
@@ -9,9 +9,14 @@ interface ButtonProps {
   type?: "button" | "submit" | "reset";
 }
 
+// Sticker-style buttons: hard ink border + offset shadow that presses in on
+// click (animation handled by the `.sticker` class in globals.css).
 const variantClasses: Record<NonNullable<ButtonProps["variant"]>, string> = {
-  primary: "bg-zinc-900 text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100",
-  ghost: "border border-zinc-900 text-zinc-900 bg-white transition-colors hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-100 dark:bg-transparent dark:hover:bg-zinc-800",
+  primary: "sticker bg-ink text-paper",
+  blue: "sticker bg-brand-blue text-white",
+  orange: "sticker bg-brand-orange text-white",
+  green: "sticker bg-brand-green text-white",
+  ghost: "sticker bg-paper text-ink",
 };
 
 export default function Button({
@@ -23,7 +28,7 @@ export default function Button({
   type = "button",
 }: ButtonProps) {
   const classes = [
-    "rounded-full py-3 text-sm font-semibold",
+    "rounded-full py-3 text-sm font-extrabold",
     fullWidth ? "w-full" : "inline-block px-8",
     variantClasses[variant],
     className,

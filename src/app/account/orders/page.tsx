@@ -130,7 +130,7 @@ export default async function BuyerOrdersPage() {
               return (
                 <li
                   key={order.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <Link
                     href={`/account/orders/${order.id}`}

@@ -62,7 +62,7 @@ function DeleteDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
+      <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-paper p-6 shadow-xl dark:border-zinc-700 dark:bg-zinc-900">
         <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
           Permanently delete design?
         </h2>
@@ -79,7 +79,7 @@ function DeleteDialog({
           onChange={(e) => setConfirmText(e.target.value)}
           placeholder="DELETE"
           autoFocus
-          className="mt-2 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-mono text-zinc-900 placeholder-zinc-300 focus:outline-none focus:ring-2 focus:ring-red-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-600"
+          className="mt-2 w-full rounded-lg border border-zinc-200 bg-paper px-3 py-2 text-sm font-mono text-zinc-900 placeholder-zinc-300 focus:outline-none focus:ring-2 focus:ring-red-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-600"
         />
         <div className="mt-5 flex items-center justify-end gap-3">
           <button
@@ -167,7 +167,7 @@ export default function AdminDesignsClient({
               className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                 filter === key
                   ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
-                  : "border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
+                  : "border-zinc-200 bg-paper text-zinc-500 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-100"
               }`}
             >
               {label}
@@ -196,7 +196,7 @@ export default function AdminDesignsClient({
               return (
                 <li
                   key={design.id}
-                  className={`overflow-hidden rounded-xl border bg-white dark:bg-zinc-900 ${
+                  className={`overflow-hidden rounded-xl border bg-paper dark:bg-zinc-900 ${
                     isArchived
                       ? "border-zinc-100 opacity-60 dark:border-zinc-800"
                       : "border-zinc-200 dark:border-zinc-700"

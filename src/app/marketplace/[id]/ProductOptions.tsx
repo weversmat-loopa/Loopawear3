@@ -110,7 +110,7 @@ export default function ProductOptions({
               onClick={() => setSize(size === s ? null : s)}
               className={`rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
                 size === s
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                   : "border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
@@ -171,10 +171,10 @@ export default function ProductOptions({
           type="button"
           onClick={handleCheckout}
           disabled={!canCheckout}
-          className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-semibold transition-colors ${
+          className={`mt-3 inline-flex w-full items-center justify-center rounded-full px-5 py-3 text-sm font-extrabold ${
             canCheckout
-              ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-              : "cursor-not-allowed border border-zinc-200 bg-zinc-50 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500"
+              ? "sticker bg-brand-green text-white"
+              : "cursor-not-allowed border-2 border-zinc-300 bg-zinc-50 text-zinc-400"
           }`}
         >
           {loading
@@ -193,7 +193,7 @@ export default function ProductOptions({
         ref={sizeGuideRef}
         onClick={handleDialogBackdropClick}
         aria-labelledby="size-guide-title"
-        className="m-auto w-[calc(100vw-2rem)] max-w-md rounded-2xl bg-white p-0 text-zinc-900 shadow-2xl backdrop:bg-zinc-900/40 backdrop:backdrop-blur-sm dark:bg-zinc-900 dark:text-zinc-100"
+        className="m-auto w-[calc(100vw-2rem)] max-w-md rounded-2xl bg-paper p-0 text-zinc-900 shadow-2xl backdrop:bg-zinc-900/40 backdrop:backdrop-blur-sm dark:bg-zinc-900 dark:text-zinc-100"
       >
         <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
           <h2 id="size-guide-title" className="text-base font-semibold">

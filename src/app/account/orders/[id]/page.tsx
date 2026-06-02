@@ -154,7 +154,7 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
             </h2>
           </div>
 
-          <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="mt-4 overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900">
             <div className="grid grid-cols-[8rem_1fr] gap-0 sm:grid-cols-[10rem_1fr]">
               <div className="border-r border-zinc-100 dark:border-zinc-800">
                 <ProductMockup
@@ -199,7 +199,7 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
             </h2>
           </div>
 
-          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 rounded-xl border border-zinc-200 bg-white p-5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-6 gap-y-2.5 rounded-xl border border-zinc-200 bg-paper p-5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
             <dt className="text-zinc-500 dark:text-zinc-400">Unit price</dt>
             <dd className="text-right tabular-nums text-zinc-900 dark:text-zinc-100">
               €{unitPriceEuros}
@@ -226,7 +226,7 @@ export default async function BuyerOrderDetailPage({ params }: Props) {
             </h2>
           </div>
 
-          <div className="mt-4 rounded-xl border border-zinc-200 bg-white p-5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="mt-4 rounded-xl border border-zinc-200 bg-paper p-5 text-sm dark:border-zinc-700 dark:bg-zinc-900">
             <p className="font-medium text-zinc-900 dark:text-zinc-100">
               {order.shipping_name}
             </p>

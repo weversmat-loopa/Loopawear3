@@ -2,25 +2,179 @@
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
+/* ============================================================
+   Loopawear design system
+   Playful-vintage "notebook / doodle" aesthetic, kept just
+   restrained enough to feel premium for a paid shop.
+   All design tokens live here — adjust the look in one place.
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #09090b;
+  /* Brand palette */
+  --paper:  #f5f0e1; /* crème background */
+  --paper-2: #efe8d4; /* slightly deeper crème for blocks */
+  --ink:    #1a1a1a; /* near-black hand-drawn ink */
+  --blue:   #2b4bd6;
+  --orange: #e8631a;
+  --green:  #2e9e4f;
+  --yellow: #f5c518;
+
+  /* Semantic */
+  --background: var(--paper);
+  --foreground: var(--ink);
+
+  /* Hard offset shadow used by sticker elements */
+  --sticker-shadow: 3px 3px 0 0 var(--ink);
+  --sticker-shadow-sm: 2px 2px 0 0 var(--ink);
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
-  --foreground: #fafaf9;
+  --paper:  #1c1b18;
+  --paper-2: #24221d;
+  --ink:    #f3ecd9;
+  --blue:   #6f87f0;
+  --orange: #f5853f;
+  --green:  #57c178;
+  --yellow: #f7d149;
+
+  --background: #181712;
+  --foreground: var(--ink);
+
+  --sticker-shadow: 3px 3px 0 0 #000;
+  --sticker-shadow-sm: 2px 2px 0 0 #000;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Brand colors exposed as Tailwind utilities (bg-brand-blue, text-ink, …) */
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-brand-blue: var(--blue);
+  --color-brand-orange: var(--orange);
+  --color-brand-green: var(--green);
+  --color-brand-yellow: var(--yellow);
+
+  /* Fonts */
+  --font-sans: "Nunito", var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Archivo Black", var(--font-archivo), ui-sans-serif, sans-serif;
+  --font-marker: "Permanent Marker", var(--font-marker), cursive;
+  --font-hand: "Caveat", var(--font-caveat), cursive;
+
+  /* ----------------------------------------------------------
+     Remap the zinc scale to the warm crème/ink system. The whole
+     existing UI is built on zinc-* utilities, so overriding the
+     scale here re-skins the entire site consistently. Light tones
+     lean crème/paper; dark tones lean warm ink-brown.
+     ---------------------------------------------------------- */
+  --color-zinc-50:  #faf6ec;
+  --color-zinc-100: #efe8d4;
+  --color-zinc-200: #e2d8bf;
+  --color-zinc-300: #cdbf9f;
+  --color-zinc-400: #9c8e6f;
+  --color-zinc-500: #6f6450;
+  --color-zinc-600: #524a3b;
+  --color-zinc-700: #3a342a;
+  --color-zinc-800: #2a261e;
+  --color-zinc-900: #1a1a1a;
+  --color-zinc-950: #131210;
+
+  /* Violet accents in the old theme become brand blue */
+  --color-violet-400: var(--blue);
 }
 
+/* Subtle paper grain laid under everything */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  background-image:
+    radial-gradient(rgba(26, 26, 26, 0.035) 1px, transparent 1px),
+    radial-gradient(rgba(26, 26, 26, 0.025) 1px, transparent 1px);
+  background-position: 0 0, 12px 12px;
+  background-size: 24px 24px, 24px 24px;
+}
+
+[data-theme="dark"] body {
+  background-image:
+    radial-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    radial-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+}
+
+/* Display headings get the bold vintage face by default */
+h1, h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+/* ============================================================
+   Reusable design-system utility classes
+   ============================================================ */
+
+@layer components {
+  /* Hand-drawn marker underline used to highlight a word/phrase */
+  .marker-underline {
+    background-image: linear-gradient(transparent 60%, var(--yellow) 60%, var(--yellow) 92%, transparent 92%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0 0.05em;
+  }
+
+  /* Sticker button — hard offset shadow that presses in on click */
+  .sticker {
+    position: relative;
+    border: 2px solid var(--ink);
+    box-shadow: var(--sticker-shadow);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .sticker:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 0 var(--ink);
+  }
+  .sticker:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 0 var(--ink);
+  }
+  [data-theme="dark"] .sticker:hover { box-shadow: 4px 4px 0 0 #000; }
+
+  .sticker-sm {
+    border: 2px solid var(--ink);
+    box-shadow: var(--sticker-shadow-sm);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+  .sticker-sm:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 0 var(--ink); }
+  .sticker-sm:active { transform: translate(2px, 2px); box-shadow: 0 0 0 0 var(--ink); }
+
+  /* Static card with the same hard ink border (no press animation) */
+  .ink-card {
+    border: 2px solid var(--ink);
+    box-shadow: var(--sticker-shadow);
+  }
+
+  /* Grid / ruled-paper block for highlight sections */
+  .paper-grid {
+    background-color: var(--paper-2);
+    background-image:
+      linear-gradient(var(--color-zinc-200) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-zinc-200) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+
+  /* Tape strip accent */
+  .tape {
+    position: relative;
+  }
+  .tape::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 70px;
+    height: 22px;
+    transform: translateX(-50%) rotate(-3deg);
+    background: rgba(245, 197, 24, 0.55);
+    box-shadow: inset 0 0 0 1px rgba(26, 26, 26, 0.12);
+  }
 }

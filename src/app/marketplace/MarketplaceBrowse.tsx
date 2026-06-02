@@ -13,6 +13,7 @@ import {
 } from "./filters";
 import type { MarketplaceDesign } from "./queries";
 import ProductMockup from "@/components/ui/ProductMockup";
+import { DoodleStar } from "@/components/ui/Doodles";
 
 interface MarketplaceBrowseProps {
   initialDesigns: MarketplaceDesign[];
@@ -127,15 +128,18 @@ export default function MarketplaceBrowse({
     <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <div className="mx-auto w-full max-w-6xl">
         {/* Header */}
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Explore designs
-        </h1>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-3xl text-ink sm:text-4xl">
+            Explore designs
+          </h1>
+          <DoodleStar className="h-7 w-7 -rotate-12 text-brand-orange" />
+        </div>
+        <p className="mt-2 text-sm text-zinc-500">
           Discover original AI-generated apparel from independent creators.
           Every piece starts with a prompt.{" "}
           <Link
             href="/generate"
-            className="text-zinc-900 underline underline-offset-2 transition-colors hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
+            className="font-bold text-brand-blue underline underline-offset-2 transition-colors hover:text-ink"
           >
             Create your own →
           </Link>
@@ -148,7 +152,7 @@ export default function MarketplaceBrowse({
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Search by keyword, style, or product…"
-            className="w-full rounded-full border border-zinc-200 bg-white px-5 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-400 transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:border-zinc-400"
+            className="w-full rounded-full border-2 border-ink bg-paper px-5 py-2.5 text-sm font-medium text-ink outline-none placeholder:text-zinc-400 transition-shadow focus:shadow-[2px_2px_0_0_var(--ink)] dark:bg-zinc-900"
           />
           {searchInput && (
             <button
@@ -170,7 +174,7 @@ export default function MarketplaceBrowse({
               onClick={() => setFilter(null)}
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 initialFilter === null
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                   : "border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
@@ -183,7 +187,7 @@ export default function MarketplaceBrowse({
                 onClick={() => setFilter(initialFilter === type ? null : type)}
                 className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                   initialFilter === type
-                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                    ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                     : "border-zinc-200 text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
                 }`}
               >
@@ -197,7 +201,7 @@ export default function MarketplaceBrowse({
             <select
               value={initialSort}
               onChange={(e) => setSort(e.target.value as SortOption)}
-              className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-sm text-zinc-700 outline-none transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
+              className="rounded-full border border-zinc-200 bg-paper px-3 py-1.5 text-sm text-zinc-700 outline-none transition-colors focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
             >
               {SORT_OPTIONS.map((s) => (
                 <option key={s} value={s}>
@@ -230,7 +234,7 @@ export default function MarketplaceBrowse({
                     href={`/marketplace/${design.id}`}
                     className="group flex flex-col"
                   >
-                    <div className="overflow-hidden rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                    <div className="ink-card overflow-hidden rounded-lg bg-paper-2">
                       <ProductMockup
                         imageUrl={design.image_url}
                         productType={design.product_type}
@@ -275,7 +279,7 @@ export default function MarketplaceBrowse({
                   type="button"
                   onClick={loadMore}
                   disabled={loadingMore}
-                  className="rounded-full border border-zinc-300 bg-white px-6 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-900 hover:text-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
+                  className="sticker-sm rounded-full bg-paper px-6 py-2.5 text-sm font-extrabold text-ink disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loadingMore ? "Loading…" : "Load more"}
                 </button>

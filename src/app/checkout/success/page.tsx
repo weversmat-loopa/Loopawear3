@@ -93,7 +93,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
           </svg>
         </div>
 
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+        <h1 className="font-display text-2xl text-ink sm:text-3xl">
           Order received!
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
@@ -101,7 +101,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         </p>
 
         {order ? (
-          <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 bg-white text-left dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 bg-paper text-left dark:border-zinc-700 dark:bg-zinc-900">
             <div className="grid grid-cols-[7rem_1fr] gap-0">
               <div className="border-r border-zinc-100 dark:border-zinc-800">
                 <ProductMockup
@@ -135,7 +135,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             <>
               <Link
                 href={`/account/orders/${order.id}`}
-                className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
               >
                 View order →
               </Link>
@@ -150,7 +150,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
             <>
               <Link
                 href="/marketplace"
-                className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                className="inline-flex items-center justify-center rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
               >
                 Browse marketplace →
               </Link>

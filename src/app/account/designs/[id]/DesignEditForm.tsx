@@ -52,7 +52,7 @@ export default function DesignEditForm({
           type="text"
           defaultValue={initialTitle ?? ""}
           placeholder="Give your design a public name…"
-          className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+          className="mt-2 w-full rounded-xl border border-zinc-200 bg-paper px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
         />
       </div>
 
@@ -69,7 +69,7 @@ export default function DesignEditForm({
           rows={4}
           defaultValue={initialPrompt}
           placeholder="Describe your design..."
-          className="mt-2 w-full resize-none rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm leading-relaxed text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+          className="mt-2 w-full resize-none rounded-xl border border-zinc-200 bg-paper px-4 py-3 text-sm leading-relaxed text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
         />
       </div>
 
@@ -85,7 +85,7 @@ export default function DesignEditForm({
               onClick={() => setProductType(productType === type ? null : type)}
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 productType === type
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                   : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
@@ -107,7 +107,7 @@ export default function DesignEditForm({
               onClick={() => setStyle(style === s ? null : s)}
               className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                 style === s
-                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-white dark:text-zinc-900"
+                  ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                   : "border-zinc-200 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
               }`}
             >
@@ -135,7 +135,7 @@ export default function DesignEditForm({
               : ""
           }
           placeholder="e.g. 29.99 — leave empty to skip"
-          className="mt-2 w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+          className="mt-2 w-full rounded-xl border border-zinc-200 bg-paper px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
         />
         <p className="mt-1.5 text-xs text-zinc-400 dark:text-zinc-500">
           Set a price for when checkout launches. Optional — does not affect publishing.

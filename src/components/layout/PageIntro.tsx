@@ -7,13 +7,13 @@ interface PageIntroProps {
 export default function PageIntro({ eyebrow, heading, description }: PageIntroProps) {
   return (
     <>
-      <span className="mb-6 rounded-full border border-zinc-800 px-4 py-1 text-xs font-medium uppercase tracking-widest text-zinc-500">
+      <span className="mb-6 inline-block -rotate-2 rounded-full border-2 border-ink bg-brand-yellow px-4 py-1 font-hand text-base font-bold text-ink">
         {eyebrow}
       </span>
-      <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl">
+      <h1 className="font-display text-5xl text-ink sm:text-6xl">
         {heading}
       </h1>
-      <p className="mt-5 max-w-sm text-base leading-relaxed text-zinc-400">
+      <p className="mt-5 max-w-sm text-base leading-relaxed text-zinc-500">
         {description}
       </p>
     </>

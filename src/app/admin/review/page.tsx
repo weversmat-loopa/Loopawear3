@@ -78,7 +78,7 @@ export default async function AdminReviewPage({
               return (
                 <li
                   key={design.id}
-                  className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900"
+                  className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900"
                 >
                   <div className="flex">
                     {/* Thumbnail */}
@@ -127,7 +127,7 @@ export default async function AdminReviewPage({
                           />
                           <button
                             type="submit"
-                            className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                            className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
                           >
                             Approve →
                           </button>

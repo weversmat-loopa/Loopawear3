@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import ProductMockup from "@/components/ui/ProductMockup";
 import { createClient } from "@/utils/supabase/server";
+import MarkerUnderline from "@/components/ui/MarkerUnderline";
+import { DoodleStar, DoodleArrow, DoodleSun, DoodleSquiggle } from "@/components/ui/Doodles";
 
 export const metadata: Metadata = {
   title: { absolute: "Loopawear" },
@@ -87,27 +89,40 @@ export default async function Home() {
         />
 
         <div className="relative mx-auto w-full max-w-7xl">
-          <h1 className="max-w-5xl text-6xl font-black leading-[0.9] tracking-tight text-white sm:text-8xl lg:text-[8.5rem]">
-            Wear what<br className="hidden sm:block" /> you imagine.
+          <span className="mb-5 inline-flex -rotate-2 items-center gap-2 rounded-full border-2 border-white/80 bg-brand-yellow px-4 py-1 font-hand text-lg font-bold text-ink">
+            <DoodleSun className="h-5 w-5" />
+            Hand-made by AI, worn by you
+          </span>
+
+          <h1 className="relative max-w-5xl font-display text-6xl leading-[0.9] tracking-tight text-white sm:text-8xl lg:text-[8.5rem]">
+            Wear what{" "}
+            <span className="relative whitespace-nowrap">
+              <MarkerUnderline>you imagine</MarkerUnderline>
+              <DoodleStar className="absolute -right-10 -top-6 hidden h-10 w-10 rotate-12 text-brand-orange sm:block" />
+            </span>
+            .
           </h1>
 
-          <p className="mt-7 max-w-sm text-sm leading-relaxed text-zinc-400 sm:text-base">
+          <p className="mt-7 max-w-md font-hand text-2xl leading-snug text-white/90">
             AI-generated apparel, made real — keep it for yourself or publish it to the world.
           </p>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <Link
               href="/marketplace"
-              className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-100"
+              className="sticker inline-flex items-center justify-center rounded-full bg-brand-orange px-8 py-3.5 text-sm font-extrabold text-white"
             >
               Shop the collection →
             </Link>
-            <Link
-              href="/generate"
-              className="inline-flex items-center justify-center rounded-full border border-zinc-700 px-8 py-3.5 text-sm font-semibold text-zinc-100 transition-colors hover:border-zinc-400 hover:text-white"
-            >
-              Start designing
-            </Link>
+            <div className="flex items-center gap-2">
+              <DoodleArrow className="hidden h-7 w-11 text-white/70 sm:block" />
+              <Link
+                href="/generate"
+                className="sticker inline-flex items-center justify-center rounded-full bg-paper px-8 py-3.5 text-sm font-extrabold text-ink"
+              >
+                Start designing
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -119,16 +134,16 @@ export default async function Home() {
 
             <div className="mb-10 flex items-end justify-between">
               <div>
-                <p className="mb-1.5 text-[0.65rem] font-medium uppercase tracking-[0.25em] text-zinc-400 dark:text-zinc-500">
+                <p className="mb-1 font-hand text-xl font-bold text-brand-blue">
                   New arrivals
                 </p>
-                <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+                <h2 className="font-display text-2xl text-ink sm:text-3xl">
                   The Collection
                 </h2>
               </div>
               <Link
                 href="/marketplace"
-                className="text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100"
+                className="text-sm font-bold text-zinc-500 transition-colors hover:text-ink"
               >
                 View all →
               </Link>
@@ -138,7 +153,7 @@ export default async function Home() {
               {featured.map((design) => (
                 <li key={design.id}>
                   <Link href={`/marketplace/${design.id}`} className="group block">
-                    <div className="overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800/60">
+                    <div className="ink-card overflow-hidden rounded-xl bg-paper-2">
                       <ProductMockup
                         imageUrl={design.image_url}
                         productType={design.product_type}
@@ -175,42 +190,46 @@ export default async function Home() {
       )}
 
       {/* ── Brand pillars ─────────────────────────────────────────── */}
-      <section className="border-t border-zinc-100 px-6 py-16 dark:border-zinc-800 md:px-12 lg:px-20">
+      <section className="border-t-2 border-ink px-6 py-16 md:px-12 lg:px-20">
         <div className="mx-auto w-full max-w-7xl">
-          <div className="grid gap-0 sm:grid-cols-3">
-            {PILLARS.map(({ label, description }, i) => (
-              <div
-                key={label}
-                className={`flex flex-col gap-2 py-8 sm:py-0 ${
-                  i > 0
-                    ? "border-t border-zinc-100 dark:border-zinc-800 sm:border-l sm:border-t-0 sm:pl-10 lg:pl-16"
-                    : "sm:pr-10 lg:pr-16"
-                }`}
-              >
-                <h3 className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-                  {label}
-                </h3>
-                <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                  {description}
-                </p>
-              </div>
-            ))}
+          <div className="paper-grid ink-card grid gap-0 rounded-2xl sm:grid-cols-3">
+            {PILLARS.map(({ label, description }, i) => {
+              const accents = ["text-brand-blue", "text-brand-orange", "text-brand-green"];
+              return (
+                <div
+                  key={label}
+                  className={`flex flex-col gap-2 p-8 ${
+                    i > 0 ? "border-t-2 border-dashed border-zinc-300 sm:border-l-2 sm:border-t-0" : ""
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <DoodleSquiggle className={`h-3 w-12 ${accents[i]}`} />
+                  </div>
+                  <h3 className="font-display text-base text-ink">{label}</h3>
+                  <p className="text-sm leading-relaxed text-zinc-600">
+                    {description}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ── Closing CTA ───────────────────────────────────────────── */}
-      <section className="bg-zinc-950 px-6 py-24 md:px-12 lg:px-20">
+      <section className="border-t-2 border-ink bg-ink px-6 py-24 md:px-12 lg:px-20">
         <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-6 text-center">
-          <h2 className="text-4xl font-black tracking-tight text-white sm:text-6xl">
-            Your idea,<br className="hidden sm:block" /> worn.
+          <DoodleSun className="h-10 w-10 text-brand-yellow" />
+          <h2 className="font-display text-4xl text-paper sm:text-6xl">
+            Your idea,{" "}
+            <span className="font-marker text-brand-yellow">worn.</span>
           </h2>
-          <p className="max-w-xs text-sm leading-relaxed text-zinc-400 sm:max-w-sm">
+          <p className="max-w-xs font-hand text-2xl leading-snug text-paper/80 sm:max-w-sm">
             Describe it. Generate it. Wear it — or sell it to the world.
           </p>
           <Link
             href="/generate"
-            className="mt-2 inline-flex items-center justify-center rounded-full bg-white px-10 py-3.5 text-sm font-semibold text-zinc-900 transition-colors hover:bg-zinc-100"
+            className="sticker mt-2 inline-flex items-center justify-center rounded-full bg-brand-yellow px-10 py-3.5 text-sm font-extrabold text-ink"
           >
             Start creating for free →
           </Link>

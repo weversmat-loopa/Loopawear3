@@ -15,9 +15,9 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-1 overflow-x-auto px-6 py-1">
-        <span className="mr-3 shrink-0 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+    <div className="border-b-2 border-ink bg-paper-2">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-1 overflow-x-auto px-6 py-1.5">
+        <span className="mr-3 shrink-0 font-marker text-base text-brand-orange">
           Admin
         </span>
         {NAV_ITEMS.map(({ label, href }) => {
@@ -31,8 +31,8 @@ export default function AdminNav() {
               href={href}
               className={`shrink-0 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-500 hover:bg-white hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                  ? "bg-paper text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
+                  : "text-zinc-500 hover:bg-paper hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
               }`}
             >
               {label}
