@@ -3,17 +3,23 @@
 import { createClient } from "@/utils/supabase/server";
 
 // ── savePlacement ─────────────────────────────────────────────────────
-// Requires this migration in Supabase before use:
-//   ALTER TABLE designs ADD COLUMN IF NOT EXISTS placement JSONB;
-
+// Requires the migration in supabase/migrations/0001_design_placement.sql
+// (adds a JSONB `placement` column to `designs`) before use.
+//
+// The stored JSON is self-describing: x/y/scale/rotation are in the editor's
+// canvas space (canvasW × canvasH), so any consumer can re-map the placement
+// onto a differently-sized surface — including a future Printful print file.
+// Keep x/y/scale stable: components/ui/ProductMockup.tsx reads them.
 export interface PlacementData {
   side:        "front" | "back";
-  x:           number;
-  y:           number;
-  scale:       number;
-  rotation:    number;
+  x:           number; // design centre X, in canvas px
+  y:           number; // design centre Y, in canvas px
+  scale:       number; // Fabric scaleX (fraction of the design's natural size)
+  rotation:    number; // degrees, clockwise
   shirtColor:  string;
   size:        string;
+  canvasW:     number; // reference canvas width  the coords were authored in
+  canvasH:     number; // reference canvas height the coords were authored in
 }
 
 type SavePlacementResult =
