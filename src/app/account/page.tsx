@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
 import { updateDisplayName, updateBio, submitForReview, unpublishDesign, deleteDesign } from "./actions";
+import { updateSocialLinks } from "./profile-actions";
 import ConfirmForm from "@/components/ui/ConfirmForm";
+import ImageUploadField from "@/components/profile/ImageUploadField";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -51,7 +53,7 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("display_name, role, generation_credits, bio")
+    .select("display_name, role, generation_credits, bio, avatar_url, banner_url, website_url, instagram_url, tiktok_url")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -159,6 +161,76 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
                     Save
                   </button>
                 </div>
+              </div>
+            </form>
+          </div>
+
+          {/* Avatar upload */}
+          <div className="px-5 py-4">
+            <ImageUploadField
+              kind="avatar"
+              currentUrl={profile?.avatar_url ?? null}
+              displayName={profile?.display_name ?? user.email ?? ""}
+            />
+          </div>
+
+          {/* Banner upload */}
+          <div className="px-5 py-4">
+            <ImageUploadField
+              kind="banner"
+              currentUrl={profile?.banner_url ?? null}
+              displayName={profile?.display_name ?? user.email ?? ""}
+            />
+          </div>
+
+          {/* Social links */}
+          <div className="px-5 py-4">
+            <form action={updateSocialLinks}>
+              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                Social links
+              </p>
+              <div className="mt-3 space-y-3">
+                <div>
+                  <label htmlFor="website_url" className="text-xs text-zinc-500 dark:text-zinc-400">Website</label>
+                  <Input
+                    id="website_url"
+                    name="website_url"
+                    type="url"
+                    defaultValue={profile?.website_url ?? ""}
+                    placeholder="https://yourwebsite.com"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="instagram_url" className="text-xs text-zinc-500 dark:text-zinc-400">Instagram</label>
+                  <Input
+                    id="instagram_url"
+                    name="instagram_url"
+                    type="url"
+                    defaultValue={profile?.instagram_url ?? ""}
+                    placeholder="https://instagram.com/handle"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="tiktok_url" className="text-xs text-zinc-500 dark:text-zinc-400">TikTok</label>
+                  <Input
+                    id="tiktok_url"
+                    name="tiktok_url"
+                    type="url"
+                    defaultValue={profile?.tiktok_url ?? ""}
+                    placeholder="https://tiktok.com/@handle"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              <div className="mt-3 flex justify-end">
+                <button
+                  type="submit"
+                  className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                >
+                  Save
+                </button>
               </div>
             </form>
           </div>

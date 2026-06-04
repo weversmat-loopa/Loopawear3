@@ -182,33 +182,66 @@ export type Database = {
           },
         ]
       }
+      follows: {
+        Row: {
+          created_at: string
+          follower_id: string
+          following_id: string
+        }
+        Insert: {
+          created_at?: string
+          follower_id: string
+          following_id: string
+        }
+        Update: {
+          created_at?: string
+          follower_id?: string
+          following_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           created_at: string
           display_name: string | null
           email: string | null
           generation_credits: number
           id: string
+          instagram_url: string | null
           role: string
+          tiktok_url: string | null
+          website_url: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
           generation_credits?: number
           id: string
+          instagram_url?: string | null
           role?: string
+          tiktok_url?: string | null
+          website_url?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
           generation_credits?: number
           id?: string
+          instagram_url?: string | null
           role?: string
+          tiktok_url?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -216,19 +249,34 @@ export type Database = {
     Views: {
       public_profiles: {
         Row: {
+          avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           display_name: string | null
           id: string | null
+          instagram_url: string | null
+          tiktok_url: string | null
+          website_url: string | null
         }
         Insert: {
+          avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           display_name?: string | null
           id?: string | null
+          instagram_url?: string | null
+          tiktok_url?: string | null
+          website_url?: string | null
         }
         Update: {
+          avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           display_name?: string | null
           id?: string | null
+          instagram_url?: string | null
+          tiktok_url?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
