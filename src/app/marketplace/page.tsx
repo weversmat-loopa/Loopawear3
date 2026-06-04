@@ -7,6 +7,7 @@ import {
   type ProductFilter,
   type SortOption,
 } from "./filters";
+import { createClient } from "@/utils/supabase/server";
 
 export const metadata: Metadata = {
   title: "Marketplace",
@@ -22,19 +23,31 @@ export default async function MarketplacePage({ searchParams }: Props) {
   const params = (await searchParams) ?? {};
 
   const q = params.q?.trim() ?? "";
-  const type: ProductFilter = isProductFilter(params.type)
-    ? params.type
-    : null;
+  const type: ProductFilter = isProductFilter(params.type) ? params.type : null;
   const sort: SortOption = isSortOption(params.sort) ? params.sort : "newest";
 
-  // The page always fetches the first page of results; the "Load more"
-  // button on the client extends the list via /api/marketplace.
   const { designs, nextCursor } = await fetchDesigns({
     q,
     type,
     sort,
     cursor: null,
   });
+
+  // Fetch current user's liked design IDs so the client shows correct
+  // initial heart state without an extra round-trip.
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  let likedIds: string[] = [];
+  if (user && designs.length > 0) {
+    const designIds = designs.map((d) => d.id);
+    const { data: liked } = await supabase
+      .from("likes")
+      .select("design_id")
+      .eq("user_id", user.id)
+      .in("design_id", designIds);
+    likedIds = (liked ?? []).map((r) => r.design_id);
+  }
 
   return (
     <MarketplaceBrowse
@@ -43,6 +56,7 @@ export default async function MarketplacePage({ searchParams }: Props) {
       initialFilter={type}
       initialQuery={q}
       initialSort={sort}
+      likedIds={likedIds}
     />
   );
 }

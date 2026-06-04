@@ -13,6 +13,7 @@ import {
 } from "./filters";
 import type { MarketplaceDesign } from "./queries";
 import ProductMockup from "@/components/ui/ProductMockup";
+import LikeButton from "@/components/ui/LikeButton";
 import { DoodleStar, DoodleSparkle, DoodleCloud } from "@/components/ui/Doodles";
 
 interface MarketplaceBrowseProps {
@@ -21,6 +22,8 @@ interface MarketplaceBrowseProps {
   initialFilter: ProductFilter;
   initialQuery: string;
   initialSort: SortOption;
+  /** Array of design IDs the current user has liked. Empty = not logged in or no likes. */
+  likedIds: string[];
 }
 
 export default function MarketplaceBrowse({
@@ -29,7 +32,9 @@ export default function MarketplaceBrowse({
   initialFilter,
   initialQuery,
   initialSort,
+  likedIds,
 }: MarketplaceBrowseProps) {
+  const likedSet = new Set(likedIds);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -238,45 +243,52 @@ export default function MarketplaceBrowse({
             >
               {allDesigns.map((design) => (
                 <li key={design.id}>
-                  <Link
-                    href={`/marketplace/${design.id}`}
-                    className="group flex flex-col"
-                  >
-                    <div className="ink-card overflow-hidden rounded-lg bg-paper-2">
-                      <ProductMockup
-                        imageUrl={design.image_url}
-                        productType={design.product_type}
-                        placement={design.placement}
-                        alt={
-                          design.product_type
-                            ? `${design.product_type} design`
-                            : "Design"
-                        }
-                        loading="lazy"
-                        className="transition-transform duration-300 group-hover:scale-[1.02]"
-                        mockupUrl={design.mockup_url}
-                        mockupStatus={design.mockup_status}
+                  <div className="group flex flex-col">
+                    <Link href={`/marketplace/${design.id}`} className="block">
+                      <div className="ink-card overflow-hidden rounded-lg bg-paper-2">
+                        <ProductMockup
+                          imageUrl={design.image_url}
+                          productType={design.product_type}
+                          placement={design.placement}
+                          alt={
+                            design.product_type
+                              ? `${design.product_type} design`
+                              : "Design"
+                          }
+                          loading="lazy"
+                          className="transition-transform duration-300 group-hover:scale-[1.02]"
+                          mockupUrl={design.mockup_url}
+                          mockupStatus={design.mockup_status}
+                        />
+                      </div>
+                      <div className="mt-3">
+                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          {design.title ??
+                            (design.product_type
+                              ? `${design.product_type} Design`
+                              : "Design")}
+                        </p>
+                        {design.creator_name && (
+                          <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                            by {design.creator_name}
+                          </p>
+                        )}
+                        {design.price_cents !== null && (
+                          <p className="mt-0.5 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                            €{(design.price_cents / 100).toFixed(2)}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                    <div className="mt-1 -ml-1">
+                      <LikeButton
+                        designId={design.id}
+                        initialLiked={likedSet.has(design.id)}
+                        initialCount={design.like_count}
+                        variant="card"
                       />
                     </div>
-                    <div className="mt-3">
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                        {design.title ??
-                          (design.product_type
-                            ? `${design.product_type} Design`
-                            : "Design")}
-                      </p>
-                      {design.creator_name && (
-                        <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                          by {design.creator_name}
-                        </p>
-                      )}
-                      {design.price_cents !== null && (
-                        <p className="mt-0.5 text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                          €{(design.price_cents / 100).toFixed(2)}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
+                  </div>
                 </li>
               ))}
             </ul>

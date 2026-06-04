@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import ProductOptions from "./ProductOptions";
 import ProductMockup from "@/components/ui/ProductMockup";
+import LikeButton from "@/components/ui/LikeButton";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -100,6 +101,27 @@ export default async function DesignPage({ params }: Props) {
     creatorName = profile?.display_name ?? null;
   }
 
+  // Like state for the current user
+  const { data: { user } } = await supabase.auth.getUser();
+  let initialLiked = false;
+  let likeCount = 0;
+
+  const { count: lc } = await supabase
+    .from("likes")
+    .select("*", { count: "exact", head: true })
+    .eq("design_id", design.id);
+  likeCount = lc ?? 0;
+
+  if (user) {
+    const { data: likeRow } = await supabase
+      .from("likes")
+      .select("user_id")
+      .eq("user_id", user.id)
+      .eq("design_id", design.id)
+      .maybeSingle();
+    initialLiked = !!likeRow;
+  }
+
   let moreByCreator: RelatedDesign[] = [];
   if (design.creator_id) {
     const { data: more } = await supabase
@@ -187,6 +209,15 @@ export default async function DesignPage({ params }: Props) {
                 by {creatorName}
               </Link>
             )}
+
+            <div className="mt-4">
+              <LikeButton
+                designId={design.id}
+                initialLiked={initialLiked}
+                initialCount={likeCount}
+                variant="detail"
+              />
+            </div>
 
             {design.price_cents !== null && (
               <p className="mt-5 text-2xl font-bold text-zinc-900 dark:text-zinc-100">

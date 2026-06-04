@@ -8,26 +8,29 @@ interface ProfileStatTilesProps {
   salesCount: number;
   followerCount: number;
   followingCount: number;
+  likesCount: number;
 }
 
 /**
- * Four stat tiles shown on the public creator profile.
+ * Stat tiles shown on the public creator profile.
  */
 export default function ProfileStatTiles({
   designCount,
   salesCount,
   followerCount,
   followingCount,
+  likesCount,
 }: ProfileStatTilesProps) {
   const stats: StatTile[] = [
     { label: "Designs",    value: designCount   },
+    { label: "Likes",      value: likesCount    },
     { label: "Sales",      value: salesCount    },
     { label: "Followers",  value: followerCount  },
     { label: "Following",  value: followingCount },
   ];
 
   return (
-    <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5">
       {stats.map(({ label, value }) => (
         <div
           key={label}

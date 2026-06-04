@@ -4,6 +4,7 @@ import Link from "next/link";
 import ProductMockup from "@/components/ui/ProductMockup";
 import { createClient } from "@/utils/supabase/server";
 import MarkerUnderline from "@/components/ui/MarkerUnderline";
+import TrendingSection from "@/components/marketplace/TrendingSection";
 import {
   DoodleStar,
   DoodleArrow,
@@ -214,6 +215,9 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* ── Trending ─────────────────────────────────────────────── */}
+      <TrendingSection />
 
       {/* ── Brand pillars ─────────────────────────────────────────── */}
       <section className="border-t-2 border-ink px-6 py-16 md:px-12 lg:px-20">

@@ -66,6 +66,24 @@ export default async function CreatorPage({ params }: Props) {
     .select("*", { count: "exact", head: true })
     .eq("creator_id", id);
 
+  // ── Total likes on this creator's published designs ──
+  // We count via the likes table joined through design IDs.
+  const { data: creatorDesigns } = await supabase
+    .from("designs")
+    .select("id")
+    .eq("creator_id", id)
+    .eq("status", "published");
+
+  let totalLikes = 0;
+  if (creatorDesigns && creatorDesigns.length > 0) {
+    const designIds = creatorDesigns.map((d) => d.id);
+    const { count: lc } = await supabase
+      .from("likes")
+      .select("*", { count: "exact", head: true })
+      .in("design_id", designIds);
+    totalLikes = lc ?? 0;
+  }
+
   // ── Follower / following counts ──
   const { count: followerCount } = await supabase
     .from("follows")
@@ -152,6 +170,7 @@ export default async function CreatorPage({ params }: Props) {
         {/* Stats */}
         <ProfileStatTiles
           designCount={totalDesigns}
+          likesCount={totalLikes}
           salesCount={salesCount ?? 0}
           followerCount={followerCount ?? 0}
           followingCount={followingCount ?? 0}
