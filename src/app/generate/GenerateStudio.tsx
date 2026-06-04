@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { saveDraft } from "./actions";
+import { DoodleStar, DoodleBolt, DoodleSwirl } from "@/components/ui/Doodles";
 
 const PlacementEditor = dynamic(() => import("./PlacementEditor"), {
   ssr: false,
@@ -231,15 +232,24 @@ export default function GenerateStudio({
 
   // ── Render ──────────────────────────────────────────────────────────
   return (
-    <main className="flex flex-1 flex-col px-6 py-16 md:py-20">
-      <div className="mx-auto w-full max-w-6xl">
+    <main className="relative flex flex-1 flex-col overflow-hidden px-6 py-16 md:py-20">
+      <DoodleBolt
+        aria-hidden
+        className="doodle-sway pointer-events-none absolute right-8 top-16 hidden h-11 w-9 -rotate-6 text-brand-orange md:block lg:right-20"
+      />
+      <DoodleSwirl
+        aria-hidden
+        className="doodle-sway pointer-events-none absolute right-24 top-40 hidden h-10 w-10 text-brand-blue/70 lg:block"
+      />
+      <div className="relative mx-auto w-full max-w-6xl">
 
-        <div className="mb-12">
+        <div className="relative mb-12 inline-block">
           <span className="mb-2 inline-flex -rotate-1 items-center gap-2 rounded-full border-2 border-ink bg-brand-yellow px-3 py-0.5 font-hand text-base font-bold text-ink">
             ✦ Make something one-of-a-kind
           </span>
           <h1 className="font-display text-3xl text-ink sm:text-4xl">
             Design Studio
+            <DoodleStar className="doodle-twinkle ml-2 inline-block h-6 w-6 -rotate-12 align-middle text-brand-orange" />
           </h1>
           <p className="mt-2 font-hand text-xl text-zinc-500">
             Type a prompt, hit Generate. Your design is ready in seconds.

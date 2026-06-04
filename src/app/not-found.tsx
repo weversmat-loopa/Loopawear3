@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
+import { DoodleBolt } from "@/components/ui/Doodles";
 
 export const metadata: Metadata = {
   title: "Page not found",
@@ -10,8 +11,10 @@ export const metadata: Metadata = {
 export default function NotFoundPage() {
   return (
     <PageShell>
-      <p className="font-marker text-4xl text-brand-orange">
-        404
+      <p className="flex items-center justify-center gap-2 font-marker text-4xl text-brand-orange">
+        4
+        <DoodleBolt className="doodle-sway inline-block h-9 w-7 text-brand-yellow" />
+        4
       </p>
       <h1 className="mt-4 font-display text-3xl text-ink">
         Page not found

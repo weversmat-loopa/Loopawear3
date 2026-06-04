@@ -162,6 +162,40 @@ h1, h2 {
     background-size: 22px 22px;
   }
 
+  /* Doodle accents — gentle idle motion for marginal figures.
+     Kept very subtle so the doodles feel alive without distracting.
+     Respects reduced-motion preferences. */
+  .doodle-float {
+    animation: doodle-float 6s ease-in-out infinite;
+  }
+  .doodle-sway {
+    animation: doodle-sway 7s ease-in-out infinite;
+    transform-origin: center;
+  }
+  .doodle-twinkle {
+    animation: doodle-twinkle 4s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  @keyframes doodle-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes doodle-sway {
+    0%, 100% { transform: rotate(-6deg); }
+    50% { transform: rotate(6deg); }
+  }
+  @keyframes doodle-twinkle {
+    0%, 100% { transform: scale(1); opacity: 0.85; }
+    50% { transform: scale(1.12); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .doodle-float, .doodle-sway, .doodle-twinkle {
+      animation: none;
+    }
+  }
+
   /* Tape strip accent */
   .tape {
     position: relative;

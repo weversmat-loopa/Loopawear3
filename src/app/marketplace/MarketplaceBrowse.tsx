@@ -13,7 +13,7 @@ import {
 } from "./filters";
 import type { MarketplaceDesign } from "./queries";
 import ProductMockup from "@/components/ui/ProductMockup";
-import { DoodleStar } from "@/components/ui/Doodles";
+import { DoodleStar, DoodleSparkle, DoodleCloud } from "@/components/ui/Doodles";
 
 interface MarketplaceBrowseProps {
   initialDesigns: MarketplaceDesign[];
@@ -125,14 +125,22 @@ export default function MarketplaceBrowse({
     initialFilter !== null || initialQuery !== "" || initialSort !== "newest";
 
   return (
-    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
-      <div className="mx-auto w-full max-w-6xl">
+    <main className="relative flex flex-1 flex-col overflow-hidden px-6 py-14 md:py-16">
+      <DoodleSparkle
+        aria-hidden
+        className="doodle-twinkle pointer-events-none absolute right-6 top-12 hidden h-8 w-8 text-brand-yellow md:block lg:right-16"
+      />
+      <DoodleCloud
+        aria-hidden
+        className="doodle-float pointer-events-none absolute right-20 top-32 hidden h-9 w-12 text-brand-blue/70 lg:block"
+      />
+      <div className="relative mx-auto w-full max-w-6xl">
         {/* Header */}
         <div className="flex items-center gap-3">
           <h1 className="font-display text-3xl text-ink sm:text-4xl">
             Explore designs
           </h1>
-          <DoodleStar className="h-7 w-7 -rotate-12 text-brand-orange" />
+          <DoodleStar className="doodle-twinkle h-7 w-7 -rotate-12 text-brand-orange" />
         </div>
         <p className="mt-2 text-sm text-zinc-500">
           Discover original AI-generated apparel from independent creators.
@@ -291,6 +299,10 @@ export default function MarketplaceBrowse({
           </>
         ) : (
           <div className="mt-6 flex flex-col items-center justify-center border-t border-zinc-100 py-24 text-center dark:border-zinc-800">
+            <DoodleCloud
+              aria-hidden
+              className="doodle-float mb-5 h-12 w-16 text-brand-blue/70"
+            />
             <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">
               {isFiltering ? "No designs match" : "No designs published yet"}
             </p>

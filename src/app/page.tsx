@@ -4,7 +4,17 @@ import Link from "next/link";
 import ProductMockup from "@/components/ui/ProductMockup";
 import { createClient } from "@/utils/supabase/server";
 import MarkerUnderline from "@/components/ui/MarkerUnderline";
-import { DoodleStar, DoodleArrow, DoodleSun, DoodleSquiggle } from "@/components/ui/Doodles";
+import {
+  DoodleStar,
+  DoodleArrow,
+  DoodleSun,
+  DoodleSquiggle,
+  DoodleSparkle,
+  DoodleSwirl,
+  DoodleBolt,
+  DoodleHeart,
+  DoodleDots,
+} from "@/components/ui/Doodles";
 
 export const metadata: Metadata = {
   title: { absolute: "Loopawear" },
@@ -88,6 +98,20 @@ export default async function Home() {
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 via-black/20 to-transparent"
         />
 
+        {/* Loose doodle accents scattered in the hero margins */}
+        <DoodleSparkle
+          aria-hidden
+          className="doodle-twinkle pointer-events-none absolute right-8 top-24 hidden h-9 w-9 text-brand-yellow sm:block lg:right-20"
+        />
+        <DoodleSwirl
+          aria-hidden
+          className="doodle-sway pointer-events-none absolute right-16 top-1/2 hidden h-12 w-12 rotate-12 text-brand-orange lg:block"
+        />
+        <DoodleDots
+          aria-hidden
+          className="pointer-events-none absolute bottom-28 right-10 hidden h-7 w-10 text-brand-blue sm:block lg:right-28"
+        />
+
         <div className="relative mx-auto w-full max-w-7xl">
           <span className="mb-5 inline-flex -rotate-2 items-center gap-2 rounded-full border-2 border-white/80 bg-brand-yellow px-4 py-1 font-hand text-lg font-bold text-ink">
             <DoodleSun className="h-5 w-5" />
@@ -98,7 +122,7 @@ export default async function Home() {
             Wear what{" "}
             <span className="relative whitespace-nowrap">
               <MarkerUnderline>you imagine</MarkerUnderline>
-              <DoodleStar className="absolute -right-10 -top-6 hidden h-10 w-10 rotate-12 text-brand-orange sm:block" />
+              <DoodleStar className="doodle-twinkle absolute -right-10 -top-6 hidden h-10 w-10 rotate-12 text-brand-orange sm:block" />
             </span>
             .
           </h1>
@@ -134,11 +158,13 @@ export default async function Home() {
 
             <div className="mb-10 flex items-end justify-between">
               <div>
-                <p className="mb-1 font-hand text-xl font-bold text-brand-blue">
+                <p className="mb-1 flex items-center gap-2 font-hand text-xl font-bold text-brand-blue">
+                  <DoodleSparkle className="h-4 w-4 text-brand-orange" />
                   New arrivals
                 </p>
-                <h2 className="font-display text-2xl text-ink sm:text-3xl">
+                <h2 className="relative inline-block font-display text-2xl text-ink sm:text-3xl">
                   The Collection
+                  <DoodleStar className="absolute -right-7 -top-4 h-5 w-5 rotate-12 text-brand-yellow" />
                 </h2>
               </div>
               <Link
@@ -217,9 +243,21 @@ export default async function Home() {
       </section>
 
       {/* ── Closing CTA ───────────────────────────────────────────── */}
-      <section className="border-t-2 border-ink bg-ink px-6 py-24 md:px-12 lg:px-20">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-6 text-center">
-          <DoodleSun className="h-10 w-10 text-brand-yellow" />
+      <section className="relative overflow-hidden border-t-2 border-ink bg-ink px-6 py-24 md:px-12 lg:px-20">
+        <DoodleBolt
+          aria-hidden
+          className="doodle-sway pointer-events-none absolute left-10 top-16 hidden h-12 w-10 -rotate-12 text-brand-orange md:block lg:left-24"
+        />
+        <DoodleHeart
+          aria-hidden
+          className="doodle-float pointer-events-none absolute bottom-16 right-10 hidden h-11 w-11 rotate-6 text-brand-green md:block lg:right-24"
+        />
+        <DoodleDots
+          aria-hidden
+          className="pointer-events-none absolute left-16 bottom-20 hidden h-7 w-10 text-brand-blue lg:block"
+        />
+        <div className="relative mx-auto flex w-full max-w-7xl flex-col items-center gap-6 text-center">
+          <DoodleSun className="doodle-sway h-10 w-10 text-brand-yellow" />
           <h2 className="font-display text-4xl text-paper sm:text-6xl">
             Your idea,{" "}
             <span className="font-marker text-brand-yellow">worn.</span>

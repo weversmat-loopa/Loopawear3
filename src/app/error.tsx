@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import PageShell from "@/components/layout/PageShell";
+import { DoodleSwirl } from "@/components/ui/Doodles";
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -11,8 +12,9 @@ interface ErrorPageProps {
 export default function ErrorPage({ reset }: ErrorPageProps) {
   return (
     <PageShell>
-      <p className="font-marker text-2xl text-brand-orange">
+      <p className="flex items-center justify-center gap-2 font-marker text-2xl text-brand-orange">
         Oops
+        <DoodleSwirl className="doodle-sway inline-block h-7 w-7 text-brand-yellow" />
       </p>
       <h1 className="mt-4 font-display text-3xl text-ink">
         Something went wrong

@@ -95,3 +95,84 @@ export function DoodleSpark({ className }: DoodleProps) {
     </svg>
   );
 }
+
+/** A wonky hand-drawn heart */
+export function DoodleHeart({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden>
+      <path
+        {...stroke}
+        d="M20 34C8 26 4 18 6 12c1.5-5 8-6 11-1 1 1.5 1.7 2.5 3 4 1.3-1.5 2-2.5 3-4 3-5 9.5-4 11 1 2 6-2 14-14 22Z"
+      />
+    </svg>
+  );
+}
+
+/** A little lightning bolt */
+export function DoodleBolt({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 32 40" className={className} aria-hidden>
+      <path {...stroke} d="M19 4 6 23h9l-3 13 14-20h-9l3-12Z" />
+    </svg>
+  );
+}
+
+/** A puffy little cloud */
+export function DoodleCloud({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 56 36" className={className} aria-hidden>
+      <path
+        {...stroke}
+        d="M14 30c-6 0-10-4-10-9s4-9 9-8c1-5 6-9 12-9s11 4 12 9c5-1 9 3 9 8s-4 9-10 9H14Z"
+      />
+    </svg>
+  );
+}
+
+/** A loose five-petal flower */
+export function DoodleFlower({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 44 44" className={className} aria-hidden>
+      <circle {...stroke} cx="22" cy="22" r="4" />
+      <path
+        {...stroke}
+        d="M22 18c-2-6-1-11 0-12 1 1 2 6 0 12ZM25 20c5-4 10-4 11-3-0 1-3 5-9 5ZM24 25c3 5 2 10 1 11-1-1-4-4-3-9ZM20 25c-3 5-7 6-9 6 0-1 1-5 7-7ZM19 20c-5-4-9-4-10-3 0 1 2 5 8 5Z"
+      />
+    </svg>
+  );
+}
+
+/** A spiral / swirl */
+export function DoodleSwirl({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden>
+      <path
+        {...stroke}
+        d="M20 8c7 0 12 5 12 12s-5 11-11 11-9-4-9-9 3-7 7-7 5 2 5 5-1 3-3 3"
+      />
+    </svg>
+  );
+}
+
+/** Three scattered dots / confetti */
+export function DoodleDots({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 40 28" className={className} aria-hidden>
+      <circle {...stroke} cx="8" cy="20" r="3" />
+      <circle {...stroke} cx="22" cy="8" r="3" />
+      <circle {...stroke} cx="34" cy="19" r="3" />
+    </svg>
+  );
+}
+
+/** A small three-point sparkle / twinkle */
+export function DoodleSparkle({ className }: DoodleProps) {
+  return (
+    <svg viewBox="0 0 32 32" className={className} aria-hidden>
+      <path
+        {...stroke}
+        d="M16 4c.8 6 2 8 11 9-9 1-10.2 3-11 12-.8-9-2-11-11-12 9-1 10.2-3 11-9Z"
+      />
+    </svg>
+  );
+}
