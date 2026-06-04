@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toggleLike } from "@/app/marketplace/like-actions";
 
 interface LikeButtonProps {
@@ -19,24 +19,36 @@ export default function LikeButton({
 }: LikeButtonProps) {
   const [isPending, startTransition] = useTransition();
 
-  // Optimistic state: flip liked + ±1 count immediately
-  const [optimistic, setOptimistic] = useOptimistic(
-    { liked: initialLiked, count: initialCount },
-    (_current, next: { liked: boolean; count: number }) => next,
-  );
+  // Local state is the single source of truth after mount.
+  // Props seed the initial values but are never read again — this prevents
+  // the flicker caused by useOptimistic resetting to stale props while the
+  // server revalidation is still in flight.
+  const [liked, setLiked] = useState(initialLiked);
+  const [count, setCount] = useState(initialCount);
 
   function handleClick(e: React.MouseEvent) {
     e.preventDefault(); // card is often inside a <Link>
     e.stopPropagation();
 
-    const nextLiked = !optimistic.liked;
-    const nextCount = optimistic.count + (nextLiked ? 1 : -1);
+    const nextLiked = !liked;
+    const nextCount = count + (nextLiked ? 1 : -1);
+
+    // Apply the change immediately — no waiting for the server.
+    setLiked(nextLiked);
+    setCount(nextCount);
 
     startTransition(async () => {
-      setOptimistic({ liked: nextLiked, count: nextCount });
-      await toggleLike(designId);
-      // On error the optimistic value snaps back automatically when the
-      // transition settles — useOptimistic resets to the current real state.
+      const result = await toggleLike(designId);
+      if ("error" in result) {
+        // Server rejected — roll back to the pre-click values.
+        setLiked(!nextLiked);
+        setCount(count);
+      } else {
+        // Use the authoritative count returned by the server so we stay
+        // in sync even if concurrent likes happened during the request.
+        setCount(result.likeCount);
+        setLiked(result.liked);
+      }
     });
   }
 
@@ -46,20 +58,20 @@ export default function LikeButton({
         type="button"
         onClick={handleClick}
         disabled={isPending}
-        aria-label={optimistic.liked ? "Unlike this design" : "Like this design"}
+        aria-label={liked ? "Unlike this design" : "Like this design"}
         className={`
           group flex items-center gap-2 rounded-full border-2 px-5 py-2.5
           text-sm font-extrabold transition-all duration-150
           disabled:cursor-not-allowed
-          ${optimistic.liked
+          ${liked
             ? "border-brand-orange bg-brand-orange text-white"
             : "border-ink bg-paper text-ink hover:border-brand-orange hover:text-brand-orange dark:bg-zinc-900"
           }
         `}
       >
-        <HeartIcon filled={optimistic.liked} className="h-4 w-4 transition-transform duration-150 group-active:scale-125" />
-        <span>{optimistic.count > 0 ? optimistic.count : ""}</span>
-        <span>{optimistic.liked ? "Liked" : "Like"}</span>
+        <HeartIcon filled={liked} className="h-4 w-4 transition-transform duration-150 group-active:scale-125" />
+        <span>{count > 0 ? count : ""}</span>
+        <span>{liked ? "Liked" : "Like"}</span>
       </button>
     );
   }
@@ -70,22 +82,22 @@ export default function LikeButton({
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      aria-label={optimistic.liked ? "Unlike" : "Like"}
+      aria-label={liked ? "Unlike" : "Like"}
       className={`
         group flex items-center gap-1 rounded-full px-2 py-1
         text-xs font-semibold transition-all duration-150
         disabled:cursor-not-allowed
-        ${optimistic.liked
+        ${liked
           ? "text-brand-orange"
           : "text-zinc-400 hover:text-brand-orange dark:text-zinc-500"
         }
       `}
     >
       <HeartIcon
-        filled={optimistic.liked}
+        filled={liked}
         className="h-3.5 w-3.5 transition-transform duration-150 group-active:scale-125"
       />
-      {optimistic.count > 0 && <span>{optimistic.count}</span>}
+      {count > 0 && <span>{count}</span>}
     </button>
   );
 }

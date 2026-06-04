@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/utils/supabase/server";
 
 export type LikeResult =
@@ -52,5 +53,15 @@ export async function toggleLike(designId: string): Promise<LikeResult> {
     .select("*", { count: "exact", head: true })
     .eq("design_id", designId);
 
-  return { liked: !existing, likeCount: count ?? 0 };
+  const newLiked = !existing;
+
+  // Revalidate all pages that display like state or counts, so any
+  // subsequent server render (navigation, refresh) reflects the new value.
+  revalidatePath("/marketplace", "page");
+  revalidatePath(`/marketplace/${designId}`, "page");
+  revalidatePath("/", "page");
+  // Creator profile pages aren't known here, but the trending/marketplace
+  // pages are the primary surfaces. Creator profiles revalidate on next visit.
+
+  return { liked: newLiked, likeCount: count ?? 0 };
 }
