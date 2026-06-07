@@ -3,9 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useState } from "react";
-import { saveDraft } from "./actions";
-import { DoodleStar, DoodleBolt, DoodleSwirl } from "@/components/ui/Doodles";
+import { useEffect, useRef, useState } from "react";
+import { saveDraft, saveDetails, submitDesignForReview } from "./actions";
+import { DoodleStar, DoodleBolt, DoodleSwirl, DoodleSparkle } from "@/components/ui/Doodles";
 
 const PlacementEditor = dynamic(() => import("./PlacementEditor"), {
   ssr: false,
@@ -87,6 +87,44 @@ export default function GenerateStudio({
   const [lastImageUrl,     setLastImageUrl]     = useState<string | null>(null);
   const [imgLoaded,        setImgLoaded]        = useState(false);
 
+  // ── Finish-flow state ────────────────────────────────────────────────────
+  // Metadata form
+  const [detailTitle,       setDetailTitle]       = useState("");
+  const [detailPrompt,      setDetailPrompt]      = useState(initialPrompt);
+  const [detailProductType, setDetailProductType] = useState<string | null>(initialProductType ?? null);
+  const [detailStyle,       setDetailStyle]       = useState<string | null>(initialStyle ?? null);
+  const [detailPrice,       setDetailPrice]       = useState("");
+  const [detailSaveStatus,  setDetailSaveStatus]  = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [detailError,       setDetailError]       = useState<string | null>(null);
+
+  // Mockup
+  const [mockupStatus,  setMockupStatus]  = useState<"idle" | "generating" | "ready" | "error">("idle");
+  const [mockupUrl,     setMockupUrl]     = useState<string | null>(null);
+  const [mockupError,   setMockupError]   = useState<string | null>(null);
+
+  // Submit
+  const [submitStatus,  setSubmitStatus]  = useState<"idle" | "submitting" | "submitted" | "error">("idle");
+  const [submitError,   setSubmitError]   = useState<string | null>(null);
+
+  // Refs for smooth scroll-to-section
+  const finishSectionRef = useRef<HTMLDivElement>(null);
+  const submitSectionRef = useRef<HTMLDivElement>(null);
+
+  // When a new image is generated, sync the prompt state with the active prompt
+  // so the details form is pre-filled correctly.
+  useEffect(() => {
+    if (saveState.status === "generated") {
+      setDetailPrompt(prompt);
+      setDetailProductType(productType);
+      // Scroll to the finish section after a short delay to let the
+      // PlacementEditor mount and lay out first.
+      const t = setTimeout(() => {
+        finishSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 600);
+      return () => clearTimeout(t);
+    }
+  }, [saveState.status]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const isWorking =
     saveState.status === "saving" || saveState.status === "generating";
   const creditsExhausted = saveState.status === "credits_exhausted";
@@ -103,6 +141,84 @@ export default function GenerateStudio({
     setProductType(null);
     setDesignId(null);
     setSaveState({ status: "idle" });
+    setDetailTitle("");
+    setDetailPrompt("");
+    setDetailProductType(null);
+    setDetailStyle(null);
+    setDetailPrice("");
+    setDetailSaveStatus("idle");
+    setDetailError(null);
+    setMockupStatus("idle");
+    setMockupUrl(null);
+    setMockupError(null);
+    setSubmitStatus("idle");
+    setSubmitError(null);
+  }
+
+  // ── Finish-flow handlers ─────────────────────────────────────────────────
+
+  async function handleSaveDetails(e: React.FormEvent) {
+    e.preventDefault();
+    if (!designId) return;
+    setDetailSaveStatus("saving");
+    setDetailError(null);
+    const result = await saveDetails({
+      designId,
+      title: detailTitle,
+      prompt: detailPrompt,
+      productType: detailProductType,
+      style: detailStyle,
+      priceEuros: detailPrice,
+    });
+    if (result.error) {
+      setDetailError(result.error);
+      setDetailSaveStatus("error");
+    } else {
+      setDetailSaveStatus("saved");
+      setTimeout(() => setDetailSaveStatus("idle"), 3000);
+    }
+  }
+
+  async function handleGenerateMockup() {
+    if (!designId) return;
+    setMockupStatus("generating");
+    setMockupError(null);
+    try {
+      const res = await fetch(`/api/designs/${designId}/mockup`, { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({})) as { error?: string };
+        setMockupError(
+          body.error === "already_generating"
+            ? "Mockup generation already in progress."
+            : "Mockup generation failed. Please try again."
+        );
+        setMockupStatus("error");
+        return;
+      }
+      const body = await res.json() as { mockupUrl?: string };
+      setMockupUrl(body.mockupUrl ?? null);
+      setMockupStatus("ready");
+    } catch {
+      setMockupError("Something went wrong. Please try again.");
+      setMockupStatus("error");
+    }
+  }
+
+  async function handleSubmitForReview() {
+    if (!designId) return;
+    setSubmitStatus("submitting");
+    setSubmitError(null);
+    const result = await submitDesignForReview(designId);
+    if (result.error) {
+      setSubmitError(result.error);
+      setSubmitStatus("error");
+    } else {
+      setSubmitStatus("submitted");
+      // Scroll to the submitted confirmation
+      setTimeout(() => {
+        submitSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
   }
 
   async function handleGenerate(id: string) {
@@ -387,12 +503,6 @@ export default function GenerateStudio({
 
               {saveState.status === "generated" && (
                 <div className="mt-5 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-                  <Link
-                    href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
-                    className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-500 dark:text-zinc-100 dark:hover:text-zinc-400"
-                  >
-                    Open in workspace →
-                  </Link>
                   <button
                     type="submit"
                     disabled={!prompt.trim() || isWorking}
@@ -407,6 +517,12 @@ export default function GenerateStudio({
                   >
                     New design
                   </button>
+                  <Link
+                    href={`/account/designs/${saveState.id}${colorPalette ? `?color_palette=${encodeURIComponent(colorPalette)}` : ""}`}
+                    className="text-sm text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                  >
+                    Manage in workspace →
+                  </Link>
                 </div>
               )}
             </div>
@@ -420,6 +536,250 @@ export default function GenerateStudio({
             imageUrl={saveState.imageUrl}
             designId={saveState.id}
           />
+        )}
+
+        {/* ── Finish flow — shown after a successful generation ────────── */}
+        {saveState.status === "generated" && (
+          <div ref={finishSectionRef} className="mt-16 space-y-10">
+
+            {/* ── Section A: Design details ──────────────────────────────── */}
+            <section className="border-t-2 border-dashed border-ink/30 pt-10">
+              <div className="flex items-center gap-3">
+                <span className="font-marker text-2xl text-brand-blue">②</span>
+                <h2 className="font-display text-2xl text-ink">Finish your design</h2>
+              </div>
+              <p className="mt-2 font-hand text-lg text-ink/70">
+                Give it a name, set a price, and save the details.
+              </p>
+
+              <form onSubmit={handleSaveDetails} className="mt-8 max-w-lg space-y-5">
+                {/* Title */}
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    value={detailTitle}
+                    onChange={(e) => setDetailTitle(e.target.value)}
+                    placeholder="Give your design a public name…"
+                    className="mt-2 w-full rounded-xl border-2 border-ink/10 bg-paper px-4 py-3 text-sm text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
+                  />
+                </div>
+
+                {/* Prompt */}
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Prompt
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={detailPrompt}
+                    onChange={(e) => setDetailPrompt(e.target.value)}
+                    className="mt-2 w-full resize-none rounded-xl border-2 border-ink/10 bg-paper px-4 py-3 text-sm leading-relaxed text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
+                  />
+                </div>
+
+                {/* Product type */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Product type
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {PRODUCT_TYPES.map((type) => (
+                      <button
+                        key={type}
+                        type="button"
+                        onClick={() => setDetailProductType(detailProductType === type ? null : type)}
+                        className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                          detailProductType === type
+                            ? "border-ink bg-ink text-paper dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                            : "border-zinc-200 text-zinc-500 hover:border-ink hover:text-ink dark:border-zinc-700 dark:text-zinc-400"
+                        }`}
+                      >
+                        {type}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Style */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Style
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {STYLE_MOODS.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setDetailStyle(detailStyle === s ? null : s)}
+                        className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                          detailStyle === s
+                            ? "border-ink bg-ink text-paper dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                            : "border-zinc-200 text-zinc-500 hover:border-ink hover:text-ink dark:border-zinc-700 dark:text-zinc-400"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div>
+                  <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Price (€)
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={detailPrice}
+                    onChange={(e) => setDetailPrice(e.target.value)}
+                    placeholder="e.g. 29.99 — leave empty to skip"
+                    className="mt-2 w-full rounded-xl border-2 border-ink/10 bg-paper px-4 py-3 text-sm text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
+                  />
+                  <p className="mt-1.5 text-xs text-zinc-400">
+                    Optional — does not affect publishing.
+                  </p>
+                </div>
+
+                {detailError && (
+                  <p className="text-sm text-red-500 dark:text-red-400">{detailError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={detailSaveStatus === "saving"}
+                  className="sticker rounded-full bg-brand-blue px-6 py-2.5 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {detailSaveStatus === "saving"
+                    ? "Saving…"
+                    : detailSaveStatus === "saved"
+                    ? "Details saved ✓"
+                    : "Save details"}
+                </button>
+              </form>
+            </section>
+
+            {/* ── Section B: Printful mockup ─────────────────────────────── */}
+            <section className="border-t-2 border-dashed border-ink/30 pt-10">
+              <div className="flex items-center gap-3">
+                <span className="font-marker text-2xl text-brand-green">③</span>
+                <h2 className="font-display text-2xl text-ink">Printful mockup</h2>
+              </div>
+              <p className="mt-2 font-hand text-lg text-ink/70">
+                Generate a real product mockup photo for the marketplace.
+              </p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-4">
+                {mockupStatus === "ready" ? (
+                  <>
+                    {mockupUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={mockupUrl}
+                        alt="Printful mockup"
+                        className="ink-card h-40 w-40 rounded-xl object-cover"
+                      />
+                    )}
+                    <div className="flex flex-col gap-2">
+                      <p className="font-hand text-lg text-brand-green">Mockup ready ✓</p>
+                      <button
+                        type="button"
+                        onClick={handleGenerateMockup}
+                        className="w-fit rounded-full border-2 border-ink/20 px-4 py-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:border-ink hover:text-ink"
+                      >
+                        Regenerate mockup
+                      </button>
+                    </div>
+                  </>
+                ) : mockupStatus === "generating" ? (
+                  <div className="flex items-center gap-3">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
+                    <p className="text-sm text-zinc-500">Generating mockup…</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={handleGenerateMockup}
+                      className="sticker w-fit rounded-full bg-brand-green px-6 py-2.5 text-sm font-extrabold text-white"
+                    >
+                      Generate Printful mockup
+                    </button>
+                    {mockupError && (
+                      <p className="text-xs text-red-500">{mockupError}</p>
+                    )}
+                    <p className="text-xs text-zinc-400">Optional — buyers will see this on the product page.</p>
+                  </div>
+                )}
+              </div>
+            </section>
+
+            {/* ── Section C: Submit for review ───────────────────────────── */}
+            <section ref={submitSectionRef} className="border-t-2 border-dashed border-ink/30 pt-10 pb-20">
+              <div className="flex items-center gap-3">
+                <span className="font-marker text-2xl text-brand-orange">④</span>
+                <h2 className="font-display text-2xl text-ink">Submit for review</h2>
+              </div>
+
+              {submitStatus === "submitted" ? (
+                <div className="mt-6 flex flex-col gap-3">
+                  <div className="ink-card inline-flex items-center gap-3 rounded-xl bg-brand-green/10 px-5 py-4 dark:bg-brand-green/20">
+                    <DoodleSparkle className="h-5 w-5 text-brand-green" />
+                    <p className="font-hand text-xl font-bold text-brand-green">
+                      Submitted for review ✓
+                    </p>
+                  </div>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    We&apos;ll notify you by email when your design is approved and goes live on the marketplace.
+                  </p>
+                  <div className="mt-2 flex flex-wrap gap-4">
+                    <Link
+                      href="/account"
+                      className="text-sm font-medium text-brand-blue transition-opacity hover:opacity-70"
+                    >
+                      View in your account →
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={resetForm}
+                      className="text-sm text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                    >
+                      Create another design
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-6 flex flex-col gap-4">
+                  <p className="max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+                    Once submitted, your design will be reviewed by our team. You&apos;ll receive an email when it&apos;s approved and live on the marketplace.
+                  </p>
+                  {submitError && (
+                    <p className="text-sm text-red-500 dark:text-red-400">{submitError}</p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-4">
+                    <button
+                      type="button"
+                      onClick={handleSubmitForReview}
+                      disabled={submitStatus === "submitting"}
+                      className="sticker rounded-full bg-brand-orange px-8 py-3 text-base font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {submitStatus === "submitting" ? "Submitting…" : "Submit for review →"}
+                    </button>
+                    <Link
+                      href={`/account/designs/${saveState.id}`}
+                      className="text-sm text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                    >
+                      Manage in workspace →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </section>
+
+          </div>
         )}
 
       </div>

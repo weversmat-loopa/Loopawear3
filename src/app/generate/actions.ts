@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/utils/supabase/server";
+import { MIN_PRICE_CENTS } from "@/lib/pricing";
 
 // ── savePlacement ─────────────────────────────────────────────────────
 // Requires the migration in supabase/migrations/0001_design_placement.sql
@@ -118,4 +119,95 @@ export async function saveDraft(
   }
 
   return { id: data.id };
+}
+
+// ── saveDetails ───────────────────────────────────────────────────────────────
+// Like updateDesign in account/actions.ts, but returns a result instead of
+// redirecting — so the Studio can call it without a page reload.
+
+type SaveDetailsInput = {
+  designId: string;
+  title: string;
+  prompt: string;
+  productType: string | null;
+  style: string | null;
+  priceEuros: string;
+};
+
+type SaveDetailsResult =
+  | { success: true; error?: never }
+  | { error: string; success?: never };
+
+export async function saveDetails(
+  input: SaveDetailsInput
+): Promise<SaveDetailsResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "auth_required" };
+
+  const title = input.title.trim() || null;
+  const prompt = input.prompt.trim();
+  if (!prompt) return { error: "Prompt cannot be empty." };
+
+  let priceCents: number | null = null;
+  if (input.priceEuros.trim() !== "") {
+    const parsed = parseFloat(input.priceEuros);
+    const minEuros = (MIN_PRICE_CENTS / 100).toFixed(2);
+    if (isNaN(parsed) || Math.round(parsed * 100) < MIN_PRICE_CENTS) {
+      return { error: `Price must be at least €${minEuros} to cover production costs.` };
+    }
+    priceCents = Math.round(parsed * 100);
+  }
+
+  const { error } = await supabase
+    .from("designs")
+    .update({
+      title,
+      prompt,
+      product_type: input.productType,
+      style: input.style,
+      price_cents: priceCents,
+    })
+    .eq("id", input.designId)
+    .eq("creator_id", user.id);
+
+  if (error) return { error: "Could not save changes. Please try again." };
+
+  return { success: true };
+}
+
+// ── submitDesignForReview ─────────────────────────────────────────────────────
+// Like submitForReview in account/actions.ts, but returns a result instead of
+// redirecting — so the Studio can show an in-place confirmation.
+
+type SubmitResult =
+  | { success: true; error?: never }
+  | { error: string; success?: never };
+
+export async function submitDesignForReview(
+  designId: string
+): Promise<SubmitResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "auth_required" };
+
+  const { data, error } = await supabase
+    .from("designs")
+    .update({ status: "pending_review" })
+    .eq("id", designId)
+    .eq("creator_id", user.id)
+    .eq("status", "draft")
+    .select("id");
+
+  if (error || !data || data.length === 0) {
+    return { error: "Could not submit for review. Please try again." };
+  }
+
+  return { success: true };
 }
