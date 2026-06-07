@@ -19,3 +19,9 @@ export const businessInfo = {
   emailProvider: "Resend (Resend Inc., 2261 Market Street #5022, San Francisco, CA 94114, USA)",
   dpoStatement: "No DPO has been appointed (not required at current processing scale).",
 } as const;
+
+// True only when every placeholder has been replaced with real data.
+// The legal draft banner on each legal page disappears automatically once this is true.
+export const businessInfoComplete = Object.values(businessInfo).every(
+  (v) => v !== PENDING
+);

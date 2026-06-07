@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { businessInfo } from "@/lib/legal/businessInfo";
+import LegalDraftBanner from "@/components/legal/LegalDraftBanner";
 
 export const metadata: Metadata = {
   title: "Imprint",
@@ -9,7 +10,9 @@ export const metadata: Metadata = {
 
 export default function ImprintPage() {
   return (
-    <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
+    <>
+      <LegalDraftBanner />
+      <main className="flex flex-1 flex-col px-6 py-14 md:py-16">
       <article className="mx-auto w-full max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
         <header>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
@@ -139,5 +142,6 @@ export default function ImprintPage() {
         </section>
       </article>
     </main>
+    </>
   );
 }
