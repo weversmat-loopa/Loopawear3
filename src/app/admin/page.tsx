@@ -403,7 +403,15 @@ export default async function AdminDashboardPage() {
           {/* Top creators */}
           <div className="ink-card rounded-xl bg-paper p-6">
             <p className="font-hand text-base font-bold text-brand-blue">Earnings</p>
-            <h2 className="mb-5 font-display text-xl text-ink">Top creators</h2>
+            <div className="mb-5 flex items-center justify-between gap-2">
+              <h2 className="font-display text-xl text-ink">Top creators</h2>
+              <Link
+                href="/admin/creators"
+                className="text-xs font-semibold text-brand-blue transition-opacity hover:opacity-70"
+              >
+                View all →
+              </Link>
+            </div>
             {topCreators.length === 0 ? (
               <EmptyState label="No creator earnings yet" />
             ) : (
