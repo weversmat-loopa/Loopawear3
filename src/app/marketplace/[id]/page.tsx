@@ -28,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .select("title, prompt, product_type")
     .eq("id", id)
     .eq("status", "published")
+    .is("archived_at", null)
     .maybeSingle();
 
   if (!design) {
@@ -86,6 +87,7 @@ export default async function DesignPage({ params }: Props) {
     .select("id, title, prompt, product_type, style, image_url, mockup_url, mockup_status, placement, created_at, creator_id, price_cents")
     .eq("id", id)
     .eq("status", "published")
+    .is("archived_at", null)
     .maybeSingle();
 
   if (!design) {
@@ -130,6 +132,7 @@ export default async function DesignPage({ params }: Props) {
       .select("id, title, product_type, image_url, mockup_url, mockup_status, prompt")
       .eq("creator_id", design.creator_id)
       .eq("status", "published")
+      .is("archived_at", null)
       .neq("id", design.id)
       .order("created_at", { ascending: false })
       .limit(3);
@@ -148,6 +151,7 @@ export default async function DesignPage({ params }: Props) {
       .from("designs")
       .select("id, title, product_type, image_url, mockup_url, mockup_status, prompt")
       .eq("status", "published")
+      .is("archived_at", null)
       .or(similarConditions.join(","))
       .not("id", "in", `(${excludeIds.join(",")})`)
       .order("created_at", { ascending: false })

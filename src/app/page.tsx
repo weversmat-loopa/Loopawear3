@@ -57,6 +57,7 @@ export default async function Home() {
     .from("designs")
     .select("id, title, product_type, image_url, placement, price_cents")
     .eq("status", "published")
+    .is("archived_at", null)
     .order("created_at", { ascending: false })
     .limit(8);
 

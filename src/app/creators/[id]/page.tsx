@@ -54,6 +54,7 @@ export default async function CreatorPage({ params }: Props) {
     .select("id, title, prompt, product_type, style, image_url", { count: "exact" })
     .eq("creator_id", id)
     .eq("status", "published")
+    .is("archived_at", null)
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -72,7 +73,8 @@ export default async function CreatorPage({ params }: Props) {
     .from("designs")
     .select("id")
     .eq("creator_id", id)
-    .eq("status", "published");
+    .eq("status", "published")
+    .is("archived_at", null);
 
   let totalLikes = 0;
   if (creatorDesigns && creatorDesigns.length > 0) {

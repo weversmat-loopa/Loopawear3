@@ -79,6 +79,7 @@ export async function fetchTrending(limit = 6): Promise<TrendingDesign[]> {
     .from("designs")
     .select("id, title, product_type, image_url, mockup_url, mockup_status, placement, price_cents, creator_id")
     .eq("status", "published")
+    .is("archived_at", null)
     .in("id", topIds);
 
   if (!designs || designs.length === 0) return [];

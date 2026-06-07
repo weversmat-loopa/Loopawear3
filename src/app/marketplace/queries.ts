@@ -147,7 +147,8 @@ export async function fetchDesigns({
     let baseQuery = supabase
       .from("designs")
       .select("id, title, prompt, product_type, style, image_url, mockup_url, mockup_status, placement, created_at, creator_id, price_cents")
-      .eq("status", "published");
+      .eq("status", "published")
+      .is("archived_at", null);
 
     if (type) baseQuery = baseQuery.eq("product_type", type);
     if (q) {
@@ -194,7 +195,8 @@ export async function fetchDesigns({
     .select(
       "id, title, prompt, product_type, style, image_url, mockup_url, mockup_status, placement, created_at, creator_id, price_cents"
     )
-    .eq("status", "published");
+    .eq("status", "published")
+    .is("archived_at", null);
 
   if (type) {
     query = query.eq("product_type", type);

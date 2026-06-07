@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
     .select("id, title, product_type, image_url, price_cents, creator_id")
     .eq("id", design_id)
     .eq("status", "published")
+    .is("archived_at", null)
     .maybeSingle();
 
   if (designError) {
