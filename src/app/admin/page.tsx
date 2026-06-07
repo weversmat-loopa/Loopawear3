@@ -309,11 +309,13 @@ export default async function AdminDashboardPage() {
             sub={`${totalRevenueCents > 0 ? Math.round((totalPlatformCents / totalRevenueCents) * 100) : 0}% of revenue`}
             accent="blue"
           />
-          <KpiCard
-            label="Orders"
-            value={orders.length}
-            sub="paid / fulfilled / shipped"
-          />
+          <Link href="/admin/orders" className="block transition-opacity hover:opacity-80">
+            <KpiCard
+              label="Orders"
+              value={orders.length}
+              sub="View all orders →"
+            />
+          </Link>
           <KpiCard
             label="Avg order value"
             value={euros(avgOrderCents)}
