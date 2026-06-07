@@ -1,4 +1,9 @@
 import { createServiceClient } from "@/utils/supabase/service";
+import {
+  designSubmittedEmail,
+  newSubmissionAdminEmail,
+  orderShippedEmail,
+} from "@/lib/email/templates";
 
 /**
  * Resend transactional email helper. Direct fetch — no SDK dependency.
@@ -111,4 +116,105 @@ export function getSiteUrl(): string {
   return (
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-8lsdx.vercel.app"
   );
+}
+
+// ── Shared notification helpers ───────────────────────────────────────────────
+//
+// These compose getUserEmail + sendEmail into single-call helpers so the same
+// logic isn't duplicated across every action that triggers an email.
+
+/**
+ * Sends two emails when a creator submits a design for review:
+ *   1. Confirmation to the creator.
+ *   2. Alert to the admin address (ADMIN_NOTIFICATION_EMAIL env var).
+ *      Silently skipped when the env var is not set.
+ *
+ * Both sends are non-blocking — errors are swallowed by sendEmail/getUserEmail.
+ */
+export async function sendDesignSubmittedNotifications({
+  creatorId,
+  designId,
+  designTitle,
+  creatorName,
+}: {
+  creatorId: string;
+  designId: string;
+  designTitle: string;
+  /** Display name for the admin notification — "Anonymous" if not set. */
+  creatorName: string;
+}): Promise<void> {
+  const siteUrl = getSiteUrl();
+  const designUrl = `${siteUrl}/account/designs/${designId}`;
+  const reviewUrl = `${siteUrl}/admin/review`;
+
+  const tasks: Promise<void>[] = [];
+
+  // 1. Creator confirmation
+  tasks.push(
+    (async () => {
+      const email = await getUserEmail(creatorId);
+      if (!email) return;
+      await sendEmail({
+        to: email,
+        ...designSubmittedEmail({ designTitle, reviewUrl: designUrl }),
+      });
+    })()
+  );
+
+  // 2. Admin notification — only when ADMIN_NOTIFICATION_EMAIL is configured
+  const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+  if (adminEmail) {
+    tasks.push(
+      sendEmail({
+        to: adminEmail,
+        ...newSubmissionAdminEmail({ designTitle, creatorName, reviewUrl }),
+      })
+    );
+  }
+
+  await Promise.all(tasks);
+}
+
+/**
+ * Sends a "your order has shipped" email to the buyer.
+ * Silently skipped when buyer_id is null (guest checkout) and no email address
+ * can be resolved, or when any part of the send fails.
+ */
+export async function sendOrderShippedEmail({
+  buyerId,
+  orderId,
+  designTitle,
+  size,
+  quantity,
+  totalCents,
+  trackingNumber,
+}: {
+  buyerId: string | null;
+  orderId: string;
+  designTitle: string;
+  size: string;
+  quantity: number;
+  totalCents: number;
+  trackingNumber: string | null;
+}): Promise<void> {
+  if (!buyerId) return; // guest orders: no account, no email to look up
+
+  const buyerEmail = await getUserEmail(buyerId);
+  if (!buyerEmail) return;
+
+  const siteUrl = getSiteUrl();
+  const orderUrl = `${siteUrl}/account/orders/${orderId}`;
+
+  await sendEmail({
+    to: buyerEmail,
+    ...orderShippedEmail({
+      designTitle,
+      orderId,
+      size,
+      quantity,
+      totalCents,
+      trackingNumber,
+      orderUrl,
+    }),
+  });
 }

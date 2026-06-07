@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { createServiceClient } from "@/utils/supabase/service";
-import { getSiteUrl, getUserEmail, sendEmail } from "@/lib/email/send";
+import { getSiteUrl, getUserEmail, sendEmail, sendOrderShippedEmail } from "@/lib/email/send";
 import {
   designApprovedEmail,
   designRejectedEmail,
@@ -172,12 +172,37 @@ export async function markShipped(formData: FormData) {
     .update({ status: "shipped", tracking_number: trackingNumber })
     .eq("id", orderId)
     .eq("status", "fulfillment_pending")
-    .select("id");
+    .select("id, buyer_id, design_id, size, quantity, amount_total_cents");
 
   if (error || !data || data.length === 0) {
     redirect(
       `/admin/orders?error=${encodeURIComponent("Could not update order. Please try again.")}`
     );
+  }
+
+  // Non-blocking: send shipping notification to buyer.
+  // Failure here must never prevent the redirect below.
+  const order = data[0];
+  if (order.buyer_id) {
+    const { data: design } = await service
+      .from("designs")
+      .select("title, product_type")
+      .eq("id", order.design_id)
+      .maybeSingle();
+
+    const designTitle =
+      design?.title ??
+      (design?.product_type ? `${design.product_type} Design` : "Design");
+
+    sendOrderShippedEmail({
+      buyerId: order.buyer_id,
+      orderId: order.id,
+      designTitle,
+      size: order.size,
+      quantity: order.quantity,
+      totalCents: order.amount_total_cents,
+      trackingNumber,
+    }).catch(() => {});
   }
 
   redirect(`/admin/orders?success=${encodeURIComponent("Order marked as shipped.")}`);

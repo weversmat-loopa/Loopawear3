@@ -213,3 +213,101 @@ export function orderConfirmationEmail({
     }),
   };
 }
+
+export function orderShippedEmail({
+  designTitle,
+  orderId,
+  size,
+  quantity,
+  totalCents,
+  trackingNumber,
+  orderUrl,
+}: {
+  designTitle: string;
+  orderId: string;
+  size: string;
+  quantity: number;
+  totalCents: number;
+  /** null when no tracking number was entered */
+  trackingNumber: string | null;
+  /** null for guest buyers */
+  orderUrl: string | null;
+}): { subject: string; html: string } {
+  const safeTitle = escapeHtml(designTitle);
+  const total = `€${(totalCents / 100).toFixed(2)}`;
+  const shortId = orderId.slice(0, 8).toUpperCase();
+
+  return {
+    subject: `Your order #${shortId} has shipped`,
+    html: baseLayout({
+      preheader: `Good news — your ${designTitle} is on its way!`,
+      contentHtml: `
+        <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#18181b;">Your order is on its way</p>
+        <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#52525b;">
+          Great news! Your order <strong style="color:#27272a;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;">#${shortId}</strong> for <strong style="color:#27272a;">${safeTitle}</strong> has been shipped.
+        </p>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin:0 0 24px;border:1px solid #e4e4e7;border-radius:12px;">
+          ${detailsRow("Size", size)}
+          ${detailsRow("Quantity", String(quantity))}
+          ${detailsRow("Total paid", total)}
+          ${trackingNumber
+            ? detailsRow("Tracking number", trackingNumber, { last: true, emphasize: true })
+            : detailsRow("Tracking", "No tracking number provided", { last: true })}
+        </table>
+        ${orderUrl ? ctaButton("View order →", orderUrl) : ""}
+      `,
+    }),
+  };
+}
+
+export function designSubmittedEmail({
+  designTitle,
+  reviewUrl,
+}: {
+  designTitle: string;
+  reviewUrl: string;
+}): { subject: string; html: string } {
+  const safeTitle = escapeHtml(designTitle);
+  return {
+    subject: `Your design "${designTitle}" is under review`,
+    html: baseLayout({
+      preheader: `${designTitle} has been submitted and is waiting for review.`,
+      contentHtml: `
+        <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#18181b;">Design submitted</p>
+        <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#52525b;">
+          We've received your design <strong style="color:#27272a;">${safeTitle}</strong> and it's now in our review queue.
+        </p>
+        <p style="margin:0 0 24px;font-size:14px;line-height:1.6;color:#52525b;">
+          We'll email you as soon as it's been reviewed. Most designs are reviewed within one business day.
+        </p>
+        ${ctaButton("View design →", reviewUrl)}
+      `,
+    }),
+  };
+}
+
+export function newSubmissionAdminEmail({
+  designTitle,
+  creatorName,
+  reviewUrl,
+}: {
+  designTitle: string;
+  creatorName: string;
+  reviewUrl: string;
+}): { subject: string; html: string } {
+  const safeTitle = escapeHtml(designTitle);
+  const safeName = escapeHtml(creatorName);
+  return {
+    subject: `New design submitted for review — "${designTitle}"`,
+    html: baseLayout({
+      preheader: `${creatorName} submitted "${designTitle}" and it's waiting in the review queue.`,
+      contentHtml: `
+        <p style="margin:0 0 16px;font-size:18px;font-weight:600;color:#18181b;">New design in review queue</p>
+        <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#52525b;">
+          <strong style="color:#27272a;">${safeName}</strong> just submitted <strong style="color:#27272a;">${safeTitle}</strong> for marketplace review.
+        </p>
+        ${ctaButton("Open review queue →", reviewUrl)}
+      `,
+    }),
+  };
+}

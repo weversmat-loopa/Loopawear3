@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
 import { MIN_PRICE_CENTS } from "@/lib/pricing";
+import { sendDesignSubmittedNotifications } from "@/lib/email/send";
 
 export async function submitForReview(formData: FormData) {
   const supabase = await createClient();
@@ -30,13 +31,32 @@ export async function submitForReview(formData: FormData) {
     .eq("id", designId)
     .eq("creator_id", user.id)
     .eq("status", "draft")
-    .select("id");
+    .select("id, title, product_type");
 
   if (error || !data || data.length === 0) {
     redirect(
       `/account?error=${encodeURIComponent("Could not submit design for review. Please try again.")}`
     );
   }
+
+  // Non-blocking: notify creator + admin. Errors must not affect the redirect.
+  const design = data[0];
+  const designTitle =
+    design.title ??
+    (design.product_type ? `${design.product_type} Design` : "Design");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  sendDesignSubmittedNotifications({
+    creatorId: user.id,
+    designId,
+    designTitle,
+    creatorName: profile?.display_name ?? "Anonymous",
+  }).catch(() => {});
 
   redirect(
     `/account/designs/${designId}?success=${encodeURIComponent("Design submitted for review.")}`

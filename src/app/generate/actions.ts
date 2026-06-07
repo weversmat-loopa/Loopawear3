@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { MIN_PRICE_CENTS } from "@/lib/pricing";
+import { sendDesignSubmittedNotifications } from "@/lib/email/send";
 
 // ── savePlacement ─────────────────────────────────────────────────────
 // Requires the migration in supabase/migrations/0001_design_placement.sql
@@ -203,11 +204,30 @@ export async function submitDesignForReview(
     .eq("id", designId)
     .eq("creator_id", user.id)
     .eq("status", "draft")
-    .select("id");
+    .select("id, title, product_type");
 
   if (error || !data || data.length === 0) {
     return { error: "Could not submit for review. Please try again." };
   }
+
+  // Non-blocking: notify creator + admin. Must not affect the returned result.
+  const design = data[0];
+  const designTitle =
+    design.title ??
+    (design.product_type ? `${design.product_type} Design` : "Design");
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  sendDesignSubmittedNotifications({
+    creatorId: user.id,
+    designId,
+    designTitle,
+    creatorName: profile?.display_name ?? "Anonymous",
+  }).catch(() => {});
 
   return { success: true };
 }
