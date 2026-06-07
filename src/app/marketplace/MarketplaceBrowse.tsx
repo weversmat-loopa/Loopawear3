@@ -130,7 +130,7 @@ export default function MarketplaceBrowse({
     initialFilter !== null || initialQuery !== "" || initialSort !== "newest";
 
   return (
-    <main className="relative flex flex-1 flex-col overflow-hidden px-6 py-14 md:py-16">
+    <main className="relative flex flex-1 flex-col overflow-hidden px-6 py-14 md:py-20 lg:px-20">
       <DoodleSparkle
         aria-hidden
         className="doodle-twinkle pointer-events-none absolute right-6 top-12 hidden h-8 w-8 text-brand-yellow md:block lg:right-16"
@@ -139,10 +139,14 @@ export default function MarketplaceBrowse({
         aria-hidden
         className="doodle-float pointer-events-none absolute right-20 top-32 hidden h-9 w-12 text-brand-blue/70 lg:block"
       />
-      <div className="relative mx-auto w-full max-w-6xl">
+      <div className="relative mx-auto w-full max-w-7xl">
         {/* Header */}
+        <p className="mb-2 flex items-center gap-2 font-hand text-xl font-bold text-brand-blue">
+          <DoodleSparkle className="h-4 w-4 text-brand-orange" />
+          Original AI apparel
+        </p>
         <div className="flex items-center gap-3">
-          <h1 className="font-display text-3xl text-ink sm:text-4xl">
+          <h1 className="relative inline-block font-display text-3xl text-ink sm:text-4xl">
             Explore designs
           </h1>
           <DoodleStar className="doodle-twinkle h-7 w-7 -rotate-12 text-brand-orange" />
@@ -237,7 +241,7 @@ export default function MarketplaceBrowse({
         {allDesigns.length > 0 ? (
           <>
             <ul
-              className={`mt-6 grid grid-cols-2 gap-x-4 gap-y-8 border-t border-zinc-100 pt-8 transition-opacity md:grid-cols-3 lg:grid-cols-4 dark:border-zinc-800 ${
+              className={`mt-6 grid grid-cols-2 gap-x-4 gap-y-10 border-t border-zinc-100 pt-8 transition-opacity sm:gap-x-6 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-14 dark:border-zinc-800 ${
                 isPending ? "opacity-50" : ""
               }`}
             >
@@ -245,7 +249,7 @@ export default function MarketplaceBrowse({
                 <li key={design.id}>
                   <div className="group flex flex-col">
                     <Link href={`/marketplace/${design.id}`} className="block">
-                      <div className="ink-card overflow-hidden rounded-lg bg-paper-2">
+                      <div className="ink-card overflow-hidden rounded-xl bg-paper-2">
                         <ProductMockup
                           imageUrl={design.image_url}
                           productType={design.product_type}
@@ -256,31 +260,31 @@ export default function MarketplaceBrowse({
                               : "Design"
                           }
                           loading="lazy"
-                          className="transition-transform duration-300 group-hover:scale-[1.02]"
+                          className="transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                           mockupUrl={design.mockup_url}
                           mockupStatus={design.mockup_status}
                         />
                       </div>
-                      <div className="mt-3">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                      <div className="mt-4 space-y-1 px-0.5">
+                        <p className="text-sm font-medium text-zinc-900 transition-colors group-hover:text-zinc-500 dark:text-zinc-100 dark:group-hover:text-zinc-400">
                           {design.title ??
                             (design.product_type
                               ? `${design.product_type} Design`
                               : "Design")}
                         </p>
                         {design.creator_name && (
-                          <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                          <p className="text-xs text-zinc-500 dark:text-zinc-400">
                             by {design.creator_name}
                           </p>
                         )}
                         {design.price_cents !== null && (
-                          <p className="mt-0.5 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             €{(design.price_cents / 100).toFixed(2)}
                           </p>
                         )}
                       </div>
                     </Link>
-                    <div className="mt-1 -ml-1">
+                    <div className="mt-1 -ml-1 px-0.5">
                       <LikeButton
                         designId={design.id}
                         initialLiked={likedSet.has(design.id)}

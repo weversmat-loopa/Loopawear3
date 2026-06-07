@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 import ProductOptions from "./ProductOptions";
 import ProductMockup from "@/components/ui/ProductMockup";
 import LikeButton from "@/components/ui/LikeButton";
+import { DoodleStar, DoodleSparkle } from "@/components/ui/Doodles";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -51,24 +52,24 @@ type RelatedDesign = {
 
 function RelatedDesignCard({ item }: { item: RelatedDesign }) {
   return (
-    <Link href={`/marketplace/${item.id}`} className="group flex flex-col">
-      <div className="ink-card overflow-hidden rounded-lg bg-paper-2">
+    <Link href={`/marketplace/${item.id}`} className="group block">
+      <div className="ink-card overflow-hidden rounded-xl bg-paper-2">
         <ProductMockup
           imageUrl={item.image_url}
           productType={item.product_type}
           alt={item.product_type ? `${item.product_type} design` : "Design"}
           loading="lazy"
-          className="transition-transform duration-300 group-hover:scale-[1.02]"
+          className="transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           mockupUrl={item.mockup_url}
           mockupStatus={item.mockup_status}
         />
       </div>
-      <div className="mt-3">
-        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
+      <div className="mt-4 space-y-1 px-0.5">
+        <p className="text-sm font-medium text-zinc-900 transition-colors group-hover:text-zinc-500 dark:text-zinc-100 dark:group-hover:text-zinc-400">
           {item.title ??
             (item.product_type ? `${item.product_type} Design` : "Design")}
         </p>
-        <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="line-clamp-1 text-xs text-zinc-500 dark:text-zinc-400">
           {item.prompt}
         </p>
       </div>
@@ -160,11 +161,11 @@ export default async function DesignPage({ params }: Props) {
   const studioHref = `/generate?${studioParams.toString()}`;
 
   return (
-    <main className="flex flex-1 flex-col px-6 py-14 md:py-20">
-      <div className="mx-auto w-full max-w-4xl">
+    <main className="flex flex-1 flex-col px-6 py-14 md:py-20 lg:px-20">
+      <div className="mx-auto w-full max-w-5xl">
         <Link
           href="/marketplace"
-          className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          className="text-sm font-medium text-zinc-500 transition-colors hover:text-ink dark:text-zinc-400 dark:hover:text-zinc-100"
         >
           ← Marketplace
         </Link>
@@ -220,7 +221,7 @@ export default async function DesignPage({ params }: Props) {
             </div>
 
             {design.price_cents !== null && (
-              <p className="mt-5 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+              <p className="mt-5 font-display text-2xl text-ink">
                 €{(design.price_cents / 100).toFixed(2)}
               </p>
             )}
@@ -266,21 +267,28 @@ export default async function DesignPage({ params }: Props) {
 
         {/* More by this creator */}
         {moreByCreator.length > 0 && (
-          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800">
-            <div className="mb-6 flex items-baseline justify-between gap-4">
-              <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
-                More by {creatorName ?? "this creator"}
-              </h2>
+          <div className="mt-20 border-t-2 border-ink pt-12">
+            <div className="mb-8 flex items-end justify-between">
+              <div>
+                <p className="mb-1 flex items-center gap-2 font-hand text-xl font-bold text-brand-blue">
+                  <DoodleSparkle className="h-4 w-4 text-brand-orange" />
+                  Same creator
+                </p>
+                <h2 className="relative inline-block font-display text-2xl text-ink sm:text-3xl">
+                  More by {creatorName ?? "this creator"}
+                  <DoodleStar className="absolute -right-7 -top-4 h-5 w-5 rotate-12 text-brand-yellow" />
+                </h2>
+              </div>
               {design.creator_id && (
                 <Link
                   href={`/creators/${design.creator_id}`}
-                  className="text-sm text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  className="text-sm font-bold text-zinc-500 transition-colors hover:text-ink"
                 >
                   See all →
                 </Link>
               )}
             </div>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 sm:grid-cols-3 lg:gap-x-8 lg:gap-y-14">
               {moreByCreator.map((related) => (
                 <li key={related.id}>
                   <RelatedDesignCard item={related} />
@@ -292,11 +300,18 @@ export default async function DesignPage({ params }: Props) {
 
         {/* Similar designs */}
         {similarDesigns.length > 0 && (
-          <div className="mt-20 border-t border-zinc-100 pt-12 dark:border-zinc-800">
-            <h2 className="mb-6 text-base font-bold text-zinc-900 dark:text-zinc-100">
-              Similar designs
-            </h2>
-            <ul className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4">
+          <div className="mt-20 border-t-2 border-ink pt-12">
+            <div className="mb-8">
+              <p className="mb-1 flex items-center gap-2 font-hand text-xl font-bold text-brand-blue">
+                <DoodleSparkle className="h-4 w-4 text-brand-orange" />
+                You might also like
+              </p>
+              <h2 className="relative inline-block font-display text-2xl text-ink sm:text-3xl">
+                Similar designs
+                <DoodleStar className="absolute -right-7 -top-4 h-5 w-5 rotate-12 text-brand-yellow" />
+              </h2>
+            </div>
+            <ul className="grid grid-cols-2 gap-x-4 gap-y-10 sm:gap-x-6 sm:grid-cols-4 lg:gap-x-8 lg:gap-y-14">
               {similarDesigns.map((related) => (
                 <li key={related.id}>
                   <RelatedDesignCard item={related} />
