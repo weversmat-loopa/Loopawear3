@@ -296,7 +296,7 @@ export default function GenerateStudio({
         </div>
       </div>
     ) : saveState.status === "generating" ? (
-      <div className="flex aspect-square w-full items-center justify-center rounded-2xl bg-zinc-50 dark:bg-zinc-900">
+      <div className="flex w-full items-center justify-center rounded-2xl bg-zinc-50 aspect-square max-h-[72vw] sm:max-h-none dark:bg-zinc-900">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-700 dark:border-zinc-700 dark:border-t-zinc-300" />
           <p className="text-sm text-zinc-400">Generating your design…</p>
@@ -315,7 +315,7 @@ export default function GenerateStudio({
         />
       </div>
     ) : saveState.status === "prompt_rejected" ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl bg-zinc-50 p-8 text-center dark:bg-zinc-900">
+      <div className="flex aspect-square w-full max-h-[72vw] sm:max-h-none flex-col items-center justify-center gap-3 rounded-2xl bg-zinc-50 p-8 text-center dark:bg-zinc-900">
         <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
           Prompt couldn&apos;t be processed
         </p>
@@ -325,21 +325,21 @@ export default function GenerateStudio({
         </p>
       </div>
     ) : saveState.status === "generate_failed" ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-3 rounded-2xl bg-zinc-50 p-8 text-center dark:bg-zinc-900">
+      <div className="flex aspect-square w-full max-h-[72vw] sm:max-h-none flex-col items-center justify-center gap-3 rounded-2xl bg-zinc-50 p-8 text-center dark:bg-zinc-900">
         <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Generation failed</p>
         <p className="text-xs text-zinc-400">
           Something went wrong. Adjust your prompt or click Retry.
         </p>
       </div>
     ) : creditsExhausted ? (
-      <div className="flex aspect-square w-full flex-col items-center justify-center gap-2 rounded-2xl bg-zinc-50 p-8 text-center dark:bg-zinc-900">
+      <div className="flex aspect-square w-full max-h-[72vw] sm:max-h-none flex-col items-center justify-center gap-2 rounded-2xl bg-zinc-50 p-8 text-center dark:bg-zinc-900">
         <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
           No generation credits remaining
         </p>
         <p className="text-xs text-zinc-400">You&apos;ve used all your available credits.</p>
       </div>
     ) : (
-      <div className="flex aspect-square w-full flex-col items-center justify-center rounded-2xl bg-zinc-50 dark:bg-zinc-900">
+      <div className="flex aspect-square w-full max-h-[72vw] sm:max-h-none flex-col items-center justify-center rounded-2xl bg-zinc-50 dark:bg-zinc-900">
         <p className="text-sm text-zinc-300 dark:text-zinc-700">
           Your design will appear here
         </p>
@@ -498,7 +498,10 @@ export default function GenerateStudio({
             </div>
 
             {/* ── Right: image preview ───────────────────────────── */}
+            {/* On mobile, cap height so the canvas doesn't dominate the screen
+                and the Generate button + finish sections stay reachable. */}
             <div className="lg:sticky lg:top-10">
+
               {canvas}
 
               {saveState.status === "generated" && (
@@ -552,7 +555,7 @@ export default function GenerateStudio({
                 Give it a name, set a price, and save the details.
               </p>
 
-              <form onSubmit={handleSaveDetails} className="mt-8 max-w-lg space-y-5">
+              <form onSubmit={handleSaveDetails} className="mt-8 w-full max-w-lg space-y-5">
                 {/* Title */}
                 <div>
                   <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
@@ -759,18 +762,18 @@ export default function GenerateStudio({
                   {submitError && (
                     <p className="text-sm text-red-500 dark:text-red-400">{submitError}</p>
                   )}
-                  <div className="flex flex-wrap items-center gap-4">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
                     <button
                       type="button"
                       onClick={handleSubmitForReview}
                       disabled={submitStatus === "submitting"}
-                      className="sticker rounded-full bg-brand-orange px-8 py-3 text-base font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                      className="sticker w-full rounded-full bg-brand-orange px-8 py-3 text-base font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                     >
                       {submitStatus === "submitting" ? "Submitting…" : "Submit for review →"}
                     </button>
                     <Link
                       href={`/account/designs/${saveState.id}`}
-                      className="text-sm text-zinc-400 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
+                      className="text-center text-sm text-zinc-400 transition-colors hover:text-zinc-900 sm:text-left dark:hover:text-zinc-100"
                     >
                       Manage in workspace →
                     </Link>

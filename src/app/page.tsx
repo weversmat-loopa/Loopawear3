@@ -120,9 +120,9 @@ export default async function Home() {
             Hand-made by AI, worn by you
           </span>
 
-          <h1 className="relative max-w-5xl font-display text-6xl leading-[0.9] tracking-tight text-white sm:text-8xl lg:text-[8.5rem]">
+          <h1 className="relative max-w-5xl font-display text-5xl leading-[0.9] tracking-tight text-white sm:text-8xl lg:text-[8.5rem]">
             Wear what{" "}
-            <span className="relative whitespace-nowrap">
+            <span className="relative">
               <MarkerUnderline>you imagine</MarkerUnderline>
               <DoodleStar className="doodle-twinkle absolute -right-10 -top-6 hidden h-10 w-10 rotate-12 text-brand-orange sm:block" />
             </span>

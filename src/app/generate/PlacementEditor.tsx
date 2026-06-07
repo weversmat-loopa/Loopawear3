@@ -16,6 +16,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+// ResizeObserver is available in all modern browsers. No polyfill needed.
 import type { Canvas as FabricCanvas, FabricImage as FabricImageT } from "fabric";
 import { savePlacement } from "./actions";
 import {
@@ -50,6 +51,30 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
   const [sliderScale, setSliderScale] = useState(35);
   const [outOfBounds, setOutOfBounds] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  // ── Responsive scaling ────────────────────────────────────────────────────
+  // The Fabric canvas is always initialised at W×H (400×480) in logical pixels.
+  // On narrow screens we CSS-scale the wrapper div down so it fits within the
+  // viewport. Fabric v7 corrects pointer/touch coordinates automatically by
+  // comparing upperCanvasEl.width with getBoundingClientRect().width.
+  // The saved placement coordinates (x, y, scale) remain in 400×480 space —
+  // the displayScale only affects the on-screen rendering, not the data.
+  const outerRef = useRef<HTMLDivElement>(null);
+  const [displayScale, setDisplayScale] = useState(1);
+
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const available = entry.contentRect.width;
+      // Never upscale (max 1); shrink when container is narrower than W.
+      setDisplayScale(Math.min(1, available / W));
+    });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   // Keep sideRef in sync.
   useEffect(() => {
@@ -273,7 +298,12 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    <section className="mt-12 border-t-2 border-dashed border-ink/30 pt-10">
+    // touch-action: none on the section prevents iOS/Android from hijacking
+    // touch events meant for the Fabric canvas (scroll leak fix).
+    <section
+      className="mt-12 border-t-2 border-dashed border-ink/30 pt-10"
+      style={{ touchAction: "none" }}
+    >
       <div className="flex items-center gap-3">
         <span className="font-marker text-2xl text-brand-orange">✶</span>
         <h2 className="font-display text-2xl text-ink">Place it on the shirt</h2>
@@ -292,45 +322,69 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       </div>
 
       <div className="mt-8 flex flex-col gap-8 lg:flex-row lg:items-start">
-        {/* ── Canvas ──────────────────────────────────────────────────────── */}
-        <div
-          className="ink-card relative mx-auto shrink-0 touch-none overflow-hidden rounded-2xl bg-paper-2"
-          style={{ width: W, height: H }}
-        >
-          {/* Layer 1 — shirt mockup, pinned top-left for a 1:1 map with the
-              Fabric canvas. PRINTFUL: swap MOCKUP.src for a real mockup. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={MOCKUP.src}
-            alt=""
-            aria-hidden
-            draggable={false}
-            className="pointer-events-none absolute left-0 top-0 select-none"
-            style={{
-              width: W,
-              height: W, // SVG is square (400×400)
-              filter: color !== "white" ? SHIRT_COLOURS[color].filter : undefined,
-            }}
-          />
-
-          {/* Layer 2 — print-zone border. Pure CSS so it always renders,
-              independent of Fabric timing. Driven by ZONES[side]. */}
+        {/* ── Canvas — responsive wrapper ──────────────────────────────────── */}
+        {/*
+          outerRef measures available width via ResizeObserver.
+          The outer div is sized to W*displayScale × H*displayScale so it
+          takes up exactly the right amount of space in the flow.
+          The inner canvas div is the real W×H and is CSS-scaled down.
+          Fabric always works in 400×480 logical pixels; saved coordinates
+          are unaffected. Pointer correction is automatic in Fabric v7 via
+          upperCanvasEl.width / getBoundingClientRect().width.
+        */}
+        <div ref={outerRef} className="w-full shrink-0 lg:w-auto">
           <div
-            aria-hidden
-            className="pointer-events-none absolute rounded-md"
+            className="mx-auto overflow-hidden"
             style={{
-              left: ZONES[side].x,
-              top: ZONES[side].y,
-              width: ZONES[side].w,
-              height: ZONES[side].h,
-              border: "2px dashed var(--ink)",
-              backgroundColor: "rgba(245,197,24,0.10)",
+              width: Math.round(W * displayScale),
+              height: Math.round(H * displayScale),
             }}
-          />
+          >
+            <div
+              className="ink-card relative touch-none overflow-hidden rounded-2xl bg-paper-2"
+              style={{
+                width: W,
+                height: H,
+                transformOrigin: "top left",
+                transform: displayScale < 1 ? `scale(${displayScale})` : undefined,
+              }}
+            >
+              {/* Layer 1 — shirt mockup, pinned top-left for a 1:1 map with the
+                  Fabric canvas. PRINTFUL: swap MOCKUP.src for a real mockup. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={MOCKUP.src}
+                alt=""
+                aria-hidden
+                draggable={false}
+                className="pointer-events-none absolute left-0 top-0 select-none"
+                style={{
+                  width: W,
+                  height: W, // SVG is square (400×400)
+                  filter: color !== "white" ? SHIRT_COLOURS[color].filter : undefined,
+                }}
+              />
 
-          {/* Layer 3 — transparent Fabric canvas above the shirt. */}
-          <div className="absolute inset-0">
-            <canvas ref={canvasEl} className="touch-none" />
+              {/* Layer 2 — print-zone border. Pure CSS so it always renders,
+                  independent of Fabric timing. Driven by ZONES[side]. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute rounded-md"
+                style={{
+                  left: ZONES[side].x,
+                  top: ZONES[side].y,
+                  width: ZONES[side].w,
+                  height: ZONES[side].h,
+                  border: "2px dashed var(--ink)",
+                  backgroundColor: "rgba(245,197,24,0.10)",
+                }}
+              />
+
+              {/* Layer 3 — transparent Fabric canvas above the shirt. */}
+              <div className="absolute inset-0">
+                <canvas ref={canvasEl} className="touch-none" />
+              </div>
+            </div>
           </div>
         </div>
 

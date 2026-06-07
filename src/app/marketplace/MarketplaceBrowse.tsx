@@ -183,8 +183,8 @@ export default function MarketplaceBrowse({
           )}
         </div>
 
-        {/* Filters + sort */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+        {/* Filters + sort — stack vertically on mobile, row on sm+ */}
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
