@@ -4,8 +4,91 @@ import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
 import { uploadAvatar, uploadBanner } from "@/app/account/profile-actions";
 
-const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_BYTES = 5 * 1024 * 1024;
+// Accepted types shown in the file picker. HEIC/HEIF are added for iOS camera
+// roll. The browser may still report an empty mime type for HEIC on some
+// devices — we handle that in convertToJpeg below.
+const ACCEPT = "image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif,.jpg,.jpeg,.png,.webp,.gif";
+
+// 10 MB hard limit — matches the server-side check and next.config bodySizeLimit.
+const MAX_BYTES = 10 * 1024 * 1024;
+
+// After canvas conversion we target ≤ 1.4 MB JPEG so we stay well under
+// the server-action body limit even with FormData overhead.
+const TARGET_BYTES = 1.4 * 1024 * 1024;
+const MAX_DIMENSION = 1600; // px — enough for a profile photo or banner
+
+/**
+ * Convert any image file to a JPEG Blob via an HTMLCanvasElement.
+ * This handles:
+ *  - HEIC/HEIF: Safari on iOS can decode these via drawImage even though
+ *    they aren't natively displayable in an <img>. The canvas re-encodes
+ *    them as standard JPEG.
+ *  - Large files: iteratively lowers quality until the result is ≤ TARGET_BYTES.
+ *  - Returns null if conversion fails (caller should show an error).
+ */
+async function convertToJpeg(file: File): Promise<File | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const img = new window.Image();
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+
+      // Scale down if larger than MAX_DIMENSION on either axis
+      let { width, height } = img;
+      if (width > MAX_DIMENSION || height > MAX_DIMENSION) {
+        const ratio = Math.min(MAX_DIMENSION / width, MAX_DIMENSION / height);
+        width  = Math.round(width  * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width  = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(null); return; }
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Iteratively lower quality until result fits TARGET_BYTES
+      let quality = 0.88;
+      const tryEncode = () => {
+        canvas.toBlob((blob) => {
+          if (!blob) { resolve(null); return; }
+          if (blob.size > TARGET_BYTES && quality > 0.3) {
+            quality -= 0.1;
+            tryEncode();
+            return;
+          }
+          const converted = new File(
+            [blob],
+            file.name.replace(/\.[^.]+$/, "") + ".jpg",
+            { type: "image/jpeg" }
+          );
+          resolve(converted);
+        }, "image/jpeg", quality);
+      };
+      tryEncode();
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      resolve(null);
+    };
+
+    img.src = url;
+  });
+}
+
+/** Returns true for types that need canvas conversion before upload. */
+function needsConversion(file: File): boolean {
+  // HEIC: mime type may be "image/heic", "image/heif", or "" on some browsers
+  if (file.type === "image/heic" || file.type === "image/heif") return true;
+  if (/\.heic$/i.test(file.name) || /\.heif$/i.test(file.name)) return true;
+  // Large files benefit from resizing too
+  if (file.size > TARGET_BYTES) return true;
+  return false;
+}
 
 interface ImageUploadFieldProps {
   kind: "avatar" | "banner";
@@ -27,20 +110,28 @@ export default function ImageUploadField({
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.files?.[0];
+    if (!raw) return;
 
     setError(null);
     setSuccess(false);
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setError("Only JPEG, PNG, WebP, or GIF images are allowed.");
+    // Basic size guard before conversion attempt
+    if (raw.size > MAX_BYTES) {
+      setError("File is too large (max 10 MB).");
       return;
     }
-    if (file.size > MAX_BYTES) {
-      setError("File is too large (max 5 MB).");
-      return;
+
+    // Convert to JPEG if needed (HEIC, or >TARGET_BYTES)
+    let file: File = raw;
+    if (needsConversion(raw)) {
+      const converted = await convertToJpeg(raw);
+      if (!converted) {
+        setError("Could not process this image. Please try a JPEG or PNG.");
+        return;
+      }
+      file = converted;
     }
 
     // Optimistic local preview
@@ -66,8 +157,8 @@ export default function ImageUploadField({
   const isAvatar = kind === "avatar";
   const label    = isAvatar ? "Profile photo" : "Banner image";
   const hint     = isAvatar
-    ? "Square image recommended · JPEG, PNG, WebP · max 5 MB"
-    : "Wide image recommended (e.g. 1200 × 400) · JPEG, PNG, WebP · max 5 MB";
+    ? "Square image recommended · JPEG, PNG, WebP, HEIC · max 10 MB"
+    : "Wide image recommended (e.g. 1200 × 400) · JPEG, PNG, WebP, HEIC · max 10 MB";
 
   return (
     <div>
@@ -112,7 +203,7 @@ export default function ImageUploadField({
       <input
         ref={inputRef}
         type="file"
-        accept={ALLOWED_TYPES.join(",")}
+        accept={ACCEPT}
         className="hidden"
         onChange={handleChange}
       />

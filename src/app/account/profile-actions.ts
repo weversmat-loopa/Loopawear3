@@ -8,8 +8,9 @@ import { createClient } from "@/utils/supabase/server";
 // ----------------------------------------------------------------
 
 const MAX_BIO_LENGTH = 300;
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024; // 10 MB — phone photos can be 3-8 MB
+// HEIC/HEIF added for iOS camera roll; canvas-converted files arrive as image/jpeg
+const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
 
 function isValidUrl(value: string): boolean {
   try {
@@ -150,10 +151,12 @@ export async function uploadAvatar(formData: FormData): Promise<{ url?: string; 
 
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return { error: "Only JPEG, PNG, WebP, or GIF images are allowed." };
-  if (file.size > MAX_IMAGE_BYTES) return { error: "File is too large (max 5 MB)." };
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return { error: "Only JPEG, PNG, WebP, GIF, or HEIC images are allowed." };
+  if (file.size > MAX_IMAGE_BYTES) return { error: "File is too large (max 10 MB)." };
 
-  const ext = file.name.split(".").pop() ?? "jpg";
+  // Derive extension from mime type so HEIC files get the right path
+  const extMap: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/heic": "heic", "image/heif": "heif" };
+  const ext = extMap[file.type] ?? file.name.split(".").pop() ?? "jpg";
   const path = `avatars/${user.id}/${user.id}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
@@ -189,10 +192,12 @@ export async function uploadBanner(formData: FormData): Promise<{ url?: string; 
 
   const file = formData.get("file");
   if (!(file instanceof File)) return { error: "No file provided." };
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return { error: "Only JPEG, PNG, WebP, or GIF images are allowed." };
-  if (file.size > MAX_IMAGE_BYTES) return { error: "File is too large (max 5 MB)." };
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) return { error: "Only JPEG, PNG, WebP, GIF, or HEIC images are allowed." };
+  if (file.size > MAX_IMAGE_BYTES) return { error: "File is too large (max 10 MB)." };
 
-  const ext = file.name.split(".").pop() ?? "jpg";
+  // Derive extension from mime type so HEIC files get the right path
+  const extMap: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif", "image/heic": "heic", "image/heif": "heif" };
+  const ext = extMap[file.type] ?? file.name.split(".").pop() ?? "jpg";
   const path = `banners/${user.id}/${user.id}.${ext}`;
 
   const { error: uploadError } = await supabase.storage

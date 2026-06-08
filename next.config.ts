@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Raise the server-action body-size limit so phone photos (3-8 MB)
+  // can be uploaded. The default 1 MB was causing HTTP 400 on mobile.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
+  },
   images: {
     // Allow next/image to optimize design artwork served from Supabase
     // Storage and the fal.ai CDN. Supabase URLs are scoped to the public
