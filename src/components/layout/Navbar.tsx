@@ -78,6 +78,16 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                   </Link>
                 )}
                 <Link
+                  href={`/creators/${user.id}`}
+                  className={`text-sm font-medium transition-colors ${
+                    pathname === `/creators/${user.id}`
+                      ? "text-zinc-900 dark:text-white"
+                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                  }`}
+                >
+                  My profile
+                </Link>
+                <Link
                   href="/account"
                   className={`text-sm font-medium transition-colors ${
                     pathname === "/account" || pathname.startsWith("/account/")
@@ -216,6 +226,17 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                     <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100">→</span>
                   </Link>
                 )}
+                <Link
+                  href={`/creators/${user.id}`}
+                  className={`group relative flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight transition-colors active:bg-paper-2 dark:border-ink/20 ${
+                    pathname === `/creators/${user.id}`
+                      ? "text-ink"
+                      : "text-ink/70 hover:text-ink"
+                  }`}
+                >
+                  My profile
+                  <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100">→</span>
+                </Link>
                 <Link
                   href="/account"
                   className={`group relative flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight transition-colors active:bg-paper-2 dark:border-ink/20 ${

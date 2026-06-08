@@ -155,7 +155,15 @@ export default async function CreatorPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Follow / Unfollow — hidden on own profile */}
+          {/* Own profile → Edit button; other profiles → Follow */}
+          {isOwnProfile && (
+            <Link
+              href="/account"
+              className="sticker-sm rounded-full bg-paper px-5 py-2 text-sm font-extrabold text-ink"
+            >
+              Edit profile
+            </Link>
+          )}
           {!isOwnProfile && user && (
             <FollowButton creatorId={id} isFollowing={isFollowing} />
           )}
