@@ -8,7 +8,8 @@ import ConfirmForm from "@/components/ui/ConfirmForm";
 import ProfileForm from "@/app/account/ProfileForm";
 import ImageUploadField from "@/components/profile/ImageUploadField";
 import { submitForReview, unpublishDesign, deleteDesign } from "@/app/account/actions";
-import type { TabId } from "./CreatorTabs";
+
+export type TabId = "designs" | "drafts" | "sales" | "credits" | "settings";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -61,6 +62,8 @@ interface CreatorTabContentProps {
   publishedDesigns: PublishedDesign[];
   /** Only present when isOwnProfile === true */
   ownerData: OwnerData | null;
+  /** When true, renders the "Edit profile" button that opens Settings client-side */
+  showEditButton?: boolean;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -97,6 +100,7 @@ export default function CreatorTabContent({
   isOwnProfile,
   publishedDesigns,
   ownerData,
+  showEditButton = false,
 }: CreatorTabContentProps) {
   const router = useRouter();
   const tabs = isOwnProfile ? OWNER_TABS : PUBLIC_TABS;
@@ -111,6 +115,19 @@ export default function CreatorTabContent({
 
   return (
     <div className="mt-10">
+      {/* ── Edit profile button (owner only) — client-side, opens Settings instantly ── */}
+      {showEditButton && (
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={() => handleTabClick("settings")}
+            className="sticker-sm rounded-full bg-paper px-5 py-2 text-sm font-extrabold text-ink"
+          >
+            Edit profile
+          </button>
+        </div>
+      )}
+
       {/* ── Tab bar ── */}
       <div className="border-b-2 border-ink/10 dark:border-ink/20">
         <div className="flex items-center gap-1 overflow-x-auto">

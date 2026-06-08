@@ -8,8 +8,7 @@ import ProfileBanner from "@/components/profile/ProfileBanner";
 import SocialLinks from "@/components/profile/SocialLinks";
 import ProfileStatTiles from "@/components/profile/ProfileStatTiles";
 import FollowButton from "@/components/profile/FollowButton";
-import CreatorTabContent from "./CreatorTabContent";
-import type { TabId } from "./CreatorTabs";
+import CreatorTabContent, { type TabId } from "./CreatorTabContent";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -264,15 +263,8 @@ export default async function CreatorPage({ params, searchParams }: Props) {
             </div>
           </div>
 
-          {/* Own profile → link to Settings tab; other profiles → Follow */}
-          {isOwnProfile && (
-            <Link
-              href={`/creators/${id}?tab=settings`}
-              className="sticker-sm rounded-full bg-paper px-5 py-2 text-sm font-extrabold text-ink"
-            >
-              Edit profile
-            </Link>
-          )}
+          {/* Own profile → Edit profile button (rendered inside CreatorTabContent to
+               use client-side tab state); other profiles → Follow */}
           {!isOwnProfile && user && (
             <FollowButton creatorId={id} isFollowing={isFollowing} />
           )}
@@ -302,6 +294,7 @@ export default async function CreatorPage({ params, searchParams }: Props) {
           isOwnProfile={isOwnProfile}
           publishedDesigns={publishedDesigns}
           ownerData={ownerData}
+          showEditButton={isOwnProfile}
         />
       </div>
     </main>
