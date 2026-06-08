@@ -12,7 +12,7 @@ const PlacementEditor = dynamic(() => import("./PlacementEditor"), {
   loading: () => (
     <div className="mt-12 border-t border-zinc-100 pt-12 dark:border-zinc-800">
       <div className="h-6 w-40 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
-      <div className="mt-4 h-[480px] w-[400px] animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
+      <div className="mt-4 w-full max-w-[400px] aspect-[400/480] animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
     </div>
   ),
 });
@@ -348,7 +348,7 @@ export default function GenerateStudio({
 
   // ── Render ──────────────────────────────────────────────────────────
   return (
-    <main className="relative flex flex-1 flex-col overflow-hidden px-6 py-16 md:py-20">
+    <main className="relative flex flex-1 flex-col overflow-hidden px-4 py-10 sm:px-6 md:py-20">
       <DoodleBolt
         aria-hidden
         className="doodle-sway pointer-events-none absolute right-8 top-16 hidden h-11 w-9 -rotate-6 text-brand-orange md:block lg:right-20"
@@ -359,7 +359,7 @@ export default function GenerateStudio({
       />
       <div className="relative mx-auto w-full max-w-6xl">
 
-        <div className="relative mb-12 inline-block">
+        <div className="relative mb-8 inline-block sm:mb-12">
           <span className="mb-2 inline-flex -rotate-1 items-center gap-2 rounded-full border-2 border-ink bg-brand-yellow px-3 py-0.5 font-hand text-base font-bold text-ink">
             ✦ Make something one-of-a-kind
           </span>
@@ -428,7 +428,7 @@ export default function GenerateStudio({
                         setProductType(productType === type ? null : type);
                         resetSaveState();
                       }}
-                      className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                      className={`min-h-[44px] rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                         productType === type
                           ? "border-zinc-900 bg-zinc-900 text-white dark:border-white dark:bg-zinc-100 dark:text-zinc-900"
                           : "border-zinc-200 text-zinc-500 hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-400 dark:hover:text-zinc-100"
@@ -566,7 +566,7 @@ export default function GenerateStudio({
                     value={detailTitle}
                     onChange={(e) => setDetailTitle(e.target.value)}
                     placeholder="Give your design a public name…"
-                    className="mt-2 w-full rounded-xl border-2 border-ink/10 bg-paper px-4 py-3 text-sm text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="mt-2 w-full rounded-xl border-2 border-ink/10 bg-paper px-4 py-3.5 text-base text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
                   />
                 </div>
 
@@ -594,7 +594,7 @@ export default function GenerateStudio({
                         key={type}
                         type="button"
                         onClick={() => setDetailProductType(detailProductType === type ? null : type)}
-                        className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                        className={`min-h-[44px] rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                           detailProductType === type
                             ? "border-ink bg-ink text-paper dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
                             : "border-zinc-200 text-zinc-500 hover:border-ink hover:text-ink dark:border-zinc-700 dark:text-zinc-400"
@@ -617,7 +617,7 @@ export default function GenerateStudio({
                         key={s}
                         type="button"
                         onClick={() => setDetailStyle(detailStyle === s ? null : s)}
-                        className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                        className={`min-h-[44px] rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
                           detailStyle === s
                             ? "border-ink bg-ink text-paper dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
                             : "border-zinc-200 text-zinc-500 hover:border-ink hover:text-ink dark:border-zinc-700 dark:text-zinc-400"
@@ -640,7 +640,7 @@ export default function GenerateStudio({
                     value={detailPrice}
                     onChange={(e) => setDetailPrice(e.target.value)}
                     placeholder="e.g. 29.99 — leave empty to skip"
-                    className="mt-2 w-full rounded-xl border-2 border-ink/10 bg-paper px-4 py-3 text-sm text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
+                    className="mt-2 w-full rounded-xl border-2 border-ink/10 bg-paper px-4 py-3.5 text-base text-ink placeholder:text-zinc-400 outline-none transition-colors focus:border-brand-blue/40 dark:bg-zinc-900 dark:text-zinc-100"
                   />
                   <p className="mt-1.5 text-xs text-zinc-400">
                     Optional — does not affect publishing.
@@ -654,7 +654,7 @@ export default function GenerateStudio({
                 <button
                   type="submit"
                   disabled={detailSaveStatus === "saving"}
-                  className="sticker rounded-full bg-brand-blue px-6 py-2.5 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  className="sticker w-full rounded-full bg-brand-blue px-6 py-3.5 text-base font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2.5 sm:text-sm"
                 >
                   {detailSaveStatus === "saving"
                     ? "Saving…"
@@ -691,7 +691,7 @@ export default function GenerateStudio({
                       <button
                         type="button"
                         onClick={handleGenerateMockup}
-                        className="w-fit rounded-full border-2 border-ink/20 px-4 py-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:border-ink hover:text-ink"
+                        className="min-h-[44px] w-fit rounded-full border-2 border-ink/20 px-4 py-2 text-xs font-semibold text-zinc-500 transition-colors hover:border-ink hover:text-ink"
                       >
                         Regenerate mockup
                       </button>
@@ -707,7 +707,7 @@ export default function GenerateStudio({
                     <button
                       type="button"
                       onClick={handleGenerateMockup}
-                      className="sticker w-fit rounded-full bg-brand-green px-6 py-2.5 text-sm font-extrabold text-white"
+                      className="sticker w-full rounded-full bg-brand-green px-6 py-3.5 text-base font-extrabold text-white sm:w-fit sm:py-2.5 sm:text-sm"
                     >
                       Generate Printful mockup
                     </button>

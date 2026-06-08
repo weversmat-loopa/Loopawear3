@@ -298,11 +298,11 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
 
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
-    // touch-action: none on the section prevents iOS/Android from hijacking
-    // touch events meant for the Fabric canvas (scroll leak fix).
+    // NOTE: touch-action:none must NOT be on the whole section — that would
+    // block page scrolling on mobile. It is applied only on the canvas wrapper
+    // (outerRef div) and the canvas element itself below.
     <section
       className="mt-12 border-t-2 border-dashed border-ink/30 pt-10"
-      style={{ touchAction: "none" }}
     >
       <div className="flex items-center gap-3">
         <span className="font-marker text-2xl text-brand-orange">✶</span>
@@ -331,8 +331,10 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
           Fabric always works in 400×480 logical pixels; saved coordinates
           are unaffected. Pointer correction is automatic in Fabric v7 via
           upperCanvasEl.width / getBoundingClientRect().width.
+          touch-action:none is scoped to this wrapper so page scroll outside
+          the canvas is unaffected on mobile.
         */}
-        <div ref={outerRef} className="w-full shrink-0 lg:w-auto">
+        <div ref={outerRef} className="w-full shrink-0 touch-none lg:w-auto">
           <div
             className="mx-auto overflow-hidden"
             style={{
@@ -401,7 +403,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
                   onClick={() => setColor(c)}
                   title={SHIRT_COLOURS[c].label}
                   aria-label={SHIRT_COLOURS[c].label}
-                  className={`h-8 w-8 rounded-full border-2 border-ink transition-transform hover:-translate-y-0.5 ${
+                  className={`h-11 w-11 rounded-full border-2 border-ink transition-transform hover:-translate-y-0.5 ${
                     color === c ? "shadow-[2px_2px_0_0_var(--ink)]" : ""
                   }`}
                   style={{ backgroundColor: SHIRT_COLOURS[c].hex }}
@@ -423,7 +425,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
               step={1}
               value={sliderScale}
               onChange={(e) => handleScaleChange(Number(e.target.value))}
-              className="w-full accent-brand-blue"
+              className="w-full accent-brand-blue h-2 cursor-pointer"
             />
           </div>
 
@@ -436,7 +438,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
                   key={s}
                   type="button"
                   onClick={() => setSize(s)}
-                  className={`${pill(size === s)} px-3 py-1 text-xs`}
+                  className={`${pill(size === s)} min-h-[44px] px-3 py-2 text-xs`}
                 >
                   {s}
                 </button>
@@ -448,7 +450,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
           <button
             type="button"
             onClick={handleCenter}
-            className="sticker-sm rounded-full bg-paper px-4 py-2 text-sm font-extrabold text-ink"
+            className="sticker-sm min-h-[44px] rounded-full bg-paper px-4 py-2.5 text-sm font-extrabold text-ink"
           >
             Center design
           </button>
@@ -466,7 +468,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
               type="button"
               onClick={handleSave}
               disabled={saveStatus === "saving"}
-              className="sticker w-full rounded-full bg-brand-green py-2.5 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
+              className="sticker w-full min-h-[48px] rounded-full bg-brand-green py-3 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saveStatus === "saving"
                 ? "Saving…"
