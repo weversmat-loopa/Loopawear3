@@ -8,11 +8,8 @@ import ProfileBanner from "@/components/profile/ProfileBanner";
 import SocialLinks from "@/components/profile/SocialLinks";
 import ProfileStatTiles from "@/components/profile/ProfileStatTiles";
 import FollowButton from "@/components/profile/FollowButton";
-import ConfirmForm from "@/components/ui/ConfirmForm";
-import ImageUploadField from "@/components/profile/ImageUploadField";
-import ProfileForm from "@/app/account/ProfileForm";
-import CreatorTabs, { type TabId } from "./CreatorTabs";
-import { submitForReview, unpublishDesign, deleteDesign } from "@/app/account/actions";
+import CreatorTabContent from "./CreatorTabContent";
+import type { TabId } from "./CreatorTabs";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -33,18 +30,6 @@ type DesignRow = {
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function euros(cents: number) {
-  return `€${(cents / 100).toFixed(2)}`;
-}
 
 const VALID_TABS: TabId[] = ["designs", "drafts", "sales", "credits", "settings"];
 
@@ -239,17 +224,6 @@ export default async function CreatorPage({ params, searchParams }: Props) {
     };
   }
 
-  // ── Tab definitions ───────────────────────────────────────────────────────
-  const publicTabs = [{ id: "designs" as TabId, label: "Designs" }];
-  const ownerTabs = [
-    { id: "designs" as TabId, label: "Designs" },
-    { id: "drafts" as TabId, label: "Drafts" },
-    { id: "sales" as TabId, label: "Sales" },
-    { id: "credits" as TabId, label: "Credits" },
-    { id: "settings" as TabId, label: "Settings" },
-  ];
-  const tabs = isOwnProfile ? ownerTabs : publicTabs;
-
   // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <main className="flex flex-1 flex-col px-6 py-10 md:py-12">
@@ -321,313 +295,14 @@ export default async function CreatorPage({ params, searchParams }: Props) {
           followingCount={followingCount ?? 0}
         />
 
-        {/* ── Tab bar ── */}
-        <div className="mt-10">
-          <CreatorTabs tabs={tabs} activeTab={activeTab} profileId={id} />
-        </div>
-
-        {/* ══════════════════════════════════════════════════════════
-            TAB: DESIGNS  (public)
-        ══════════════════════════════════════════════════════════ */}
-        {activeTab === "designs" && (
-          <div className="mt-6">
-            {publishedDesigns.length > 0 ? (
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {publishedDesigns.map((design) => (
-                  <li key={design.id}>
-                    <Link
-                      href={`/marketplace/${design.id}`}
-                      className="group flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-paper shadow-sm transition-all hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-none"
-                    >
-                      {design.image_url ? (
-                        <div className="relative aspect-square w-full overflow-hidden">
-                          <Image
-                            src={design.image_url}
-                            alt={design.product_type ? `${design.product_type} design` : "Design"}
-                            fill
-                            sizes="(min-width: 1280px) 256px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                            className="object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-square w-full bg-zinc-100 dark:bg-zinc-800" />
-                      )}
-                      <div className="flex flex-col gap-1 p-4">
-                        <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                          {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
-                        </p>
-                        {design.style && (
-                          <span className="w-fit rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
-                            {design.style}
-                          </span>
-                        )}
-                        <p className="mt-1 line-clamp-1 text-xs leading-relaxed text-zinc-400">
-                          {design.prompt}
-                        </p>
-                      </div>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 px-6 py-16 text-center dark:border-zinc-700">
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">No published designs yet</p>
-                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                  {isOwnProfile
-                    ? "Head to the Studio to create your first design."
-                    : "This creator hasn't published anything yet."}
-                </p>
-                {isOwnProfile && (
-                  <Link href="/generate" className="mt-3 text-xs text-violet-600 underline underline-offset-2">
-                    Open Studio →
-                  </Link>
-                )}
-              </div>
-            )}
-
-            {/* Studio CTA for public visitors */}
-            {!isOwnProfile && (
-              <div className="mt-16 border-t border-zinc-200 pt-8 pb-4 dark:border-zinc-800">
-                <p className="text-sm text-zinc-500">
-                  Inspired?{" "}
-                  <Link href="/generate" className="text-zinc-500 underline underline-offset-2 transition-colors hover:text-violet-600">
-                    Create your own design →
-                  </Link>
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════
-            TAB: DRAFTS  (owner only — data only present if isOwnProfile)
-        ══════════════════════════════════════════════════════════ */}
-        {activeTab === "drafts" && isOwnProfile && ownerData && (
-          <div className="mt-6 space-y-10 pb-16">
-            {/* Drafts */}
-            <section>
-              <div className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
-                <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Drafts</h2>
-                {ownerData.drafts.length > 0 && (
-                  <span className="text-sm text-zinc-400">{ownerData.drafts.length}</span>
-                )}
-              </div>
-              <p className="mt-1 text-sm text-zinc-500">Saved designs not yet visible in the marketplace.</p>
-
-              {ownerData.drafts.length > 0 ? (
-                <ul className="mt-4 space-y-2">
-                  {ownerData.drafts.map((design) => (
-                    <li key={design.id} className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900">
-                      <div className="flex">
-                        <Link href={`/account/designs/${design.id}`} className="relative block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800" tabIndex={-1} aria-hidden>
-                          {design.image_url && <Image src={design.image_url} alt="" fill sizes="80px" className="object-cover" />}
-                        </Link>
-                        <div className="flex flex-1 flex-col justify-between gap-3 p-4">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <Link href={`/account/designs/${design.id}`} className="text-sm font-medium text-zinc-900 transition-colors hover:text-violet-600 dark:text-zinc-100">
-                                {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
-                              </Link>
-                              {design.image_status === "generating" && (
-                                <span className="rounded-full border border-violet-200 bg-violet-50 px-2 py-0.5 text-xs text-violet-600">Generating…</span>
-                              )}
-                              {design.image_status === "failed" && (
-                                <span className="rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-xs text-red-600">Failed</span>
-                              )}
-                            </div>
-                            <p className="mt-1 line-clamp-1 text-xs text-zinc-400">{design.prompt}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            {design.product_type && (
-                              <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">{design.product_type}</span>
-                            )}
-                            <span className="text-xs text-zinc-400">{formatDate(design.created_at)}</span>
-                            <div className="ml-auto flex items-center gap-3">
-                              <Link href={`/account/designs/${design.id}`} className="text-xs text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100">Edit</Link>
-                              {design.image_status === "ready" && (
-                                <ConfirmForm action={submitForReview} message="Submit this design for marketplace review?" hiddenFields={{ designId: design.id }}>
-                                  <button type="submit" className="rounded-full bg-zinc-900 px-3 py-1 text-xs font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900">Submit for review →</button>
-                                </ConfirmForm>
-                              )}
-                              <ConfirmForm action={deleteDesign} message="Delete this design permanently? This cannot be undone." hiddenFields={{ designId: design.id }}>
-                                <button type="submit" className="text-xs text-zinc-400 transition-colors hover:text-red-500">Delete</button>
-                              </ConfirmForm>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <div className="mt-4 rounded-xl border border-dashed border-zinc-300 px-6 py-10 text-center dark:border-zinc-700">
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">No drafts yet</p>
-                  <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                    Head to the{" "}
-                    <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-violet-600">Studio</Link>
-                    {" "}to create your first design.
-                  </p>
-                </div>
-              )}
-            </section>
-
-            {/* In review */}
-            {ownerData.pendingDesigns.length > 0 && (
-              <section>
-                <div className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                  <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">In review</h2>
-                  <span className="text-sm text-zinc-400">{ownerData.pendingDesigns.length}</span>
-                </div>
-                <p className="mt-1 text-sm text-zinc-500">Submitted designs awaiting admin review.</p>
-                <ul className="mt-4 space-y-2">
-                  {ownerData.pendingDesigns.map((design) => (
-                    <li key={design.id} className="overflow-hidden rounded-xl border border-zinc-200 bg-paper dark:border-zinc-700 dark:bg-zinc-900">
-                      <div className="flex">
-                        <Link href={`/account/designs/${design.id}`} className="relative block aspect-square w-20 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800" tabIndex={-1} aria-hidden>
-                          {design.image_url && <Image src={design.image_url} alt="" fill sizes="80px" className="object-cover" />}
-                        </Link>
-                        <div className="flex flex-1 flex-col justify-between gap-3 p-4">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <Link href={`/account/designs/${design.id}`} className="text-sm font-medium text-zinc-900 transition-colors hover:text-violet-600 dark:text-zinc-100">
-                                {design.title ?? (design.product_type ? `${design.product_type} Design` : "Design")}
-                              </Link>
-                              <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400">In review</span>
-                            </div>
-                            <p className="mt-1 line-clamp-1 text-xs text-zinc-400">{design.prompt}</p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            {design.product_type && (
-                              <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs text-zinc-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">{design.product_type}</span>
-                            )}
-                            <span className="text-xs text-zinc-400">{formatDate(design.created_at)}</span>
-                            <div className="ml-auto">
-                              <ConfirmForm action={deleteDesign} message="Delete this design permanently? This cannot be undone." hiddenFields={{ designId: design.id }}>
-                                <button type="submit" className="text-xs text-zinc-400 transition-colors hover:text-red-500">Delete</button>
-                              </ConfirmForm>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════
-            TAB: SALES  (owner only)
-        ══════════════════════════════════════════════════════════ */}
-        {activeTab === "sales" && isOwnProfile && ownerData && (
-          <div className="mt-6 pb-16">
-            <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Sales & Earnings</h2>
-            <p className="mt-1 text-sm text-zinc-500">Revenue from completed and processing orders.</p>
-
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { label: "Total sales", value: euros(ownerData.totalSalesCents) },
-                { label: "Orders", value: ownerData.orderCount },
-                { label: "Items sold", value: ownerData.itemsSold },
-                { label: "Earned", value: euros(ownerData.totalEarnedCents) },
-              ].map(({ label, value }) => (
-                <div key={label} className="rounded-xl border border-zinc-200 bg-paper px-4 py-4 dark:border-zinc-700 dark:bg-zinc-900">
-                  <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{label}</p>
-                  <p className="mt-1 text-xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{value}</p>
-                </div>
-              ))}
-            </div>
-
-            {ownerData.orderCount === 0 && (
-              <p className="mt-6 text-sm text-zinc-400 dark:text-zinc-500">
-                No sales yet. Earnings appear here once buyers complete checkout.
-              </p>
-            )}
-
-            <div className="mt-6 text-xs text-zinc-400 dark:text-zinc-500">
-              Earnings shown are your creator share from paid, processing, and shipped orders.
-            </div>
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════
-            TAB: CREDITS  (owner only)
-        ══════════════════════════════════════════════════════════ */}
-        {activeTab === "credits" && isOwnProfile && ownerData && (
-          <div className="mt-6 pb-16">
-            <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">AI Credits</h2>
-            <p className="mt-1 text-sm text-zinc-500">Credits are used to generate designs in the Studio.</p>
-
-            <div className="mt-4 inline-flex items-baseline gap-2 rounded-xl border border-zinc-200 bg-paper px-6 py-5 dark:border-zinc-700 dark:bg-zinc-900">
-              <span className="font-display text-4xl text-ink">
-                {ownerData.ownProfile?.generation_credits ?? 0}
-              </span>
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">
-                {(ownerData.ownProfile?.generation_credits ?? 0) === 1 ? "credit" : "credits"} remaining
-              </span>
-            </div>
-
-            <div className="mt-4 rounded-xl border border-zinc-100 bg-zinc-50 px-5 py-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              <p className="font-medium text-zinc-700 dark:text-zinc-300">How credits work</p>
-              <p className="mt-1">Each AI image generation costs 1 credit. Credits are granted when you sign up and can be topped up by the platform.</p>
-            </div>
-
-            <div className="mt-6">
-              <Link href="/generate" className="sticker-sm inline-block rounded-full bg-brand-blue px-5 py-2 text-sm font-extrabold text-white">
-                Open Studio →
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════
-            TAB: SETTINGS  (owner only)
-        ══════════════════════════════════════════════════════════ */}
-        {activeTab === "settings" && isOwnProfile && ownerData && (
-          <div className="mt-6 pb-16">
-            <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">Profile settings</h2>
-            <p className="mt-1 text-sm text-zinc-500">Update your public profile information.</p>
-
-            <div className="mt-4 divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-paper dark:divide-zinc-800 dark:border-zinc-700 dark:bg-zinc-900">
-              <ProfileForm
-                displayName={ownerData.ownProfile?.display_name ?? ""}
-                bio={ownerData.ownProfile?.bio ?? ""}
-                websiteUrl={ownerData.ownProfile?.website_url ?? ""}
-                instagramUrl={ownerData.ownProfile?.instagram_url ?? ""}
-                tiktokUrl={ownerData.ownProfile?.tiktok_url ?? ""}
-              />
-
-              <div className="px-5 py-4">
-                <ImageUploadField
-                  kind="avatar"
-                  currentUrl={ownerData.ownProfile?.avatar_url ?? null}
-                  displayName={ownerData.ownProfile?.display_name ?? ownerData.userEmail ?? ""}
-                />
-              </div>
-
-              <div className="px-5 py-4">
-                <ImageUploadField
-                  kind="banner"
-                  currentUrl={ownerData.ownProfile?.banner_url ?? null}
-                  displayName={ownerData.ownProfile?.display_name ?? ownerData.userEmail ?? ""}
-                />
-              </div>
-
-              <div className="px-5 py-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Email</p>
-                <p className="mt-1 text-sm text-zinc-900 dark:text-zinc-100">{ownerData.userEmail}</p>
-              </div>
-
-              <div className="px-5 py-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Role</p>
-                <p className="mt-1 text-sm capitalize text-zinc-900 dark:text-zinc-100">{ownerData.ownProfile?.role ?? "buyer"}</p>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* ── Tabs + tab content (client component for instant tab switching) ── */}
+        <CreatorTabContent
+          initialTab={activeTab}
+          profileId={id}
+          isOwnProfile={isOwnProfile}
+          publishedDesigns={publishedDesigns}
+          ownerData={ownerData}
+        />
       </div>
     </main>
   );

@@ -87,16 +87,6 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                 >
                   My profile
                 </Link>
-                <Link
-                  href={`/creators/${user.id}?tab=settings`}
-                  className={`text-sm font-medium transition-colors ${
-                    pathname === "/account" || pathname.startsWith("/account/")
-                      ? "text-zinc-900 dark:text-white"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                  }`}
-                >
-                  Account
-                </Link>
                 <form action={signOut}>
                   <button
                     type="submit"
@@ -235,17 +225,6 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                   }`}
                 >
                   My profile
-                  <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100">→</span>
-                </Link>
-                <Link
-                  href={`/creators/${user.id}?tab=settings`}
-                  className={`group relative flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight transition-colors active:bg-paper-2 dark:border-ink/20 ${
-                    pathname === "/account" || pathname.startsWith("/account/")
-                      ? "text-ink"
-                      : "text-ink/70 hover:text-ink"
-                  }`}
-                >
-                  Account
                   <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100">→</span>
                 </Link>
                 <form action={signOut} className="w-full">
