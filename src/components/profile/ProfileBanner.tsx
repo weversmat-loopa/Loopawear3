@@ -11,7 +11,7 @@ interface ProfileBannerProps {
  */
 export default function ProfileBanner({ bannerUrl, displayName }: ProfileBannerProps) {
   return (
-    <div className="relative h-36 w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800 sm:h-48">
+    <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-100 dark:bg-zinc-800" style={{ aspectRatio: "5/2", maxHeight: "320px" }}>
       {bannerUrl ? (
         <Image
           src={bannerUrl}
@@ -19,7 +19,7 @@ export default function ProfileBanner({ bannerUrl, displayName }: ProfileBannerP
           fill
           priority
           sizes="(min-width: 1024px) 1024px, 100vw"
-          className="object-cover"
+          className="object-cover object-center"
         />
       ) : (
         /* Fallback: diagonal-stripe pattern in brand colours */
