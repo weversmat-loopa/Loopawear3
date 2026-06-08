@@ -36,12 +36,14 @@ export default function DesignImageSection({
 
   const [isMockupGenerating, setIsMockupGenerating] = useState(false);
   const [mockupError, setMockupError] = useState<string | null>(null);
+  const [isAiMockupGenerating, setIsAiMockupGenerating] = useState(false);
+  const [aiMockupError, setAiMockupError] = useState<string | null>(null);
   const [showMockup, setShowMockup] = useState(
     mockupStatus === "ready" && !!mockupUrl
   );
 
   const serverMockupGenerating = mockupStatus === "generating";
-  const anyMockupGenerating = isMockupGenerating || serverMockupGenerating;
+  const anyMockupGenerating = isMockupGenerating || isAiMockupGenerating || serverMockupGenerating;
 
   // Auto-switch to mockup view after successful generation (props update via router.refresh).
   useEffect(() => {
@@ -113,6 +115,35 @@ export default function DesignImageSection({
       setMockupError("Something went wrong. Please try again.");
     } finally {
       setIsMockupGenerating(false);
+    }
+  }
+
+  async function handleGenerateAiMockup() {
+    setIsAiMockupGenerating(true);
+    setAiMockupError(null);
+
+    try {
+      const res = await fetch(`/api/designs/${designId}/ai-mockup`, {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        setAiMockupError(
+          body.error === "already_generating"
+            ? "Generation already in progress."
+            : body.detail
+            ? `Configuration error: ${body.detail}`
+            : "AI mockup generation failed. Please try again."
+        );
+        return;
+      }
+
+      router.refresh();
+    } catch {
+      setAiMockupError("Something went wrong. Please try again.");
+    } finally {
+      setIsAiMockupGenerating(false);
     }
   }
 
@@ -301,42 +332,81 @@ export default function DesignImageSection({
     imageStatus === "ready" ? (
       <div className="mt-6 border-t border-zinc-100 pt-5 dark:border-zinc-800">
         <p className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-          Printful mockup
+          Mockups
         </p>
-        {anyMockupGenerating ? (
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Generating mockup…
-            </p>
-          </div>
-        ) : mockupStatus === "ready" ? (
-          <button
-            type="button"
-            onClick={handleGenerateMockup}
-            className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
-          >
-            Regenerate mockup
-          </button>
-        ) : (
-          <div className="space-y-2">
+
+        {/* Printful mockup */}
+        <div className="mb-4">
+          <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">Printful flat mockup</p>
+          {isMockupGenerating || serverMockupGenerating ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-200 border-t-zinc-600 dark:border-zinc-700 dark:border-t-zinc-300" />
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Generating mockup…
+              </p>
+            </div>
+          ) : mockupStatus === "ready" ? (
             <button
               type="button"
               onClick={handleGenerateMockup}
-              className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
+              className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-900 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500 dark:hover:text-zinc-100"
             >
-              Generate Printful mockup
+              Regenerate mockup
             </button>
-            {mockupStatus === "failed" && !mockupError && (
-              <p className="text-xs text-zinc-400">
-                Previous attempt failed — try again.
+          ) : (
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleGenerateMockup}
+                className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"
+              >
+                Generate Printful mockup
+              </button>
+              {mockupStatus === "failed" && !mockupError && (
+                <p className="text-xs text-zinc-400">
+                  Previous attempt failed — try again.
+                </p>
+              )}
+              {mockupError && (
+                <p className="text-xs text-red-500">{mockupError}</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* AI on-model mockup */}
+        <div>
+          <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">AI on-model lifestyle mockup</p>
+          {isAiMockupGenerating ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-200 border-t-violet-600 dark:border-zinc-700 dark:border-t-violet-400" />
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Generating AI mockup…
               </p>
-            )}
-            {mockupError && (
-              <p className="text-xs text-red-500">{mockupError}</p>
-            )}
-          </div>
-        )}
+            </div>
+          ) : mockupStatus === "ready" ? (
+            <button
+              type="button"
+              onClick={handleGenerateAiMockup}
+              className="rounded-full border border-zinc-200 px-5 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-violet-600 hover:text-violet-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-violet-400 dark:hover:text-violet-400"
+            >
+              Regenereer AI-model mockup
+            </button>
+          ) : (
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={handleGenerateAiMockup}
+                className="rounded-full bg-violet-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-700 dark:bg-violet-500 dark:hover:bg-violet-600"
+              >
+                Genereer AI-model mockup
+              </button>
+              {aiMockupError && (
+                <p className="text-xs text-red-500">{aiMockupError}</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     ) : null;
 
