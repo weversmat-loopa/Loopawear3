@@ -2,7 +2,6 @@
 
 import { useTransition, useState } from "react";
 import Input from "@/components/ui/Input";
-import { updateProfile } from "./profile-actions";
 
 type Props = {
   displayName: string;
@@ -37,10 +36,13 @@ export default function ProfileForm({
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
     setStatus(null);
     startTransition(async () => {
-      const result = await updateProfile(formData);
+      const result = await fetch("/api/account/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      }).then((r) => r.json() as Promise<{ success?: string; error?: string }>);
       setStatus(result);
     });
   }
