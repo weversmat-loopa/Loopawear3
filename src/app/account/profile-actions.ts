@@ -63,6 +63,48 @@ export async function updateSocialLinks(formData: FormData) {
 }
 
 // ----------------------------------------------------------------
+// updateProfile — saves all editable profile fields in one shot
+// ----------------------------------------------------------------
+
+export async function updateProfile(formData: FormData): Promise<{ success?: string; error?: string }> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return { error: "Not authenticated." };
+
+  const display_name = String(formData.get("display_name") ?? "").trim() || null;
+
+  const rawBio = String(formData.get("bio") ?? "").trim();
+  if (rawBio.length > MAX_BIO_LENGTH) {
+    return { error: `Bio is too long (max ${MAX_BIO_LENGTH} characters).` };
+  }
+  const bio = rawBio || null;
+
+  const rawWebsite   = String(formData.get("website_url")   ?? "").trim();
+  const rawInstagram = String(formData.get("instagram_url") ?? "").trim();
+  const rawTiktok    = String(formData.get("tiktok_url")    ?? "").trim();
+
+  if (rawWebsite   && !isValidUrl(rawWebsite))   return { error: "Website URL is invalid." };
+  if (rawInstagram && !isValidUrl(rawInstagram)) return { error: "Instagram URL is invalid." };
+  if (rawTiktok    && !isValidUrl(rawTiktok))    return { error: "TikTok URL is invalid." };
+
+  const website_url   = rawWebsite   || null;
+  const instagram_url = rawInstagram || null;
+  const tiktok_url    = rawTiktok    || null;
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ display_name, bio, website_url, instagram_url, tiktok_url })
+    .eq("id", user.id);
+
+  if (error) return { error: "Could not save profile. Please try again." };
+
+  return { success: "Profile saved." };
+}
+
+// ----------------------------------------------------------------
 // updateBio (extended — replaces the one in actions.ts)
 // Kept here so the account page can import from one place;
 // the old actions.ts version is still intact for backwards compat.

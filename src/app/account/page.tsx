@@ -2,12 +2,11 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import Input from "@/components/ui/Input";
 import { createClient } from "@/utils/supabase/server";
-import { updateDisplayName, updateBio, submitForReview, unpublishDesign, deleteDesign } from "./actions";
-import { updateSocialLinks } from "./profile-actions";
+import { submitForReview, unpublishDesign, deleteDesign } from "./actions";
 import ConfirmForm from "@/components/ui/ConfirmForm";
 import ImageUploadField from "@/components/profile/ImageUploadField";
+import ProfileForm from "./ProfileForm";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", {
@@ -105,65 +104,14 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
 
         {/* Profile settings */}
         <div className="mt-8 divide-y divide-zinc-200 rounded-2xl border border-zinc-200 bg-paper dark:divide-zinc-800 dark:border-zinc-700 dark:bg-zinc-900">
-          <div className="px-5 py-4">
-            <form action={updateDisplayName}>
-              <label
-                htmlFor="display_name"
-                className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
-              >
-                Name
-              </label>
-              <div className="mt-2 flex items-center gap-3">
-                <Input
-                  id="display_name"
-                  name="display_name"
-                  type="text"
-                  defaultValue={profile?.display_name ?? ""}
-                  placeholder="Your display name"
-                  autoComplete="name"
-                />
-                <button
-                  type="submit"
-                  className="shrink-0 text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
-          </div>
-
-          <div className="px-5 py-4">
-            <form action={updateBio}>
-              <label
-                htmlFor="bio"
-                className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
-              >
-                Bio
-              </label>
-              <div className="mt-2">
-                <textarea
-                  id="bio"
-                  name="bio"
-                  rows={3}
-                  defaultValue={profile?.bio ?? ""}
-                  placeholder="A short intro about you…"
-                  maxLength={300}
-                  className="w-full resize-none rounded-lg border border-zinc-200 bg-paper px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition-colors focus:border-violet-400/60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500"
-                />
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                    Optional · max 300 characters
-                  </p>
-                  <button
-                    type="submit"
-                    className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
-                  >
-                    Save
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
+          {/* Editable profile fields: name, bio, social links — one form, one save */}
+          <ProfileForm
+            displayName={profile?.display_name ?? ""}
+            bio={profile?.bio ?? ""}
+            websiteUrl={profile?.website_url ?? ""}
+            instagramUrl={profile?.instagram_url ?? ""}
+            tiktokUrl={profile?.tiktok_url ?? ""}
+          />
 
           {/* Avatar upload */}
           <div className="px-5 py-4">
@@ -181,58 +129,6 @@ export default async function AccountPage({ searchParams }: AccountPageProps) {
               currentUrl={profile?.banner_url ?? null}
               displayName={profile?.display_name ?? user.email ?? ""}
             />
-          </div>
-
-          {/* Social links */}
-          <div className="px-5 py-4">
-            <form action={updateSocialLinks}>
-              <p className="text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Social links
-              </p>
-              <div className="mt-3 space-y-3">
-                <div>
-                  <label htmlFor="website_url" className="text-xs text-zinc-500 dark:text-zinc-400">Website</label>
-                  <Input
-                    id="website_url"
-                    name="website_url"
-                    type="url"
-                    defaultValue={profile?.website_url ?? ""}
-                    placeholder="https://yourwebsite.com"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="instagram_url" className="text-xs text-zinc-500 dark:text-zinc-400">Instagram</label>
-                  <Input
-                    id="instagram_url"
-                    name="instagram_url"
-                    type="url"
-                    defaultValue={profile?.instagram_url ?? ""}
-                    placeholder="https://instagram.com/handle"
-                    className="mt-1"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="tiktok_url" className="text-xs text-zinc-500 dark:text-zinc-400">TikTok</label>
-                  <Input
-                    id="tiktok_url"
-                    name="tiktok_url"
-                    type="url"
-                    defaultValue={profile?.tiktok_url ?? ""}
-                    placeholder="https://tiktok.com/@handle"
-                    className="mt-1"
-                  />
-                </div>
-              </div>
-              <div className="mt-3 flex justify-end">
-                <button
-                  type="submit"
-                  className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
-                >
-                  Save
-                </button>
-              </div>
-            </form>
           </div>
 
           <div className="px-5 py-4">
