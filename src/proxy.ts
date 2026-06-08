@@ -15,13 +15,16 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            request.cookies.set(name, value);
-            response = NextResponse.next({
-              request,
-            });
-            response.cookies.set(name, value, options);
-          });
+          // Step 1: set on the request so downstream Server Components see them.
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          // Step 2: recreate the response once so it carries all updated cookies.
+          response = NextResponse.next({ request });
+          // Step 3: write all cookies to the response headers (headers are open here).
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
         },
       },
     }
