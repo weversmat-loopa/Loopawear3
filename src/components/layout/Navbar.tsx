@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { signOut } from "@/lib/auth/actions";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import { DoodleStar } from "@/components/ui/Doodles";
+import { DoodleStar, DoodleSparkle, DoodleUnderline } from "@/components/ui/Doodles";
 
 const links = [
   { label: "Marketplace", href: "/marketplace" },
@@ -117,7 +117,6 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
 
         {/* ── Mobile controls (< md) ────────────────────────────── */}
         <div className="flex items-center gap-2 md:hidden">
-          <ThemeToggle />
           <button
             type="button"
             onClick={() => setIsMenuOpen((prev) => !prev)}
@@ -163,10 +162,19 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
         </div>
       </header>
 
-      {/* ── Mobile slide-down menu ────────────────────────────────── */}
+      {/* ── Mobile full-screen menu ──────────────────────────────────
+           Full-screen cream overlay with doodle-style nav items.
+           Only rendered on < md. Desktop nav is unaffected.
+      ─────────────────────────────────────────────────────────── */}
       {isMenuOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-14 z-40 flex flex-col overflow-y-auto bg-paper px-6 py-8 md:hidden">
-          <nav className="flex flex-col gap-1">
+        <div className="fixed inset-x-0 bottom-0 top-14 z-40 flex flex-col overflow-y-auto bg-paper px-6 pb-10 pt-8 md:hidden">
+
+          {/* Decorative sparkles – top corners */}
+          <DoodleSparkle className="absolute right-6 top-5 h-5 w-5 text-brand-orange opacity-60 doodle-twinkle" />
+          <DoodleSparkle className="absolute left-8 top-8 h-3.5 w-3.5 text-brand-blue opacity-40 doodle-twinkle" />
+
+          {/* ── Primary nav links ── */}
+          <nav className="flex flex-col">
             {links.map(({ label, href }) => {
               const isActive =
                 pathname === href || pathname.startsWith(href + "/");
@@ -174,47 +182,55 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
                 <Link
                   key={href}
                   href={href}
-                  className={`rounded-lg px-3 py-3 text-base font-medium transition-colors ${
-                    isActive
-                      ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                  className={`group relative flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 transition-colors active:bg-paper-2 dark:border-ink/20 ${
+                    isActive ? "text-ink" : "text-ink/70 hover:text-ink"
                   }`}
                 >
-                  {label}
+                  <span className={`font-display text-2xl leading-none tracking-tight ${isActive ? "" : ""}`}>
+                    {label}
+                  </span>
+                  {isActive && (
+                    <DoodleUnderline className="absolute bottom-1.5 left-0 h-2 w-24 text-brand-orange" />
+                  )}
+                  {/* Subtle right arrow on hover */}
+                  <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100 group-active:opacity-100">
+                    →
+                  </span>
                 </Link>
               );
             })}
           </nav>
 
-          <div className="mt-6 flex flex-col gap-1 border-t border-zinc-100 pt-6 dark:border-zinc-800">
+          {/* ── Account actions ── */}
+          <div className="mt-6 flex flex-col gap-3">
             {user ? (
               <>
                 {isAdmin && (
                   <Link
                     href="/admin"
-                    className={`rounded-lg px-3 py-3 text-base font-medium transition-colors ${
-                      pathname.startsWith("/admin")
-                        ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                        : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                    className={`group relative flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight transition-colors active:bg-paper-2 dark:border-ink/20 ${
+                      pathname.startsWith("/admin") ? "text-ink" : "text-ink/70 hover:text-ink"
                     }`}
                   >
                     Admin
+                    <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100">→</span>
                   </Link>
                 )}
                 <Link
                   href="/account"
-                  className={`rounded-lg px-3 py-3 text-base font-medium transition-colors ${
+                  className={`group relative flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight transition-colors active:bg-paper-2 dark:border-ink/20 ${
                     pathname === "/account" || pathname.startsWith("/account/")
-                      ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-white"
-                      : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                      ? "text-ink"
+                      : "text-ink/70 hover:text-ink"
                   }`}
                 >
                   Account
+                  <span className="ml-auto text-brand-orange opacity-0 transition-opacity group-hover:opacity-100">→</span>
                 </Link>
                 <form action={signOut} className="w-full">
                   <button
                     type="submit"
-                    className="w-full rounded-lg px-3 py-3 text-left text-base font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                    className="flex min-h-[56px] w-full items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight text-ink/70 transition-colors hover:text-ink active:bg-paper-2 dark:border-ink/20"
                   >
                     Log out
                   </button>
@@ -224,18 +240,33 @@ export default function Navbar({ user, isAdmin = false }: NavbarProps) {
               <>
                 <Link
                   href="/login"
-                  className="rounded-lg px-3 py-3 text-base font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-white"
+                  className="flex min-h-[56px] items-center border-b-2 border-ink/10 py-3 font-display text-2xl leading-none tracking-tight text-ink/70 transition-colors hover:text-ink dark:border-ink/20"
                 >
                   Log in
                 </Link>
-                <Link
-                  href="/signup"
-                  className="sticker-sm mt-2 rounded-full bg-brand-blue px-4 py-2.5 text-center text-base font-extrabold text-white"
-                >
-                  Sign up
-                </Link>
+                <div className="pt-2">
+                  <Link
+                    href="/signup"
+                    className="sticker block rounded-full bg-brand-blue px-6 py-3.5 text-center font-display text-xl font-extrabold text-white"
+                  >
+                    Sign up ✦
+                  </Link>
+                </div>
               </>
             )}
+          </div>
+
+          {/* ── Dark mode row ── */}
+          <div className="mt-6 flex min-h-[52px] items-center justify-between border-t-2 border-ink/10 pt-5 dark:border-ink/20">
+            <span className="font-hand text-lg text-ink/60">Dark mode</span>
+            <ThemeToggle />
+          </div>
+
+          {/* ── Bottom doodle accent ── */}
+          <div className="mt-auto flex items-center justify-center gap-3 pt-8 text-ink/20">
+            <DoodleStar className="h-4 w-4" />
+            <DoodleSparkle className="h-3 w-3" />
+            <DoodleStar className="h-4 w-4" />
           </div>
         </div>
       )}
