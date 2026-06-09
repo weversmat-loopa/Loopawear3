@@ -8,6 +8,7 @@ import ConfirmForm from "@/components/ui/ConfirmForm";
 import ProfileForm from "@/app/account/ProfileForm";
 import ImageUploadField from "@/components/profile/ImageUploadField";
 import { submitForReview, unpublishDesign, deleteDesign } from "@/app/account/actions";
+import EmptyState from "@/components/ui/EmptyState";
 
 export type TabId = "designs" | "drafts" | "sales" | "credits" | "settings";
 
@@ -195,20 +196,19 @@ export default function CreatorTabContent({
                 </li>
               ))}
             </ul>
+          ) : isOwnProfile ? (
+            <EmptyState
+              title="Nog geen designs gepubliceerd ✦"
+              description="Maak je eerste design in de Studio en publiceer het in de marketplace."
+              sparkleColor="text-brand-orange"
+              action={{ label: "Naar de Studio →", href: "/generate", color: "bg-brand-orange" }}
+            />
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-300 px-6 py-16 text-center dark:border-zinc-700">
-              <p className="text-sm font-medium text-zinc-600 dark:text-zinc-300">No published designs yet</p>
-              <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                {isOwnProfile
-                  ? "Head to the Studio to create your first design."
-                  : "This creator hasn't published anything yet."}
-              </p>
-              {isOwnProfile && (
-                <Link href="/generate" className="mt-3 text-xs text-violet-600 underline underline-offset-2">
-                  Open Studio →
-                </Link>
-              )}
-            </div>
+            <EmptyState
+              title="Nog niets te zien hier"
+              description="Deze maker heeft nog geen designs gepubliceerd."
+              sparkleColor="text-brand-blue"
+            />
           )}
 
           {!isOwnProfile && (
@@ -287,13 +287,13 @@ export default function CreatorTabContent({
                 ))}
               </ul>
             ) : (
-              <div className="mt-4 rounded-xl border border-dashed border-zinc-300 px-6 py-10 text-center dark:border-zinc-700">
-                <p className="text-sm text-zinc-500 dark:text-zinc-400">No drafts yet</p>
-                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                  Head to the{" "}
-                  <Link href="/generate" className="underline underline-offset-2 transition-colors hover:text-violet-600">Studio</Link>
-                  {" "}to create your first design.
-                </p>
+              <div className="mt-4">
+                <EmptyState
+                  title="Nog geen concepten"
+                  description="Designs die je opslaat maar nog niet publiceert, verschijnen hier. Maak je eerste design in de Studio."
+                  sparkleColor="text-brand-blue"
+                  action={{ label: "Naar de Studio →", href: "/generate", color: "bg-brand-blue" }}
+                />
               </div>
             )}
           </section>
@@ -367,9 +367,14 @@ export default function CreatorTabContent({
           </div>
 
           {ownerData.orderCount === 0 && (
-            <p className="mt-6 text-sm text-zinc-400 dark:text-zinc-500">
-              No sales yet. Earnings appear here once buyers complete checkout.
-            </p>
+            <div className="mt-6">
+              <EmptyState
+                title="Nog geen verkopen"
+                description="Zodra iemand een van jouw designs koopt, zie je het hier. Zorg dat je designs zichtbaar zijn in de marketplace!"
+                sparkleColor="text-brand-yellow"
+                action={{ label: "Bekijk je designs →", href: `/creators/${profileId}?tab=designs`, color: "bg-brand-yellow" }}
+              />
+            </div>
           )}
 
           <div className="mt-6 text-xs text-zinc-400 dark:text-zinc-500">
@@ -396,15 +401,25 @@ export default function CreatorTabContent({
           </div>
 
           <div className="mt-4 rounded-xl border border-zinc-100 bg-zinc-50 px-5 py-4 text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-            <p className="font-medium text-zinc-700 dark:text-zinc-300">How credits work</p>
-            <p className="mt-1">Each AI image generation costs 1 credit. Credits are granted when you sign up and can be topped up by the platform.</p>
+            <p className="font-medium text-zinc-700 dark:text-zinc-300">Hoe werken credits?</p>
+            <p className="mt-1">Elke AI-generatie kost 1 credit. Je krijgt credits bij aanmelding; het platform kan ze aanvullen.</p>
           </div>
 
-          <div className="mt-6">
-            <Link href="/generate" className="sticker-sm inline-block rounded-full bg-brand-blue px-5 py-2 text-sm font-extrabold text-white">
-              Open Studio →
-            </Link>
-          </div>
+          {(ownerData.ownProfile?.generation_credits ?? 0) === 0 ? (
+            <div className="mt-6">
+              <EmptyState
+                title="Geen credits meer over"
+                description="Je hebt al je credits gebruikt. Neem contact op met het platform om ze aan te laten vullen."
+                sparkleColor="text-brand-green"
+              />
+            </div>
+          ) : (
+            <div className="mt-6">
+              <Link href="/generate" className="sticker-sm inline-block rounded-full bg-brand-blue px-5 py-2 text-sm font-extrabold text-white">
+                Open Studio →
+              </Link>
+            </div>
+          )}
         </div>
       )}
 
