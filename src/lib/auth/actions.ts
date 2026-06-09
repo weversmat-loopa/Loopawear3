@@ -48,7 +48,7 @@ export async function requestPasswordReset(formData: FormData) {
   const supabase = await createClient();
 
   const email = String(formData.get("email") ?? "");
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://loopawear.vercel.app";
 
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/callback?next=/auth/reset-password`,
@@ -63,12 +63,29 @@ export async function requestPasswordReset(formData: FormData) {
 
 export async function signInWithGoogle() {
   const supabase = await createClient();
+  // NEXT_PUBLIC_SITE_URL must be set to the canonical origin of the
+  // environment (e.g. https://loopawear.vercel.app for production,
+  // http://localhost:3000 for local dev).  The hardcoded fallback is a
+  // last-resort guard; in practice the env var should always be present.
+  // A wrong/missing value here is the primary cause of intermittent
+  // "invalid link" errors after Google OAuth because the redirectTo in the
+  // OAuth request must exactly match the URI registered in Supabase and
+  // Google Console.
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-8lsdx.vercel.app";
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://loopawear.vercel.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${siteUrl}/auth/callback` },
+    options: {
+      redirectTo: `${siteUrl}/auth/callback`,
+      queryParams: {
+        // Request a refresh token so the session survives beyond the
+        // default one-hour access-token lifetime without requiring a
+        // re-login.
+        access_type: "offline",
+        prompt: "consent",
+      },
+    },
   });
 
   if (error || !data.url) {
@@ -83,7 +100,7 @@ export async function signInWithGoogle() {
 export async function signInWithApple() {
   const supabase = await createClient();
   const siteUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://project-8lsdx.vercel.app";
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://loopawear.vercel.app";
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "apple",
