@@ -98,16 +98,10 @@ function buildGenerationPrompt(
     parts.push(COLOR_PALETTE_KEYWORDS[colorPalette]);
   }
 
-  // Soft product context: shapes composition expectations without dictating art style.
-  if (productType) {
-    parts.push(`suitable for ${productType.toLowerCase()} printing`);
-  }
-
-  // Quality guidance describes the output standard, not the visual style.
-  parts.push("high detail, sharp focus, clean composition, print-ready artwork");
-
-  // Flux/schnell does not accept negative_prompt — embed exclusions in positive prompt.
-  parts.push("no blur, no watermark, no distorted text, no artifacts, no low quality");
+  // Force an isolated standalone design — the product is applied later via Printful mockup.
+  parts.push("isolated standalone graphic design, centered, on a plain solid white background");
+  parts.push("flat 2D artwork only — not a product, not a t-shirt, not a mockup, no clothing, no fabric, no person wearing it, no scene, no background environment");
+  parts.push("high detail, sharp focus, clean print-ready artwork");
 
   return parts.join(", ");
 }
