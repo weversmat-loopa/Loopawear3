@@ -5,12 +5,12 @@ export const maxDuration = 120;
 
 const PRINTFUL_API = "https://api.printful.com/v2";
 
-// Phase 1 — Bella + Canvas 3001, DTG front, Black / M.
+// Phase 1 — Bella + Canvas 3001 (product 71), Black / M (variant 4017), DTG front.
 // Replace variant id when multi-colour support is added.
 const PRINTFUL_CATALOG_PRODUCT_ID = 71;
 const PRINTFUL_CATALOG_VARIANT_ID = 4017;
-// Men's Lifestyle 3 (front view) — tested against product 71.
-const PRINTFUL_MOCKUP_STYLE_ID = 758;
+// Flat › Front (style 849) — clean product shot, no model, good for marketplace listings.
+const PRINTFUL_MOCKUP_STYLE_ID = 849;
 
 const POLL_INTERVAL_MS = 2_000;
 const POLL_TIMEOUT_MS  = 60_000;
