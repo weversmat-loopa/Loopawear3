@@ -9,13 +9,103 @@ const PRINTFUL_API = "https://api.printful.com/v2";
 // Replace variant id when multi-colour support is added.
 const PRINTFUL_CATALOG_PRODUCT_ID = 71;
 const PRINTFUL_CATALOG_VARIANT_ID = 4017;
-// Flat › Front (style 849) — clean product shot, no model, good for marketplace listings.
-const PRINTFUL_MOCKUP_STYLE_ID = 849;
+// Men's Lifestyle 3 › Front (style 758) — real model wearing the shirt.
+const PRINTFUL_MOCKUP_STYLE_ID = 758;
+
+// Printful front print area for product 71: 12 × 16 inches at 150 DPI.
+const PRINT_AREA_W = 1800; // 12 * 150
+const PRINT_AREA_H = 2400; // 16 * 150
 
 const POLL_INTERVAL_MS = 2_000;
 const POLL_TIMEOUT_MS  = 60_000;
 
 type Params = { id: string };
+
+// Shape of the placement JSONB column saved by PlacementEditor.
+interface SavedPlacement {
+  side?: unknown;
+  x?: unknown;
+  y?: unknown;
+  scale?: unknown;
+  rotation?: unknown;
+  shirtColor?: unknown;
+  size?: unknown;
+  canvasW?: unknown;
+  canvasH?: unknown;
+}
+
+// Printful position object sent inside a layer.
+interface PrintfulPosition {
+  area_width: number;
+  area_height: number;
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+  rotation?: number;
+}
+
+/**
+ * Convert a PlacementEditor canvas-space placement into a Printful pixel-space
+ * position object. Returns null if the placement data is missing or invalid so
+ * the caller can fall back to Printful's default centering.
+ *
+ * Canvas coordinate system: x/y is the design's CENTER in canvas pixels.
+ * scale is the fraction of canvasW that the design occupies (its rendered width).
+ * Printful position system: left/top is the design's TOP-LEFT in print pixels.
+ */
+function buildPrintfulPosition(raw: unknown): PrintfulPosition | null {
+  if (!raw || typeof raw !== "object") return null;
+
+  const p = raw as SavedPlacement;
+
+  const x       = typeof p.x       === "number" ? p.x       : null;
+  const y       = typeof p.y       === "number" ? p.y       : null;
+  const scale   = typeof p.scale   === "number" ? p.scale   : null;
+  const canvasW = typeof p.canvasW === "number" ? p.canvasW : null;
+  const canvasH = typeof p.canvasH === "number" ? p.canvasH : null;
+
+  // All five fields must be finite non-zero numbers.
+  if (
+    x === null || y === null || scale === null ||
+    canvasW === null || canvasH === null ||
+    !isFinite(x) || !isFinite(y) || !isFinite(scale) ||
+    !isFinite(canvasW) || !isFinite(canvasH) ||
+    canvasW <= 0 || canvasH <= 0 || scale <= 0
+  ) {
+    return null;
+  }
+
+  // Design footprint as a fraction of canvas width — scale IS that fraction.
+  const footprintFraction = scale;
+  const designPx = Math.round(footprintFraction * PRINT_AREA_W);
+  const width  = Math.max(1, designPx);
+  const height = width; // keep square
+
+  // Convert center coords to top-left in print space.
+  let left = Math.round((x / canvasW) * PRINT_AREA_W - width / 2);
+  let top  = Math.round((y / canvasH) * PRINT_AREA_H - height / 2);
+
+  // Clamp so the design never bleeds outside the print area.
+  left = Math.max(0, Math.min(left, PRINT_AREA_W - width));
+  top  = Math.max(0, Math.min(top,  PRINT_AREA_H - height));
+
+  const position: PrintfulPosition = {
+    area_width:  PRINT_AREA_W,
+    area_height: PRINT_AREA_H,
+    width,
+    height,
+    left,
+    top,
+  };
+
+  const rotation = typeof p.rotation === "number" ? p.rotation : null;
+  if (rotation !== null && isFinite(rotation) && rotation !== 0) {
+    position.rotation = rotation;
+  }
+
+  return position;
+}
 
 // Minimal shapes for the Printful v2 responses we actually inspect.
 // Both endpoints return results wrapped in a `data` array.
@@ -54,7 +144,7 @@ export async function POST(
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, creator_id, image_status, image_url, mockup_status")
+    .select("id, creator_id, image_status, image_url, mockup_status, placement")
     .eq("id", id)
     .maybeSingle();
 
@@ -84,8 +174,19 @@ export async function POST(
     return NextResponse.json({ error: "already_generating" }, { status: 409 });
   }
 
+  // Build Printful position from saved placement, falling back to centered.
+  const printfulPosition = buildPrintfulPosition(design.placement);
+
   try {
     // ── 1. Create Printful v2 mockup task ──────────────────────────────
+    const layer: Record<string, unknown> = {
+      type: "file",
+      url: design.image_url,
+    };
+    if (printfulPosition) {
+      layer.position = printfulPosition;
+    }
+
     const createRes = await fetch(`${PRINTFUL_API}/mockup-tasks`, {
       method: "POST",
       headers: {
@@ -104,12 +205,7 @@ export async function POST(
               {
                 placement: "front",
                 technique: "dtg",
-                layers: [
-                  {
-                    type: "file",
-                    url: design.image_url,
-                  },
-                ],
+                layers: [layer],
               },
             ],
           },
