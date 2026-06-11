@@ -12,9 +12,10 @@ const PRINTFUL_CATALOG_VARIANT_ID = 4017;
 // Men's Lifestyle 3 › Front (style 758) — real model wearing the shirt.
 const PRINTFUL_MOCKUP_STYLE_ID = 758;
 
-// Printful front print area for product 71: 12 × 16 inches at 150 DPI.
-const PRINT_AREA_W = 1800; // 12 * 150
-const PRINT_AREA_H = 2400; // 16 * 150
+// Printful front print area for product 71: 12 × 16 inches.
+// The v2 position object expects inch values, not pixels.
+const PRINT_AREA_W = 12; // inches
+const PRINT_AREA_H = 16; // inches
 
 const POLL_INTERVAL_MS = 2_000;
 const POLL_TIMEOUT_MS  = 60_000;
@@ -76,19 +77,21 @@ function buildPrintfulPosition(raw: unknown): PrintfulPosition | null {
     return null;
   }
 
-  // Design footprint as a fraction of canvas width — scale IS that fraction.
-  const footprintFraction = scale;
-  const designPx = Math.round(footprintFraction * PRINT_AREA_W);
-  const width  = Math.max(1, designPx);
-  const height = width; // keep square
+  const round2 = (v: number) => Math.round(v * 100) / 100;
 
-  // Convert center coords to top-left in print space.
-  let left = Math.round((x / canvasW) * PRINT_AREA_W - width / 2);
-  let top  = Math.round((y / canvasH) * PRINT_AREA_H - height / 2);
+  // Design footprint as a fraction of canvas width — scale IS that fraction.
+  // Multiply by 12 inches (PRINT_AREA_W) to get design width in inches.
+  let width  = round2(Math.min(scale * PRINT_AREA_W, PRINT_AREA_W));
+  let height = width; // keep square, cap to 16 if somehow larger
+  if (height > PRINT_AREA_H) height = PRINT_AREA_H;
+
+  // Convert center coords to top-left in print space (inches).
+  let left = round2((x / canvasW) * PRINT_AREA_W - width / 2);
+  let top  = round2((y / canvasH) * PRINT_AREA_H - height / 2);
 
   // Clamp so the design never bleeds outside the print area.
-  left = Math.max(0, Math.min(left, PRINT_AREA_W - width));
-  top  = Math.max(0, Math.min(top,  PRINT_AREA_H - height));
+  left = Math.max(0, Math.min(left, round2(PRINT_AREA_W - width)));
+  top  = Math.max(0, Math.min(top,  round2(PRINT_AREA_H - height)));
 
   const position: PrintfulPosition = {
     area_width:  PRINT_AREA_W,
