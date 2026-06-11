@@ -13,15 +13,16 @@ import { sendDesignSubmittedNotifications } from "@/lib/email/send";
 // onto a differently-sized surface — including a future Printful print file.
 // Keep x/y/scale stable: components/ui/ProductMockup.tsx reads them.
 export interface PlacementData {
-  side:        "front" | "back";
-  x:           number; // design centre X, in canvas px
-  y:           number; // design centre Y, in canvas px
-  scale:       number; // Fabric scaleX (fraction of the design's natural size)
-  rotation:    number; // degrees, clockwise
-  shirtColor:  string;
-  size:        string;
-  canvasW:     number; // reference canvas width  the coords were authored in
-  canvasH:     number; // reference canvas height the coords were authored in
+  side:          "front" | "back";
+  x:             number; // design centre X, in canvas px
+  y:             number; // design centre Y, in canvas px
+  scale:         number; // Fabric scaleX (fraction of the design's natural size)
+  widthFraction?: number; // rendered design width as fraction of the print zone width
+  rotation:      number; // degrees, clockwise
+  shirtColor:    string;
+  size:          string;
+  canvasW:       number; // reference canvas width  the coords were authored in
+  canvasH:       number; // reference canvas height the coords were authored in
 }
 
 type SavePlacementResult =

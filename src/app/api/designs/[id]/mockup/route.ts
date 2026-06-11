@@ -28,6 +28,7 @@ interface SavedPlacement {
   x?: unknown;
   y?: unknown;
   scale?: unknown;
+  widthFraction?: unknown;
   rotation?: unknown;
   shirtColor?: unknown;
   size?: unknown;
@@ -60,28 +61,29 @@ function buildPrintfulPosition(raw: unknown): PrintfulPosition | null {
 
   const p = raw as SavedPlacement;
 
-  const x       = typeof p.x       === "number" ? p.x       : null;
-  const y       = typeof p.y       === "number" ? p.y       : null;
-  const scale   = typeof p.scale   === "number" ? p.scale   : null;
-  const canvasW = typeof p.canvasW === "number" ? p.canvasW : null;
-  const canvasH = typeof p.canvasH === "number" ? p.canvasH : null;
+  const x            = typeof p.x            === "number" ? p.x            : null;
+  const y            = typeof p.y            === "number" ? p.y            : null;
+  const widthFraction = typeof p.widthFraction === "number" ? p.widthFraction : null;
+  const canvasW      = typeof p.canvasW      === "number" ? p.canvasW      : null;
+  const canvasH      = typeof p.canvasH      === "number" ? p.canvasH      : null;
 
-  // All five fields must be finite non-zero numbers.
+  // All five fields must be finite positive numbers.
+  // widthFraction is required — old designs without it fall back to centered.
   if (
-    x === null || y === null || scale === null ||
+    x === null || y === null || widthFraction === null ||
     canvasW === null || canvasH === null ||
-    !isFinite(x) || !isFinite(y) || !isFinite(scale) ||
+    !isFinite(x) || !isFinite(y) || !isFinite(widthFraction) ||
     !isFinite(canvasW) || !isFinite(canvasH) ||
-    canvasW <= 0 || canvasH <= 0 || scale <= 0
+    canvasW <= 0 || canvasH <= 0 || widthFraction <= 0
   ) {
     return null;
   }
 
   const round2 = (v: number) => Math.round(v * 100) / 100;
 
-  // Design footprint as a fraction of canvas width — scale IS that fraction.
-  // Multiply by 12 inches (PRINT_AREA_W) to get design width in inches.
-  let width  = round2(Math.min(scale * PRINT_AREA_W, PRINT_AREA_W));
+  // widthFraction = rendered design width / zone width (saved by PlacementEditor).
+  // Multiply by 12 inches to get the design's print width in inches.
+  let width  = round2(Math.min(widthFraction * PRINT_AREA_W, PRINT_AREA_W));
   let height = width; // keep square, cap to 16 if somehow larger
   if (height > PRINT_AREA_H) height = PRINT_AREA_H;
 

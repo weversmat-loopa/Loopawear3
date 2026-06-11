@@ -272,6 +272,7 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       x: Math.round(obj.left),
       y: Math.round(obj.top),
       scale: Math.round((obj.scaleX ?? 1) * 1000) / 1000,
+      widthFraction: Math.round(((obj.scaleX ?? 1) * imgNaturalWRef.current / ZONES[sideRef.current].w) * 1000) / 1000,
       rotation: Math.round(obj.angle ?? 0),
       shirtColor: color,
       size,
