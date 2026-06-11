@@ -205,12 +205,12 @@ export async function POST(
   );
 
   try {
-    const result = await fal.run("fal-ai/flux/schnell", {
+    const result = await fal.run("fal-ai/nano-banana-2", {
       input: {
         prompt,
-        image_size: "square_hd",
         num_images: 1,
-        num_inference_steps: 8,
+        aspect_ratio: "1:1",
+        output_format: "png",
       },
     });
 
