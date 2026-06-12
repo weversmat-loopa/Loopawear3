@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { markFulfillmentPending, markShipped, cancelOrder } from "@/app/admin/actions";
+import { sendToPrintful, markShipped, cancelOrder } from "@/app/admin/actions";
 import { DoodleSparkle } from "@/components/ui/Doodles";
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -273,13 +273,13 @@ function OrderRow({ order }: { order: AdminOrder }) {
           {isActionable && (
             <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-ink/10 pt-4">
               {order.status === "paid" && (
-                <form action={markFulfillmentPending}>
+                <form action={sendToPrintful}>
                   <input type="hidden" name="orderId" value={order.id} />
                   <button
                     type="submit"
                     className="rounded-full bg-ink px-4 py-1.5 text-xs font-bold text-paper transition-opacity hover:opacity-75"
                   >
-                    Mark fulfillment pending →
+                    Send to Printful →
                   </button>
                 </form>
               )}

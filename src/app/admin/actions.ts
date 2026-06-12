@@ -133,6 +133,123 @@ export async function rejectDesign(formData: FormData) {
   redirect("/admin/review");
 }
 
+// ── Printful fulfillment ─────────────────────────────────────────────────
+
+// Black M = 4017, White M = 4012 (Bella+Canvas 3001)
+function getPrintfulVariantId(placement: unknown): number {
+  if (
+    placement !== null &&
+    typeof placement === "object" &&
+    "shirtColor" in (placement as Record<string, unknown>) &&
+    (placement as Record<string, unknown>).shirtColor === "white"
+  ) {
+    return 4012;
+  }
+  return 4017;
+}
+
+export async function sendToPrintful(formData: FormData) {
+  const { service } = await requireAdmin();
+
+  const orderId = String(formData.get("orderId") ?? "").trim();
+  if (!orderId) {
+    redirect(`/admin/orders?error=${encodeURIComponent("Invalid order.")}`);
+  }
+
+  // Fetch order
+  const { data: order, error: orderError } = await service
+    .from("orders")
+    .select(
+      "id, status, design_id, size, quantity, shipping_name, shipping_line1, shipping_line2, shipping_city, shipping_state, shipping_postal_code, shipping_country"
+    )
+    .eq("id", orderId)
+    .maybeSingle();
+
+  if (orderError || !order) {
+    redirect(`/admin/orders?error=${encodeURIComponent("Order not found.")}`);
+  }
+
+  if (order.status !== "paid") {
+    redirect(
+      `/admin/orders?error=${encodeURIComponent(`Order status is '${order.status}', expected 'paid'.`)}`
+    );
+  }
+
+  // Fetch design
+  const { data: design, error: designError } = await service
+    .from("designs")
+    .select("id, image_url, placement")
+    .eq("id", order.design_id)
+    .maybeSingle();
+
+  if (designError || !design) {
+    redirect(`/admin/orders?error=${encodeURIComponent("Design not found.")}`);
+  }
+
+  const catalogVariantId = getPrintfulVariantId(design.placement);
+
+  // Submit to Printful
+  let pfData: Record<string, unknown>;
+  try {
+    const pfRes = await fetch("https://api.printful.com/v2/orders", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.PRINTFUL_TOKEN}`,
+        "X-PF-Store-Id": process.env.PRINTFUL_STORE_ID!,
+      },
+      body: JSON.stringify({
+        recipient: {
+          name: order.shipping_name,
+          address1: order.shipping_line1,
+          address2: order.shipping_line2 ?? undefined,
+          city: order.shipping_city,
+          state_code: order.shipping_state,
+          zip: order.shipping_postal_code,
+          country_code: order.shipping_country,
+        },
+        items: [
+          {
+            catalog_variant_id: catalogVariantId,
+            quantity: order.quantity ?? 1,
+            files: [{ type: "default", url: design.image_url }],
+          },
+        ],
+      }),
+    });
+
+    if (!pfRes.ok) {
+      const body = await pfRes.text().catch(() => "");
+      redirect(
+        `/admin/orders?error=${encodeURIComponent(`Printful error ${pfRes.status}${body ? `: ${body.slice(0, 120)}` : "."}.`)}`
+      );
+    }
+
+    pfData = await pfRes.json();
+  } catch (err) {
+    if ((err as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) throw err;
+    redirect(
+      `/admin/orders?error=${encodeURIComponent("Failed to reach Printful. Please try again.")}`
+    );
+  }
+
+  const printfulOrderId: number = (pfData?.data as Record<string, unknown>)?.id as number ?? pfData?.id as number;
+
+  // Update order in DB
+  const { error: updateError } = await service
+    .from("orders")
+    .update({ status: "fulfillment_pending", printful_order_id: printfulOrderId })
+    .eq("id", orderId);
+
+  if (updateError) {
+    redirect(
+      `/admin/orders?error=${encodeURIComponent("Printful order created but DB update failed. Please check manually.")}`
+    );
+  }
+
+  redirect(`/admin/orders?success=${encodeURIComponent("Order sent to Printful.")}`);
+}
+
 export async function markFulfillmentPending(formData: FormData) {
   const { service } = await requireAdmin();
 
