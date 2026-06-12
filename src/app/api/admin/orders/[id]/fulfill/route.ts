@@ -90,7 +90,7 @@ export async function POST(
       {
         catalog_variant_id: catalogVariantId,
         quantity: order.quantity ?? 1,
-        files: [{ type: "default", url: design.image_url }],
+        files: [{ type: "default", source: { type: "url", url: design.image_url } }],
       },
     ],
   };
