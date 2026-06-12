@@ -100,7 +100,7 @@ export async function POST(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.PRINTFUL_TOKEN}`,
+      Authorization: `Bearer ${process.env.PRINTFUL_API_TOKEN}`,
       "X-PF-Store-Id": process.env.PRINTFUL_STORE_ID!,
     },
     body: JSON.stringify(printfulPayload),
