@@ -5,12 +5,67 @@ export const maxDuration = 120;
 
 const PRINTFUL_API = "https://api.printful.com/v2";
 
-// Phase 1 — Bella + Canvas 3001 (product 71), Black / M (variant 4017), DTG front.
-// Replace variant id when multi-colour support is added.
+// Phase 1 — Bella + Canvas 3001 (product 71), DTG front.
 const PRINTFUL_CATALOG_PRODUCT_ID = 71;
-const PRINTFUL_CATALOG_VARIANT_ID = 4017;
+
+// Catalog variant ids per shirt colour (Bella + Canvas 3001, size M).
+// Black is the default for missing/unknown colours so older designs and any
+// future colour we haven't mapped yet still produce a mockup.
+const PRINTFUL_VARIANT_BLACK_M = 4017;
+const PRINTFUL_VARIANT_WHITE_M = 4012;
+
+// Map a saved placement.shirtColor to a Printful catalog variant id.
+// Extend this as more colours are added (e.g. "navy" -> <variant id>).
+function getMockupVariantId(shirtColor: unknown): number {
+  if (typeof shirtColor === "string" && shirtColor.toLowerCase() === "white") {
+    return PRINTFUL_VARIANT_WHITE_M;
+  }
+  // "black", missing, or any unmapped colour falls back to black.
+  return PRINTFUL_VARIANT_BLACK_M;
+}
+
 // Men's Lifestyle 3 › Front (style 758) — real model wearing the shirt.
+// In Printful v2 a style id is only valid for the variants that support it, so
+// we verify availability per-variant at request time (see isStyleAvailable) and
+// fall back to Printful's default style when 758 isn't offered for the variant.
 const PRINTFUL_MOCKUP_STYLE_ID = 758;
+
+// Shape of the /v2/catalog-products/{id}/mockup-styles response we inspect.
+type MockupStylesResponse = {
+  data?: Array<{ id?: number; catalog_variant_ids?: number[] }>;
+};
+
+/**
+ * Returns true when mockup style `styleId` is offered for `variantId` on the
+ * given product. Any failure (network, parse, unexpected shape) returns false
+ * so the caller falls back to Printful's default style rather than risking a
+ * create-task error for an unsupported style/variant pairing.
+ */
+async function isStyleAvailable(
+  productId: number,
+  variantId: number,
+  styleId: number,
+  token: string
+): Promise<boolean> {
+  try {
+    const res = await fetch(
+      `${PRINTFUL_API}/catalog-products/${productId}/mockup-styles`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    if (!res.ok) return false;
+
+    const json = (await res.json()) as MockupStylesResponse;
+    const style = json.data?.find((s) => s.id === styleId);
+    // A style with no variant restriction list applies to all variants.
+    if (!style) return false;
+    if (!style.catalog_variant_ids || style.catalog_variant_ids.length === 0) {
+      return true;
+    }
+    return style.catalog_variant_ids.includes(variantId);
+  } catch {
+    return false;
+  }
+}
 
 // Printful front print area for product 71: 12 × 16 inches.
 // The v2 position object expects inch values, not pixels.
@@ -182,6 +237,10 @@ export async function POST(
   // Build Printful position from saved placement, falling back to centered.
   const printfulPosition = buildPrintfulPosition(design.placement);
 
+  // Pick the catalog variant that matches the shirt colour the user chose.
+  const placement = design.placement as SavedPlacement | null;
+  const catalogVariantId = getMockupVariantId(placement?.shirtColor);
+
   try {
     // ── 1. Create Printful v2 mockup task ──────────────────────────────
     const layer: Record<string, unknown> = {
@@ -192,6 +251,32 @@ export async function POST(
       layer.position = printfulPosition;
     }
 
+    // Only request our preferred lifestyle style when it's actually offered for
+    // this variant; otherwise omit mockup_style_ids so Printful picks a default
+    // style for the variant rather than failing the task.
+    const product: Record<string, unknown> = {
+      source: "catalog",
+      catalog_product_id: PRINTFUL_CATALOG_PRODUCT_ID,
+      catalog_variant_ids: [catalogVariantId],
+      placements: [
+        {
+          placement: "front",
+          technique: "dtg",
+          layers: [layer],
+        },
+      ],
+    };
+
+    const styleAvailable = await isStyleAvailable(
+      PRINTFUL_CATALOG_PRODUCT_ID,
+      catalogVariantId,
+      PRINTFUL_MOCKUP_STYLE_ID,
+      process.env.PRINTFUL_API_TOKEN!
+    );
+    if (styleAvailable) {
+      product.mockup_style_ids = [PRINTFUL_MOCKUP_STYLE_ID];
+    }
+
     const createRes = await fetch(`${PRINTFUL_API}/mockup-tasks`, {
       method: "POST",
       headers: {
@@ -200,21 +285,7 @@ export async function POST(
       },
       body: JSON.stringify({
         format: "jpg",
-        products: [
-          {
-            source: "catalog",
-            catalog_product_id: PRINTFUL_CATALOG_PRODUCT_ID,
-            catalog_variant_ids: [PRINTFUL_CATALOG_VARIANT_ID],
-            mockup_style_ids: [PRINTFUL_MOCKUP_STYLE_ID],
-            placements: [
-              {
-                placement: "front",
-                technique: "dtg",
-                layers: [layer],
-              },
-            ],
-          },
-        ],
+        products: [product],
       }),
     });
 
