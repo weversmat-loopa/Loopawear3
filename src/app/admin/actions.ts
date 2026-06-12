@@ -210,9 +210,16 @@ export async function sendToPrintful(formData: FormData) {
         },
         items: [
           {
+            source: "catalog",
             catalog_variant_id: catalogVariantId,
             quantity: order.quantity ?? 1,
-            files: [{ type: "default", source: { type: "url", url: design.image_url } }],
+            placements: [
+              {
+                placement: "front",
+                technique: "dtg",
+                layers: [{ type: "file", url: design.image_url }],
+              },
+            ],
           },
         ],
       }),
