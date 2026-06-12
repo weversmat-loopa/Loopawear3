@@ -198,7 +198,7 @@ export async function sendToPrintful(formData: FormData) {
         Authorization: `Bearer ${process.env.PRINTFUL_TOKEN}`,
         "X-PF-Store-Id": process.env.PRINTFUL_STORE_ID!,
       },
-      body: JSON.stringify({
+      body: JSON.stringify({ draft: true,
         recipient: {
           name: order.shipping_name,
           address1: order.shipping_line1,
