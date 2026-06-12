@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
+// Print-zone geometry (in editor canvas pixels) is the single source of truth
+// shared with the PlacementEditor. We need it here to translate a saved
+// placement (canvas-space) into the Printful print area (inches).
+import { ZONES, type Side } from "@/app/generate/printful";
 
 export const maxDuration = 120;
 
@@ -103,13 +107,31 @@ interface PrintfulPosition {
 }
 
 /**
- * Convert a PlacementEditor canvas-space placement into a Printful pixel-space
- * position object. Returns null if the placement data is missing or invalid so
- * the caller can fall back to Printful's default centering.
+ * Convert a PlacementEditor placement into a Printful print-area position.
  *
- * Canvas coordinate system: x/y is the design's CENTER in canvas pixels.
- * scale is the fraction of canvasW that the design occupies (its rendered width).
- * Printful position system: left/top is the design's TOP-LEFT in print pixels.
+ * THREE coordinate spaces are involved — getting the bug right means mapping
+ * between them correctly:
+ *
+ *  1. Editor canvas space (pixels, 400 × 480). `x`/`y` are the design's
+ *     CENTER in these pixels (Fabric originX/originY = "center").
+ *  2. Print ZONE — a sub-rectangle of the canvas, e.g. front =
+ *     { x:80, y:92, w:240, h:288 }. The dashed print zone the user sees is
+ *     this rectangle, NOT the whole canvas. The Printful print area maps onto
+ *     THIS zone, so all positions must be expressed relative to the zone's
+ *     origin (zone.x, zone.y) and size (zone.w, zone.h) — not the canvas.
+ *  3. Printful print area (inches, 12 × 16). left/top is the design's
+ *     TOP-LEFT in inches from the print-area origin.
+ *
+ * The previous implementation divided x/y by the full canvas width/height,
+ * which ignored the zone offset/size and pulled every design toward the canvas
+ * centre — horizontal offset was effectively lost. We now convert the center
+ * to a fraction of the ZONE, then scale by the inch dimensions of the print area.
+ *
+ * `widthFraction` is already saved as (design width / zone width), so it maps
+ * directly onto the 12-inch print width.
+ *
+ * Returns null if the placement data is missing or invalid so the caller can
+ * fall back to Printful's default centering.
  */
 function buildPrintfulPosition(raw: unknown): PrintfulPosition | null {
   if (!raw || typeof raw !== "object") return null;
@@ -134,6 +156,11 @@ function buildPrintfulPosition(raw: unknown): PrintfulPosition | null {
     return null;
   }
 
+  // Resolve the print zone the placement was made against. Default to front
+  // (the only side currently sent to Printful) for unknown/missing sides.
+  const side: Side = p.side === "back" ? "back" : "front";
+  const zone = ZONES[side];
+
   const round2 = (v: number) => Math.round(v * 100) / 100;
 
   // widthFraction = rendered design width / zone width (saved by PlacementEditor).
@@ -142,9 +169,15 @@ function buildPrintfulPosition(raw: unknown): PrintfulPosition | null {
   let height = width; // keep square, cap to 16 if somehow larger
   if (height > PRINT_AREA_H) height = PRINT_AREA_H;
 
-  // Convert center coords to top-left in print space (inches).
-  let left = round2((x / canvasW) * PRINT_AREA_W - width / 2);
-  let top  = round2((y / canvasH) * PRINT_AREA_H - height / 2);
+  // Convert the design CENTER from canvas pixels → fraction of the print ZONE,
+  // then scale by the print area's inch dimensions and shift to TOP-LEFT.
+  // A design at the zone's top-left corner (x≈zone.x, y≈zone.y) now maps to
+  // ~0 inches left/top instead of being pulled toward the canvas centre.
+  const zoneFracX = (x - zone.x) / zone.w;
+  const zoneFracY = (y - zone.y) / zone.h;
+
+  let left = round2(zoneFracX * PRINT_AREA_W - width / 2);
+  let top  = round2(zoneFracY * PRINT_AREA_H - height / 2);
 
   // Clamp so the design never bleeds outside the print area.
   left = Math.max(0, Math.min(left, round2(PRINT_AREA_W - width)));
