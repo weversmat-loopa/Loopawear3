@@ -8,6 +8,7 @@ import {
   designApprovedEmail,
   designRejectedEmail,
 } from "@/lib/email/templates";
+import { getVariantId } from "@/lib/printfulVariants";
 
 async function requireAdmin() {
   const supabase = await createClient();
@@ -135,19 +136,6 @@ export async function rejectDesign(formData: FormData) {
 
 // ── Printful fulfillment ─────────────────────────────────────────────────
 
-// Black M = 4017, White M = 4012 (Bella+Canvas 3001)
-function getPrintfulVariantId(placement: unknown): number {
-  if (
-    placement !== null &&
-    typeof placement === "object" &&
-    "shirtColor" in (placement as Record<string, unknown>) &&
-    (placement as Record<string, unknown>).shirtColor === "white"
-  ) {
-    return 4012;
-  }
-  return 4017;
-}
-
 export async function sendToPrintful(formData: FormData) {
   const { service } = await requireAdmin();
 
@@ -186,7 +174,9 @@ export async function sendToPrintful(formData: FormData) {
     redirect(`/admin/orders?error=${encodeURIComponent("Design not found.")}`);
   }
 
-  const catalogVariantId = getPrintfulVariantId(design.placement);
+  const catalogVariantId = getVariantId(
+    (design.placement as { shirtColor?: unknown } | null)?.shirtColor
+  );
 
   // Submit to Printful
   let pfData: Record<string, unknown>;

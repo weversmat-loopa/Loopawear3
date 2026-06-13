@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/server";
 // shared with the PlacementEditor. We need it here to translate a saved
 // placement (canvas-space) into the Printful print area (inches).
 import { ZONES, type Side } from "@/app/generate/printful";
+import { getVariantId } from "@/lib/printfulVariants";
 
 export const maxDuration = 120;
 
@@ -11,22 +12,6 @@ const PRINTFUL_API = "https://api.printful.com/v2";
 
 // Phase 1 — Bella + Canvas 3001 (product 71), DTG front.
 const PRINTFUL_CATALOG_PRODUCT_ID = 71;
-
-// Catalog variant ids per shirt colour (Bella + Canvas 3001, size M).
-// Black is the default for missing/unknown colours so older designs and any
-// future colour we haven't mapped yet still produce a mockup.
-const PRINTFUL_VARIANT_BLACK_M = 4017;
-const PRINTFUL_VARIANT_WHITE_M = 4012;
-
-// Map a saved placement.shirtColor to a Printful catalog variant id.
-// Extend this as more colours are added (e.g. "navy" -> <variant id>).
-function getMockupVariantId(shirtColor: unknown): number {
-  if (typeof shirtColor === "string" && shirtColor.toLowerCase() === "white") {
-    return PRINTFUL_VARIANT_WHITE_M;
-  }
-  // "black", missing, or any unmapped colour falls back to black.
-  return PRINTFUL_VARIANT_BLACK_M;
-}
 
 // Men's Lifestyle 3 › Front (style 758) — real model wearing the shirt.
 // In Printful v2 a style id is only valid for the variants that support it, so
@@ -272,7 +257,7 @@ export async function POST(
 
   // Pick the catalog variant that matches the shirt colour the user chose.
   const placement = design.placement as SavedPlacement | null;
-  const catalogVariantId = getMockupVariantId(placement?.shirtColor);
+  const catalogVariantId = getVariantId(placement?.shirtColor);
 
   try {
     // ── 1. Create Printful v2 mockup task ──────────────────────────────

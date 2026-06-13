@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { createServiceClient } from "@/utils/supabase/service";
-
-// Black M = 4017, White M = 4012 (Bella+Canvas 3001)
-function getCatalogVariantId(placement: unknown): number {
-  if (
-    placement !== null &&
-    typeof placement === "object" &&
-    "shirtColor" in (placement as Record<string, unknown>) &&
-    (placement as Record<string, unknown>).shirtColor === "white"
-  ) {
-    return 4012;
-  }
-  return 4017;
-}
+import { getVariantId } from "@/lib/printfulVariants";
 
 export async function POST(
   _req: NextRequest,
@@ -73,7 +61,9 @@ export async function POST(
     return NextResponse.json({ ok: false, error: "Design not found" }, { status: 404 });
   }
 
-  const catalogVariantId = getCatalogVariantId(design.placement);
+  const catalogVariantId = getVariantId(
+    (design.placement as { shirtColor?: unknown } | null)?.shirtColor
+  );
 
   // ── Build Printful payload ────────────────────────────────────────────────
   const printfulPayload = {
