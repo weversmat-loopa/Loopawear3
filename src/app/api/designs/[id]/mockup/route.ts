@@ -25,8 +25,17 @@ const PRINTFUL_CATALOG_PRODUCT_ID = 71;
 const PRINTFUL_MOCKUP_STYLE_IDS = [758, 849, 22145] as const;
 
 // Shape of the /v2/catalog-products/{id}/mockup-styles response we inspect.
+// Styles are nested per placement: data[].mockup_styles[]. Each style is
+// restricted to a set of variant ids via `restricted_to_variants` (null/empty
+// means it applies to all variants).
 type MockupStylesResponse = {
-  data?: Array<{ id?: number; catalog_variant_ids?: number[] }>;
+  data?: Array<{
+    placement?: string;
+    mockup_styles?: Array<{
+      id?: number;
+      restricted_to_variants?: number[] | null;
+    }>;
+  }>;
 };
 
 /**
@@ -49,13 +58,16 @@ async function isStyleAvailable(
     if (!res.ok) return false;
 
     const json = (await res.json()) as MockupStylesResponse;
-    const style = json.data?.find((s) => s.id === styleId);
-    // A style with no variant restriction list applies to all variants.
+    // Styles are nested inside data[].mockup_styles[] — flatten across all
+    // placement entries into one list before looking up by id.
+    const allStyles = (json.data ?? []).flatMap((d) => d.mockup_styles ?? []);
+    const style = allStyles.find((s) => s.id === styleId);
     if (!style) return false;
-    if (!style.catalog_variant_ids || style.catalog_variant_ids.length === 0) {
+    // null/empty restriction list means the style applies to all variants.
+    if (!style.restricted_to_variants || style.restricted_to_variants.length === 0) {
       return true;
     }
-    return style.catalog_variant_ids.includes(variantId);
+    return style.restricted_to_variants.includes(variantId);
   } catch {
     return false;
   }
