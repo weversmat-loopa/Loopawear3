@@ -14,6 +14,7 @@ interface DesignImageSectionProps {
   colorPalette: string | null;
   refineHref: string;
   mockupUrl: string | null;
+  mockupUrls?: string[] | null;
   mockupStatus: string | null;
 }
 
@@ -25,6 +26,7 @@ export default function DesignImageSection({
   colorPalette,
   refineHref,
   mockupUrl,
+  mockupUrls,
   mockupStatus,
 }: DesignImageSectionProps) {
   const router = useRouter();
@@ -40,6 +42,17 @@ export default function DesignImageSection({
     mockupStatus === "ready" && !!mockupUrl
   );
 
+  // Gallery list: prefer the multi-URL array, fall back to the single
+  // mockupUrl for designs generated before the array existed.
+  const galleryUrls =
+    mockupUrls && mockupUrls.length > 0
+      ? mockupUrls
+      : mockupUrl
+      ? [mockupUrl]
+      : [];
+  // Which gallery image is shown when the "Mockup" toggle is active.
+  const [activeMockup, setActiveMockup] = useState(0);
+
   const serverMockupGenerating = mockupStatus === "generating";
   const anyMockupGenerating = isMockupGenerating || serverMockupGenerating;
 
@@ -49,6 +62,14 @@ export default function DesignImageSection({
       setShowMockup(true);
     }
   }, [mockupStatus, mockupUrl]);
+
+  // Reset the active thumbnail if the gallery shrinks below the current index
+  // (e.g. after a regeneration returns fewer styles).
+  useEffect(() => {
+    if (activeMockup > galleryUrls.length - 1) {
+      setActiveMockup(0);
+    }
+  }, [galleryUrls.length, activeMockup]);
 
   const canGenerate =
     !isGenerating &&
@@ -159,7 +180,9 @@ export default function DesignImageSection({
   }
 
   // Server state: ready with image
-  const hasReadyMockup = mockupStatus === "ready" && !!mockupUrl;
+  const hasReadyMockup = mockupStatus === "ready" && galleryUrls.length > 0;
+  // The mockup currently selected in the gallery (guarded by the reset effect).
+  const activeMockupUrl = galleryUrls[activeMockup] ?? galleryUrls[0] ?? null;
 
   const imageArea =
     imageStatus === "ready" && imageUrl ? (
@@ -192,7 +215,7 @@ export default function DesignImageSection({
         )}
         <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
           <Image
-            src={hasReadyMockup && showMockup ? mockupUrl! : imageUrl}
+            src={hasReadyMockup && showMockup && activeMockupUrl ? activeMockupUrl : imageUrl}
             alt={productType ? `${productType} design` : "Generated design"}
             width={1024}
             height={1024}
@@ -200,6 +223,35 @@ export default function DesignImageSection({
             className="block h-auto w-full"
           />
         </div>
+
+        {/* Mockup gallery thumbnails — only when viewing mockups and more
+            than one style was produced. */}
+        {hasReadyMockup && showMockup && galleryUrls.length > 1 && (
+          <div className="mt-3 flex gap-2">
+            {galleryUrls.map((url, idx) => (
+              <button
+                key={url}
+                type="button"
+                onClick={() => setActiveMockup(idx)}
+                aria-label={`Mockup ${idx + 1}`}
+                aria-pressed={idx === activeMockup}
+                className={`overflow-hidden rounded-lg border transition-colors ${
+                  idx === activeMockup
+                    ? "border-zinc-900 dark:border-zinc-100"
+                    : "border-zinc-200 hover:border-zinc-400 dark:border-zinc-700 dark:hover:border-zinc-500"
+                }`}
+              >
+                <Image
+                  src={url}
+                  alt={`Mockup ${idx + 1} thumbnail`}
+                  width={72}
+                  height={72}
+                  className="block h-16 w-16 object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     ) : serverGenerating ? (
       <div className="flex aspect-square w-full animate-pulse items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">

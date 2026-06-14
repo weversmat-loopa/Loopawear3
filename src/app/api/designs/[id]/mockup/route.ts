@@ -17,7 +17,12 @@ const PRINTFUL_CATALOG_PRODUCT_ID = 71;
 // In Printful v2 a style id is only valid for the variants that support it, so
 // we verify availability per-variant at request time (see isStyleAvailable) and
 // fall back to Printful's default style when 758 isn't offered for the variant.
-const PRINTFUL_MOCKUP_STYLE_ID = 758;
+// Styles we request for the multi-mockup gallery, in display order:
+//   758   — Men's Lifestyle Front
+//   849   — Flat Front
+//   22145 — Zoomed In
+// Each style that Printful actually produces becomes one stored mockup URL.
+const PRINTFUL_MOCKUP_STYLE_IDS = [758, 849, 22145] as const;
 
 // Shape of the /v2/catalog-products/{id}/mockup-styles response we inspect.
 type MockupStylesResponse = {
@@ -196,7 +201,7 @@ type PrintfulPollResponse = {
     status?: string;
     failure_reasons?: string[];
     catalog_variant_mockups?: Array<{
-      mockups?: Array<{ mockup_url?: string }>;
+      mockups?: Array<{ mockup_url?: string; style_id?: number }>;
     }>;
   }>;
 };
@@ -269,9 +274,10 @@ export async function POST(
       layer.position = printfulPosition;
     }
 
-    // Only request our preferred lifestyle style when it's actually offered for
-    // this variant; otherwise omit mockup_style_ids so Printful picks a default
-    // style for the variant rather than failing the task.
+    // Request all gallery styles that are actually offered for this variant.
+    // Unsupported styles are filtered out so the task never fails on a bad
+    // style/variant pairing; if none survive, omit mockup_style_ids entirely
+    // and let Printful pick a default style.
     const product: Record<string, unknown> = {
       source: "catalog",
       catalog_product_id: PRINTFUL_CATALOG_PRODUCT_ID,
@@ -285,14 +291,18 @@ export async function POST(
       ],
     };
 
-    const styleAvailable = await isStyleAvailable(
-      PRINTFUL_CATALOG_PRODUCT_ID,
-      catalogVariantId,
-      PRINTFUL_MOCKUP_STYLE_ID,
-      process.env.PRINTFUL_API_TOKEN!
-    );
-    if (styleAvailable) {
-      product.mockup_style_ids = [PRINTFUL_MOCKUP_STYLE_ID];
+    const availableStyleIds: number[] = [];
+    for (const styleId of PRINTFUL_MOCKUP_STYLE_IDS) {
+      const ok = await isStyleAvailable(
+        PRINTFUL_CATALOG_PRODUCT_ID,
+        catalogVariantId,
+        styleId,
+        process.env.PRINTFUL_API_TOKEN!
+      );
+      if (ok) availableStyleIds.push(styleId);
+    }
+    if (availableStyleIds.length > 0) {
+      product.mockup_style_ids = availableStyleIds;
     }
 
     const createRes = await fetch(`${PRINTFUL_API}/mockup-tasks`, {
@@ -322,7 +332,10 @@ export async function POST(
     }
 
     // ── 2. Poll until completed or timeout ────────────────────────────
-    let mockupCdnUrl: string | null = null;
+    // Collect every produced mockup (one per requested style) with its
+    // style_id so we can name the stored files deterministically.
+    type CdnMockup = { url: string; styleId: number | null };
+    let cdnMockups: CdnMockup[] = [];
     const deadline = Date.now() + POLL_TIMEOUT_MS;
 
     while (Date.now() < deadline) {
@@ -351,50 +364,71 @@ export async function POST(
       }
 
       if (task?.status === "completed") {
-        mockupCdnUrl =
-          task.catalog_variant_mockups?.[0]?.mockups?.[0]?.mockup_url ?? null;
+        // Flatten all mockups across every catalog_variant_mockups entry.
+        cdnMockups = (task.catalog_variant_mockups ?? []).flatMap((cvm) =>
+          (cvm.mockups ?? [])
+            .filter((m) => typeof m.mockup_url === "string")
+            .map((m) => ({
+              url: m.mockup_url as string,
+              styleId: typeof m.style_id === "number" ? m.style_id : null,
+            }))
+        );
         break;
       }
       // status === "pending" — keep polling
     }
 
-    if (!mockupCdnUrl) {
+    if (cdnMockups.length === 0) {
       throw new Error("mockup_timeout");
     }
 
-    // ── 3. Download from Printful CDN and persist in Supabase Storage ──
-    // Printful CDN URLs are temporary — we must store a permanent copy.
-    let publicUrl: string;
+    // ── 3. Download each from Printful CDN and persist in Supabase Storage ──
+    // Printful CDN URLs are temporary — we must store permanent copies.
+    // Files are named by style_id when available, falling back to the index
+    // so two styles never collide on the same storage path.
+    let publicUrls: string[];
     try {
-      const imgRes = await fetch(mockupCdnUrl);
-      if (!imgRes.ok) throw new Error("download_failed");
-      const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
+      publicUrls = await Promise.all(
+        cdnMockups.map(async (m, idx) => {
+          const imgRes = await fetch(m.url);
+          if (!imgRes.ok) throw new Error("download_failed");
+          const imgBuffer = Buffer.from(await imgRes.arrayBuffer());
 
-      const storagePath = `designs/${id}_mockup.jpg`;
-      const { error: uploadError } = await supabase.storage
-        .from("design-images")
-        .upload(storagePath, imgBuffer, {
-          contentType: "image/jpeg",
-          upsert: true,
-        });
+          const styleKey = m.styleId ?? `idx${idx}`;
+          const storagePath = `designs/${id}_mockup_${styleKey}.jpg`;
+          const { error: uploadError } = await supabase.storage
+            .from("design-images")
+            .upload(storagePath, imgBuffer, {
+              contentType: "image/jpeg",
+              upsert: true,
+            });
 
-      if (uploadError) throw new Error("upload_failed");
+          if (uploadError) throw new Error("upload_failed");
 
-      const {
-        data: { publicUrl: baseUrl },
-      } = supabase.storage.from("design-images").getPublicUrl(storagePath);
+          const {
+            data: { publicUrl: baseUrl },
+          } = supabase.storage.from("design-images").getPublicUrl(storagePath);
 
-      // Cache-bust so the browser never serves a stale mockup after regeneration.
-      publicUrl = `${baseUrl}?t=${Date.now()}`;
+          // Cache-bust so the browser never serves a stale mockup after regen.
+          return `${baseUrl}?t=${Date.now()}`;
+        })
+      );
     } catch (err) {
       console.error("[mockup] Storage error:", err);
       throw new Error("storage_failed");
     }
 
-    // ── 4. Persist URL in DB ───────────────────────────────────────────
+    // First URL doubles as the legacy single mockup_url for backwards compat.
+    const primaryUrl = publicUrls[0];
+
+    // ── 4. Persist URLs in DB ──────────────────────────────────────────
     const { error: dbError } = await supabase
       .from("designs")
-      .update({ mockup_status: "ready", mockup_url: publicUrl })
+      .update({
+        mockup_status: "ready",
+        mockup_url: primaryUrl,
+        mockup_urls: publicUrls,
+      })
       .eq("id", id)
       .eq("creator_id", user.id);
 
@@ -403,7 +437,7 @@ export async function POST(
       throw new Error("db_failed");
     }
 
-    return NextResponse.json({ mockupUrl: publicUrl });
+    return NextResponse.json({ mockupUrl: primaryUrl, mockupUrls: publicUrls });
   } catch (err) {
     // Always release the generating lock so the user can retry.
     console.error("[mockup]", err);
