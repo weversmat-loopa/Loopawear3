@@ -18,7 +18,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 // ResizeObserver is available in all modern browsers. No polyfill needed.
 import type { Canvas as FabricCanvas, FabricImage as FabricImageT } from "fabric";
-import { savePlacement } from "./actions";
+import { savePlacement, type PlacementData } from "./actions";
 import {
   CANVAS_W as W,
   CANVAS_H as H,
@@ -33,9 +33,27 @@ import {
 interface Props {
   imageUrl: string;
   designId: string;
+  /**
+   * Previously saved placement to restore on mount. When present, the editor
+   * loads the design at the saved position/scale/rotation and pre-selects the
+   * saved shirt colour, side and garment size instead of starting from a
+   * centred default. Written by `savePlacement` (see actions.ts).
+   */
+  initialPlacement?: PlacementData | null;
 }
 
-export default function PlacementEditor({ imageUrl, designId }: Props) {
+// Coerce a stored shirt-colour string back to a known ShirtColor, falling back
+// to "white" if the value is no longer a valid option.
+function asShirtColor(value: string | undefined): ShirtColor {
+  return value && value in SHIRT_COLOURS ? (value as ShirtColor) : "white";
+}
+
+// Coerce a stored side string back to a known Side, defaulting to "front".
+function asSide(value: string | undefined): Side {
+  return value && value in ZONES ? (value as Side) : "front";
+}
+
+export default function PlacementEditor({ imageUrl, designId, initialPlacement = null }: Props) {
   const canvasEl = useRef<HTMLCanvasElement>(null);
   const fabricRef = useRef<FabricCanvas | null>(null);
   const designRef = useRef<FabricImageT | null>(null);
@@ -43,11 +61,14 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
   // Fabric scaleX (fraction of natural size) and slider % (fraction of zone width).
   const imgNaturalWRef = useRef<number>(1024);
   // Ref keeps the closure in the Fabric event handlers up-to-date.
-  const sideRef = useRef<Side>("front");
+  const sideRef = useRef<Side>(asSide(initialPlacement?.side));
+  // Ref keeps the saved placement reachable inside the one-time init closure
+  // without re-running it (init only depends on imageUrl).
+  const initialPlacementRef = useRef<PlacementData | null>(initialPlacement);
 
-  const [side, setSide] = useState<Side>("front");
-  const [color, setColor] = useState<ShirtColor>("white");
-  const [size, setSize] = useState("M");
+  const [side, setSide] = useState<Side>(asSide(initialPlacement?.side));
+  const [color, setColor] = useState<ShirtColor>(asShirtColor(initialPlacement?.shirtColor));
+  const [size, setSize] = useState(initialPlacement?.size ?? "M");
   const [sliderScale, setSliderScale] = useState(35);
   const [outOfBounds, setOutOfBounds] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -127,21 +148,26 @@ export default function PlacementEditor({ imageUrl, designId }: Props) {
       const upper = canvas.upperCanvasEl;
       if (upper) upper.style.touchAction = "none";
 
-      const z = ZONES.front;
+      const saved = initialPlacementRef.current;
+      const z = ZONES[asSide(saved?.side)];
 
       // ── Design image ─────────────────────────────────────────────────────
       try {
         const img = await FabricImage.fromURL(imageUrl, { crossOrigin: "anonymous" });
         const naturalW = img.width ?? 1024;
         imgNaturalWRef.current = naturalW;
-        const scale = Math.min(
+        // Restore the saved scale/position/rotation when available; otherwise
+        // fall back to a centred, 35%-of-zone default.
+        const defaultScale = Math.min(
           (z.w * 0.35) / naturalW,
           (z.h * 0.35) / (img.height ?? 1024),
         );
+        const scale = saved ? saved.scale : defaultScale;
         setSliderScale(Math.round((scale * naturalW) / z.w * 100));
         img.set({
-          left: z.x + z.w / 2,
-          top: z.y + z.h / 2,
+          left: saved ? saved.x : z.x + z.w / 2,
+          top: saved ? saved.y : z.y + z.h / 2,
+          angle: saved ? saved.rotation : 0,
           originX: "center",
           originY: "center",
           scaleX: scale,

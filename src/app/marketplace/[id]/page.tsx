@@ -84,7 +84,7 @@ export default async function DesignPage({ params }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, image_url, mockup_url, mockup_status, placement, created_at, creator_id, price_cents")
+    .select("id, title, prompt, product_type, style, image_url, mockup_url, mockup_urls, mockup_status, placement, created_at, creator_id, price_cents")
     .eq("id", id)
     .eq("status", "published")
     .is("archived_at", null)
@@ -189,6 +189,7 @@ export default async function DesignPage({ params }: Props) {
                 }
                 loading="eager"
                 mockupUrl={design.mockup_url ?? null}
+                mockupUrls={design.mockup_urls ?? []}
                 mockupStatus={design.mockup_status ?? null}
               />
             </div>

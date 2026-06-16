@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
-import { saveDraft, saveDetails, submitDesignForReview } from "./actions";
+import { saveDraft, saveDetails, submitDesignForReview, type PlacementData } from "./actions";
+import { createClient } from "@/utils/supabase/client";
 import { DoodleStar, DoodleBolt, DoodleSwirl, DoodleSparkle } from "@/components/ui/Doodles";
 
 const PlacementEditor = dynamic(() => import("./PlacementEditor"), {
@@ -107,6 +108,9 @@ export default function GenerateStudio({
   const [removeBackground, setRemoveBackground] = useState(true);
   const [lastImageUrl,     setLastImageUrl]     = useState<string | null>(null);
   const [imgLoaded,        setImgLoaded]        = useState(false);
+  // Saved placement for the loaded design, passed to the PlacementEditor so it
+  // restores the creator's earlier positioning instead of a centred default.
+  const [placement,        setPlacement]        = useState<PlacementData | null>(null);
 
   // Accordion open step
   const [openStep, setOpenStep] = useState<OpenStep>(1);
@@ -137,6 +141,57 @@ export default function GenerateStudio({
 
   // Whether post-generation steps are unlocked
   const postGenUnlocked = saveState.status === "generated";
+
+  // ── Load an existing design when arriving with ?design_id=… ───────────────
+  // Lets a creator re-open a saved draft in the Studio: we restore the existing
+  // image, details and placement WITHOUT regenerating (which would cost a
+  // credit). The "Generate" button still works for anyone who wants to replace
+  // the image — that path consumes a credit, by design.
+  useEffect(() => {
+    if (!initialDesignId) return;
+    let cancelled = false;
+
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: design } = await supabase
+        .from("designs")
+        .select("image_url, image_status, title, price_cents, placement, prompt, product_type, style")
+        .eq("id", initialDesignId)
+        .eq("creator_id", user.id)
+        .maybeSingle();
+
+      if (cancelled || !design) return;
+
+      // Prefill the form fields from the saved design.
+      setPrompt(design.prompt ?? "");
+      setDetailPrompt(design.prompt ?? "");
+      setDetailTitle(design.title ?? "");
+      setDetailProductType(design.product_type ?? null);
+      setDetailStyle(design.style ?? null);
+      if (PRODUCT_TYPES.includes(design.product_type as (typeof PRODUCT_TYPES)[number])) {
+        setProductType(design.product_type as ProductType);
+      }
+      setDetailPrice(
+        design.price_cents != null ? (design.price_cents / 100).toFixed(2) : ""
+      );
+      setPlacement((design.placement as PlacementData | null) ?? null);
+
+      // Restore the existing image straight into "generated" — no regeneration.
+      if (design.image_status === "ready" && design.image_url) {
+        setLastImageUrl(design.image_url);
+        setSaveState({ status: "generated", id: initialDesignId, imageUrl: design.image_url });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialDesignId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When a new image is generated, sync the prompt state and open step 2
   useEffect(() => {
@@ -178,6 +233,7 @@ export default function GenerateStudio({
     setPrompt("");
     setProductType(null);
     setDesignId(null);
+    setPlacement(null);
     setSaveState({ status: "idle" });
     setDetailTitle("");
     setDetailPrompt("");
@@ -496,6 +552,7 @@ export default function GenerateStudio({
                 <PlacementEditor
                   imageUrl={saveState.imageUrl}
                   designId={saveState.id}
+                  initialPlacement={placement}
                 />
               </div>
             )}

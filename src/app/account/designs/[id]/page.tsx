@@ -64,7 +64,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
 
   const { data: design } = await supabase
     .from("designs")
-    .select("id, title, prompt, product_type, style, status, image_status, image_url, mockup_url, mockup_urls, mockup_status, created_at, price_cents")
+    .select("id, title, prompt, product_type, style, status, image_status, image_url, mockup_url, mockup_urls, mockup_status, created_at, price_cents, placement")
     .eq("id", id)
     .eq("creator_id", user.id)
     .maybeSingle();
@@ -164,6 +164,7 @@ export default async function OwnerDesignPage({ params, searchParams }: Props) {
             <PlacementEditorWrapper
               imageUrl={design.image_url}
               designId={design.id}
+              initialPlacement={design.placement ?? null}
             />
           )}
 

@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import type { PlacementData } from "@/app/generate/actions";
 
 const PlacementEditor = dynamic(
   () => import("@/app/generate/PlacementEditor"),
@@ -18,9 +19,17 @@ const PlacementEditor = dynamic(
 export default function PlacementEditorWrapper({
   imageUrl,
   designId,
+  initialPlacement = null,
 }: {
   imageUrl: string;
   designId: string;
+  initialPlacement?: PlacementData | null;
 }) {
-  return <PlacementEditor imageUrl={imageUrl} designId={designId} />;
+  return (
+    <PlacementEditor
+      imageUrl={imageUrl}
+      designId={designId}
+      initialPlacement={initialPlacement}
+    />
+  );
 }

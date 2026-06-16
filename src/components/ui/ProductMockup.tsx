@@ -8,6 +8,7 @@
  */
 
 import Image from "next/image";
+import MockupGallery from "./MockupGallery";
 
 interface PlacementProps {
   x: number;
@@ -27,6 +28,8 @@ interface ProductMockupProps {
   className?: string;
   /** Printful-generated mockup URL. When present and status is "ready", shown directly — no SVG overlay. */
   mockupUrl?: string | null;
+  /** Multiple Printful mockup style variants. When more than one is present, a thumbnail gallery is shown. */
+  mockupUrls?: string[];
   mockupStatus?: string | null;
 }
 
@@ -65,6 +68,7 @@ export default function ProductMockup({
   loading = "lazy",
   className,
   mockupUrl = null,
+  mockupUrls = [],
   mockupStatus = null,
 }: ProductMockupProps) {
   const wrapperClass = `relative aspect-square w-full overflow-hidden ${className ?? ""}`.trim();
@@ -79,6 +83,18 @@ export default function ProductMockup({
   // Printful mockup: already a complete product photo, no SVG overlay needed.
   // imageUrl is guaranteed non-null past the check above.
   if (mockupStatus === "ready" && mockupUrl) {
+    // Multiple style variants → interactive thumbnail gallery (client).
+    if (mockupUrls.length > 1) {
+      return (
+        <MockupGallery
+          urls={mockupUrls}
+          alt={alt}
+          wrapperClass={wrapperClass}
+          sizes={MOCKUP_SIZES}
+          loading={loading}
+        />
+      );
+    }
     return (
       <div className={`${wrapperClass} bg-zinc-50 dark:bg-zinc-800`}>
         <Image

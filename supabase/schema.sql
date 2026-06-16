@@ -210,6 +210,8 @@ CREATE TABLE IF NOT EXISTS "public"."orders" (
     "shipping_country" "text" NOT NULL,
     "status" "text" DEFAULT 'paid'::"text" NOT NULL,
     "tracking_number" "text",
+    "tracking_url" "text",
+    "carrier" "text",
     "fulfillment_notes" "text",
     "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
     "paid_at" timestamp with time zone DEFAULT "now"() NOT NULL,
